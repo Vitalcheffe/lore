@@ -1005,96 +1005,100 @@ body {
 
 <script>
 // ===== ANIMATION ENGINE =====
-const TOTAL_DURATION = 290; // seconds
-const FPS = 8;
+const TOTAL_DURATION = 150; // seconds
+const FPS = 24;
 const TOTAL_FRAMES = TOTAL_DURATION * FPS;
 
 // Scene timing: [sceneId, startTime, endTime, soundEffect?]
 const sceneSchedule = [
-  // HOOK (0-30s)
-  ['scene1', 0, 4],              // "Every 68 seconds..."
-  ['scene2', 4, 9],              // "someone in crisis"
-  ['scene3', 9, 13],             // "And finds..."
-  ['scene4', 13, 17],            // "keywords." (red, big)
-  ['scene5', 17, 23],            // "No context. No understanding."
-  ['scene6', 23, 30],            // "What if AI could understand?"
+  // HOOK (0-17s)
+  ['scene1', 0, 2.5],            // "Every 68 seconds..."
+  ['scene2', 2.5, 5.5],          // "someone in crisis"
+  ['scene3', 5.5, 7.5],          // "And finds..."
+  ['scene4', 7.5, 10],           // "keywords." (red, big)
+  ['scene5', 10, 13.5],          // "No context. No understanding."
+  ['scene6', 13.5, 17],          // "What if AI could understand?"
 
-  // SOLUTION (30-120s)
-  ['scene7', 30, 36],            // Introducing ClearPath AI
-  ['scene8', 36, 41],            // Not another chatbot / A real NLI classifier
-  ['scene9', 41, 46],            // NLI Explained
-  ['scene10', 46, 54],           // Keyword problem examples
-  ['scene11', 54, 61],           // Keywords can't tell - pills
-  ['scene12', 61, 67],           // NLI changes everything
-  ['scene13', 67, 77],           // Pipeline animation
-  ['scene14', 77, 85],           // BART-large-MNLI
-  ['scene15', 85, 92],           // 407M counter
-  ['scene16', 92, 96],           // Label Design section
-  ['scene17', 96, 103],          // 7-8 terms per label
-  ['scene18', 103, 109],         // Too short?
-  ['scene19', 109, 114],         // Too long?
-  ['scene20', 114, 120],         // Just right
+  // SOLUTION (17-46s)
+  ['scene7', 17, 20],            // Introducing ClearPath AI
+  ['scene8', 20, 23],            // Not another chatbot / A real NLI classifier
+  ['scene9', 23, 25.5],          // NLI Explained
+  ['scene10', 25.5, 29],         // Keyword problem examples
+  ['scene11', 29, 32],           // Keywords can't tell - pills
+  ['scene12', 32, 34.5],         // NLI changes everything
+  ['scene13', 34.5, 39],         // Pipeline animation
+  ['scene14', 39, 43],           // BART-large-MNLI
+  ['scene15', 43, 46],           // 407M counter
 
-  // MULTI-NEED & HONEST CONFIDENCE (120-170s)
-  ['scene21', 120, 125],         // Multi-Need Detection
-  ['scene22', 125, 131],         // multi_label: true
-  ['scene23', 131, 139],         // Multi-need example
-  ['scene24', 139, 143],         // Honest Confidence section
-  ['scene25', 143, 150],         // Green badge
-  ['scene26', 150, 157],         // Amber badge
-  ['scene27', 157, 164],         // Honesty principle
+  // LABEL DESIGN (46-60s)
+  ['scene16', 46, 48],           // Label Design section
+  ['scene17', 48, 52],           // 7-8 terms per label
+  ['scene18', 52, 55],           // Too short?
+  ['scene19', 55, 57.5],         // Too long?
+  ['scene20', 57.5, 60],         // Just right
 
-  // CRISIS DETECTION (164-195s)
-  ['scene28', 164, 168],         // Crisis Detection section
-  ['scene29', 168, 174],         // Not AI. Deterministic.
-  ['scene30', 174, 182],         // 4 types
-  ['scene31', 182, 189],         // Instant redirect
-  ['scene32', 189, 195],         // Deterministic beats probabilistic
+  // MULTI-NEED (60-70s)
+  ['scene21', 60, 62],           // Multi-Need Detection
+  ['scene22', 62, 65.5],         // multi_label: true
+  ['scene23', 65.5, 70],         // Multi-need example
 
-  // DEMO (195-240s)
-  ['scene33', 195, 199],         // Let's see it
-  ['scene34', 199, 206],         // Homepage screenshot
-  ['scene35', 206, 212],         // App empty
-  ['scene36', 212, 219],         // App typing
-  ['scene37', 219, 226],         // App results
-  ['scene38', 226, 234],         // Highlight domestic violence
-  ['scene39', 234, 240],         // Second example
+  // HONEST CONFIDENCE (70-84s)
+  ['scene24', 70, 72],           // Honest Confidence section
+  ['scene25', 72, 76],           // Green badge
+  ['scene26', 76, 80],           // Amber badge
+  ['scene27', 80, 84],           // Honesty principle
 
-  // IMPACT (240-290s)
-  ['scene40', 240, 246],         // Real understanding. Multiple needs.
-  ['scene41', 246, 249],         // Built With section
-  ['scene42', 249, 258],         // Tech grid
-  ['scene43', 258, 264],         // Geolocation
-  ['scene44', 264, 270],         // ClearPath AI big
-  ['scene45', 270, 277],         // Three pillars
-  ['scene46', 277, 282],         // Open Source / Transparent / Honest
-  ['scene47', 282, 286],         // People in crisis deserve
-  ['scene48', 286, 288],         // URL
-  ['scene49', 288, 289.5],       // Thank you (black)
-  ['scene50', 289.5, 290],       // Final URL hold (black)
+  // CRISIS DETECTION (84-100s)
+  ['scene28', 84, 86],           // Crisis Detection section
+  ['scene29', 86, 89],           // Not AI. Deterministic.
+  ['scene30', 89, 93],           // 4 types
+  ['scene31', 93, 96.5],         // Instant redirect
+  ['scene32', 96.5, 100],        // Deterministic beats probabilistic
+
+  // DEMO (100-125s)
+  ['scene33', 100, 102],         // Let's see it
+  ['scene34', 102, 106],         // Homepage screenshot
+  ['scene35', 106, 109],         // App empty
+  ['scene36', 109, 113],         // App typing
+  ['scene37', 113, 117],         // App results
+  ['scene38', 117, 121],         // Highlight domestic violence
+  ['scene39', 121, 124.5],       // Second example
+
+  // TECH + IMPACT (125-150s)
+  ['scene40', 124.5, 127],       // Real understanding. Multiple needs.
+  ['scene41', 127, 129],         // Built With section
+  ['scene42', 129, 133],         // Tech grid
+  ['scene43', 133, 136],         // Geolocation
+  ['scene44', 136, 139],         // ClearPath AI big
+  ['scene45', 139, 142.5],       // Three pillars
+  ['scene46', 142.5, 145],       // Open Source / Transparent / Honest
+  ['scene47', 145, 147.5],       // People in crisis deserve
+  ['scene48', 147.5, 148.5],     // URL
+  ['scene49', 148.5, 149.5],     // Thank you (black)
+  ['scene50', 149.5, 150],       // Final URL hold (black)
 ];
 
 // Sound effect cue points: [timeInSeconds, sfxType]
 window.sfxCues = [
   [0, 'rise'],       // Hook start
-  [13, 'whoosh'],    // "keywords."
-  [23, 'ding'],      // "understand?"
-  [30, 'whoosh'],    // ClearPath AI intro
-  [41, 'click'],     // NLI section
-  [54, 'pop'],       // Pills appear
-  [67, 'whoosh'],    // Pipeline
-  [85, 'rise'],      // 407M counter
-  [92, 'click'],     // Label Design
-  [114, 'ding'],     // Just right
-  [120, 'whoosh'],   // Multi-Need
-  [139, 'click'],    // Honest Confidence
-  [164, 'rise'],     // Crisis Detection
-  [182, 'whoosh'],   // Crisis banner
-  [195, 'whoosh'],   // Demo
-  [219, 'pop'],      // Results appear
-  [240, 'ding'],     // Impact start
-  [264, 'rise'],     // ClearPath AI big
-  [288, 'ding'],     // Thank you
+  [7.5, 'whoosh'],   // "keywords."
+  [13.5, 'ding'],    // "understand?"
+  [17, 'whoosh'],    // ClearPath AI intro
+  [23, 'click'],     // NLI section
+  [29, 'pop'],       // Pills appear
+  [34.5, 'whoosh'],  // Pipeline
+  [43, 'rise'],      // 407M counter
+  [46, 'click'],     // Label Design
+  [57.5, 'ding'],    // Just right
+  [60, 'whoosh'],    // Multi-Need
+  [70, 'click'],     // Honest Confidence
+  [84, 'rise'],      // Crisis Detection
+  [93, 'whoosh'],    // Crisis banner
+  [100, 'whoosh'],   // Demo
+  [113, 'pop'],      // Results appear
+  [124.5, 'ding'],   // Impact start
+  [136, 'rise'],     // ClearPath AI big
+  [148.5, 'ding'],   // Thank you
 ];
 
 // Export for external use
@@ -1139,11 +1143,13 @@ function updateProgress(time) {
 }
 
 // Special: Animate the 407M gauge when scene15 is shown
+// scene15 runs from 43s to 46s (3s duration), gauge animates 0% → 100%
 function animateGauge() {
   const gauge = document.getElementById('gauge407');
   if (gauge) {
     gauge.style.width = '0%';
-    setTimeout(() => { gauge.style.width = '87%'; }, 300);
+    // Small delay to ensure CSS transition triggers, then animate to 100%
+    setTimeout(() => { gauge.style.width = '100%'; }, 100);
   }
 }
 
