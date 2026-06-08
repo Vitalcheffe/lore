@@ -1060,3 +1060,97 @@ Stage Summary:
 - All security issues fixed (NEXTAUTH_SECRET, fake data, fake claims)
 - Deployment configuration ready (vercel.json, .env.example)
 - Remaining: Real OAuth credentials (needs Amine), Vercel deployment
+
+---
+Task ID: 1
+Agent: general-purpose
+Task: Take production screenshots from ClearPath AI at https://clearpath-ai-prod.vercel.app
+
+Work Log:
+- Wrote Playwright script (take-prod-screenshots.js) to capture 4 production screenshots
+- Set viewport to 1280x720, headless mode, networkidle waits
+- Screenshot 1: Homepage — navigated to /, waited for networkidle + 2s, captured
+- Screenshot 2: App empty state — navigated to /app, waited for load, captured
+- Screenshot 3: App with typing — navigated to /app, found textarea, typed "My husband hurts me and I'm scared" char-by-char (80ms delay), waited 2s, captured
+- Screenshot 4: App with results — no submit button found (auto-classification), waited for "Crisis" text to appear (found within 5s), waited 3s for full render, captured
+- All 4 screenshots captured successfully
+
+Stage Summary:
+- prod_homepage.png — 187K (full landing page with hero, nav, sections)
+- prod_app_empty.png — 47K (empty chat state with suggestions)
+- prod_app_typing.png — 44K (input field with typed crisis text visible)
+- prod_app_results.png — 44K (AI classification results showing crisis detection)
+- Production site loaded successfully, AI classification API responding
+- Crisis keyword detection triggered correctly for domestic violence input
+
+---
+Task ID: 2-a and 2-b
+Agent: general-purpose
+Task: Generate background music and SFX for 5-minute pitch video (Apple Keynote style)
+
+Work Log:
+- Created /home/z/my-project/scripts/ directory for generation scripts
+- Created generate_bg_music.py for 5-minute ambient background music
+- Created generate_sfx.py for 5 sound effects
+- Ran both scripts successfully with numpy
+- Verified all 6 WAV files generated correctly with proper specs
+
+Stage Summary:
+
+Part A — Background Music (/home/z/my-project/download/bg_music.wav):
+- 300.00 seconds (5 minutes), 44100 Hz, 16-bit PCM, mono
+- File size: 26,460,044 bytes (25.2 MB)
+- Chord progression: C major → A minor → F major → G major (8s each, cycling)
+- Soft sine wave pads with ±3 cent detuning (chorus effect)
+- Sub-octave layer for warmth
+- Slow amplitude modulation (0.2-0.5 Hz tremolo)
+- Subtle 880 Hz shimmer with slow modulation
+- Gentle pulse at 70 BPM using filtered soft clicks
+- 1-second crossfades between chord transitions
+- Fade in over first 10 seconds, fade out over last 10 seconds
+- Max amplitude: 0.15 (quiet background)
+
+Part B — Sound Effects (all 44100 Hz, 16-bit PCM, mono):
+1. sfx_whoosh.wav — 0.40s, 35,324 bytes
+   - Filtered white noise with bandpass sweep (3000→300 Hz)
+   - Quick fade in/out envelope, amplitude 0.3
+2. sfx_pop.wav — 0.15s, 13,274 bytes
+   - 800 Hz sine burst with exponential decay (rate=30)
+   - Very quick attack, amplitude 0.25
+3. sfx_ding.wav — 0.50s, 44,144 bytes
+   - 1200 Hz + 1800 Hz + 2400 Hz harmonics
+   - Slow exponential decay (rate=6), amplitude 0.2
+4. sfx_click.wav — 0.05s, 4,454 bytes
+   - Short noise burst + 500 Hz tonal component
+   - Very fast exponential decay (rate=200-300), amplitude 0.2
+5. sfx_rise.wav — 1.00s, 88,244 bytes
+   - Sine wave sweeping 300→1200 Hz (exponential sweep)
+   - Octave and sub-octave harmonics for richness
+   - Quadratic volume crescendo, amplitude 0.25
+
+All files verified: ✓ present, ✓ correct duration, ✓ 44100 Hz, ✓ 16-bit PCM
+
+---
+Task ID: 5
+Agent: main
+Task: Re-record pitch video with much more dynamic animations, 50+ scenes, background music, and sound effects
+
+Work Log:
+- Took fresh screenshots from production URL (clearpath-ai-prod.vercel.app)
+- Generated 5-minute ambient background music using Python/numpy (chord progressions, pads, shimmer, pulse)
+- Generated 5 sound effects (whoosh, pop, ding, click, rise) using Python/numpy
+- Created completely new animation HTML (pitch_v3.html) with 50 scenes, each 2-5 seconds
+- Fixed autoPlay() interference that caused frames after 30s to be black
+- Recorded 2320 frames at 8fps using Playwright with manual time control
+- Encoded video using Python pipe to ffmpeg (H.264 + AAC, 24fps output)
+- Combined background music + 19 timed sound effects into single audio track
+- Merged video + audio into final MP4
+
+Stage Summary:
+- Final video: /home/z/my-project/download/ClearPath_AI_Demo.mp4
+- Duration: 4:50 (290 seconds), 1280x720, H.264 + AAC
+- File size: 12.3 MB
+- 50 dynamic scenes with animations (fade-up, scale-up, slide-left, slide-right)
+- Background music: ambient chord progressions at 70 BPM
+- 19 timed sound effects at scene transitions
+- Production screenshots from clearpath-ai-prod.vercel.app in browser mockups
