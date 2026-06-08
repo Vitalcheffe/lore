@@ -46,3 +46,5 @@ https://next-auth.js.org/warnings#no_secret
  GET / 200 in 110ms (compile: 3ms, render: 107ms)
  GET / 200 in 108ms (compile: 3ms, render: 105ms)
  GET / 200 in 109ms (compile: 3ms, render: 106ms)
+ GET / 200 in 107ms (compile: 3ms, render: 105ms)
+ GET / 200 in 109ms (compile: 3ms, render: 107ms)
