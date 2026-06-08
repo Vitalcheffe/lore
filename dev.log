@@ -79,3 +79,8 @@ https://next-auth.js.org/warnings#no_secret
  GET / 200 in 105ms (compile: 3ms, render: 102ms)
  GET /api/auth/session 200 in 30ms (compile: 21ms, render: 9ms)
  GET / 200 in 110ms (compile: 2ms, render: 108ms)
+ GET / 200 in 102ms (compile: 3ms, render: 100ms)
+ GET / 200 in 110ms (compile: 3ms, render: 108ms)
+ GET / 200 in 106ms (compile: 2ms, render: 103ms)
+ GET /api/auth/session 200 in 29ms (compile: 21ms, render: 9ms)
+ GET / 200 in 110ms (compile: 3ms, render: 107ms)
