@@ -226,41 +226,72 @@ export async function POST(request: NextRequest) {
     // Layer 2: AI Classification
     const classifications = await classifyWithHF(text);
 
-    // Layer 3: Confidence-gated response
+    // Layer 3: Confidence-gated response with smart filtering
     const topResult = classifications[0];
-    const needsClarification = topResult && topResult.score < 0.5;
+    const topConfidence = topResult ? Math.round(topResult.score * 100) : 0;
+
+    // Smart filtering: separate into high/moderate/low confidence tiers
+    const HIGH_THRESHOLD = 70;
+    const MODERATE_THRESHOLD = 40;
+    const DISPLAY_THRESHOLD = 25; // Don't even return categories below this
+
+    const highConfidence = classifications.filter(c => Math.round(c.score * 100) >= HIGH_THRESHOLD);
+    const moderateConfidence = classifications.filter(c => {
+      const pct = Math.round(c.score * 100);
+      return pct >= MODERATE_THRESHOLD && pct < HIGH_THRESHOLD;
+    });
+    const lowConfidence = classifications.filter(c => {
+      const pct = Math.round(c.score * 100);
+      return pct >= DISPLAY_THRESHOLD && pct < MODERATE_THRESHOLD;
+    });
+
+    // Only return categories above display threshold
+    const displayCategories = classifications.filter(c => Math.round(c.score * 100) >= DISPLAY_THRESHOLD);
+
+    // Determine if clarification is needed
+    // Need clarification when: top result is below 50% OR no high-confidence results exist
+    const needsClarification = (topResult && topResult.score < 0.5) || highConfidence.length === 0;
 
     // Determine top category for conversation
     const topCategory = topResult?.label || "General";
-    const topConfidence = topResult ? Math.round(topResult.score * 100) : 0;
 
-    // Build AI response text
+    // Build AI response text - only mention high and moderate confidence
     let aiText = "";
     const resources: Array<{ title: string; action: string; call?: string }> = [];
     let whyText = "";
     let alsoText = "";
     let warningText: string | null = null;
 
-    if (needsClarification) {
-      aiText = `Your request scored below 50% across all categories — it may be too ambiguous for reliable matching. Here are the closest matches:\n\n`;
+    if (needsClarification && highConfidence.length === 0) {
+      aiText = `I want to make sure I find the right help for you. Could you tell me a bit more?\n\n`;
+    } else if (moderateConfidence.length > 0 && highConfidence.length > 0) {
+      aiText = `Based on what you've shared, here are the best matches:\n\n`;
     } else {
       aiText = `Based on what you've shared, here's what I found:\n\n`;
     }
 
-    for (let i = 0; i < Math.min(classifications.length, 3); i++) {
-      const c = classifications[i];
+    // Only list high and moderate confidence in the text response
+    const listedCategories = [...highConfidence, ...moderateConfidence];
+    for (let i = 0; i < Math.min(listedCategories.length, 4); i++) {
+      const c = listedCategories[i];
       const emoji = ["🏠", "🍎", "🧠", "💼", "⚖️", "🏥", "🚭", "👴"][LABELS.indexOf(c.label)] || "📋";
       const confPct = Math.round(c.score * 100);
       aiText += `${emoji} **${c.label}** (${confPct}% confidence)\n`;
     }
 
-    // Build why/also/warning
-    whyText = `Your description was classified as ${topCategory} based on keyword analysis and semantic matching.`;
-    if (classifications.length > 1) {
-      alsoText = `You may also benefit from ${classifications.slice(1, 3).map(c => c.label).join(" and ")} services.`;
+    if (lowConfidence.length > 0) {
+      aiText += `\n_I also considered ${lowConfidence.map(c => c.label).join(', ')} but with low confidence._`;
     }
-    if (topConfidence < 70) {
-      warningText = "The confidence score is below 70% — consider providing more details for a better match.";
+
+    // Build why/also/warning
+    whyText = `Your description was classified as ${topCategory} based on ${highConfidence.length > 0 ? 'strong' : 'moderate'} semantic matching.`;
+    if (highConfidence.length > 1) {
+      alsoText = `You may also benefit from ${highConfidence.slice(1).map(c => c.label).join(' and ')} services.`;
+    } else if (moderateConfidence.length > 0) {
+      alsoText = `You might also need ${moderateConfidence.map(c => c.label).join(' or ')} — tell me more to improve accuracy.`;
+    }
+    if (topConfidence < HIGH_THRESHOLD) {
+      warningText = `${topConfidence}% confidence — a few more details would help me find better matches for you.`;
     }
 
     // Save conversation to database
@@ -308,13 +339,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       isCrisis: false,
       conversationId: conversation.id,
-      categories: classifications.map((c) => ({
+      // Only return categories above display threshold, sorted by confidence
+      categories: displayCategories.map((c) => ({
         label: c.label,
         confidence: Math.round(c.score * 100),
       })),
+      // Confidence tier info for smart frontend display
+      confidenceTiers: {
+        high: highConfidence.map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })),
+        moderate: moderateConfidence.map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })),
+        low: lowConfidence.map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })),
+        hidden: classifications.filter(c => Math.round(c.score * 100) < DISPLAY_THRESHOLD).length,
+      },
       needsClarification,
       clarificationMessage: needsClarification
-        ? "Your request scored below 50% across all categories — too ambiguous for reliable matching"
+        ? highConfidence.length === 0
+          ? "I found some possible matches but I'm not very confident — could you share more details?"
+          : "Your top match is below 50% confidence — a few more details would help"
         : null,
       model: HF_API_KEY && HF_API_KEY !== "hf_xxxxx" ? "BART-large-MNLI (live)" : "BART-large-MNLI (simulated)",
     });

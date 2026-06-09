@@ -76,6 +76,12 @@ interface CrisisLine {
 interface ClassifyResponse {
   isCrisis: boolean
   categories: { label: string; confidence: number }[]
+  confidenceTiers?: {
+    high: { label: string; confidence: number }[]
+    moderate: { label: string; confidence: number }[]
+    low: { label: string; confidence: number }[]
+    hidden: number
+  }
   needsClarification: boolean
   clarificationMessage: string | null
   crisisLines?: CrisisLine[]
@@ -1409,6 +1415,12 @@ export default function Home() {
     isCrisis?: boolean
     crisisLines?: CrisisLine[]
     categories?: Category[]
+    confidenceTiers?: {
+      high: { label: string; confidence: number }[]
+      moderate: { label: string; confidence: number }[]
+      low: { label: string; confidence: number }[]
+      hidden: number
+    }
     statusBadge?: 'crisis' | 'clarify' | 'verified' | 'upgrade'
     upgradeInfo?: { from: number; to: number; category: string }
     isClarify?: boolean
@@ -1416,7 +1428,9 @@ export default function Home() {
     clarifyReason?: string
     transparencyItems?: string[]
     model?: string
+    showAllCategories?: boolean
   }>>([])
+  const [showAllCategoriesMap, setShowAllCategoriesMap] = useState<Record<number, boolean>>({})
   const [suggestions, setSuggestions] = useState<Array<{ id: string; label: string; description?: string; icon?: string }>>(starters)
   const [isTyping, setIsTyping] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
@@ -1617,6 +1631,7 @@ export default function Home() {
         isCrisis,
         crisisLines,
         categories: enrichedCategories,
+        confidenceTiers: data.confidenceTiers,
         statusBadge,
         upgradeInfo,
         isClarify,
@@ -1626,13 +1641,31 @@ export default function Home() {
         model: data.model,
       }])
 
-      // Set follow-up suggestions
+      // Set follow-up suggestions — only for high/moderate confidence categories
       if (!isCrisis && !isClarify && enrichedCategories.length > 0) {
-        const followUps = enrichedCategories.slice(0, 3).map((cat, i) => ({
+        const highAndModerate = enrichedCategories.filter(c => c.confidence >= 40)
+        const followUps = highAndModerate.slice(0, 2).map((cat, i) => ({
           id: `followup-${i}`,
           label: `Tell me more about ${cat.label}`,
         }))
+        // If there are low-confidence categories, suggest providing more details
+        const lowCount = enrichedCategories.filter(c => c.confidence < 40).length
+        if (lowCount > 0) {
+          followUps.push({
+            id: 'followup-details',
+            label: 'Add more details for better matches',
+          })
+        }
         setSuggestions(followUps)
+      } else if (isClarify) {
+        // When clarification is needed, suggest category-specific follow-ups
+        const clarifySuggestions = [
+          { id: 'clarify-housing', label: 'I need housing or shelter' },
+          { id: 'clarify-food', label: 'I need food or basic necessities' },
+          { id: 'clarify-health', label: 'I need health or mental health support' },
+          { id: 'clarify-employment', label: 'I need job help or training' },
+        ]
+        setSuggestions(clarifySuggestions)
       } else {
         setSuggestions([])
       }
@@ -2213,11 +2246,55 @@ export default function Home() {
                         )}
 
                         {/* Categories */}
-                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && (
-                          <div className="space-y-3">
-                            {msg.categories.map((cat, j) => <CategoryCard key={j} cat={cat} index={j} />)}
-                          </div>
-                        )}
+                        {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && (() => {
+                          const showAll = showAllCategoriesMap[i] ?? false
+                          // Smart filtering: only show high (>=70%) and moderate (>=40%) by default
+                          const highAndModerate = msg.categories.filter(c => c.confidence >= 40)
+                          const lowConfidence = msg.categories.filter(c => c.confidence < 40)
+                          const displayCategories = showAll ? msg.categories : highAndModerate
+                          const hasHiddenLow = !showAll && lowConfidence.length > 0
+                          const hiddenCount = msg.confidenceTiers?.hidden ?? 0
+
+                          return (
+                            <div className="space-y-3">
+                              {displayCategories.map((cat, j) => <CategoryCard key={j} cat={cat} index={j} />)}
+                              
+                              {/* Show more / Show less toggle for low-confidence categories */}
+                              {hasHiddenLow && (
+                                <motion.button
+                                  initial={{ opacity: 0, y: 8 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.3 }}
+                                  onClick={() => setShowAllCategoriesMap(prev => ({ ...prev, [i]: true }))}
+                                  className="w-full py-3 px-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/40 text-[13px] text-gray-400 font-medium hover:bg-gray-50/80 hover:text-gray-500 hover:border-gray-300 transition-all flex items-center justify-center gap-2"
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                  Show {lowConfidence.length} lower confidence {lowConfidence.length === 1 ? 'result' : 'results'}
+                                  {lowConfidence.map(c => c.label).join(', ')}
+                                </motion.button>
+                              )}
+                              
+                              {showAll && lowConfidence.length > 0 && (
+                                <motion.button
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  onClick={() => setShowAllCategoriesMap(prev => ({ ...prev, [i]: false }))}
+                                  className="w-full py-2 px-4 rounded-xl text-[12px] text-gray-400 font-medium hover:text-gray-500 transition-all flex items-center justify-center gap-1.5"
+                                >
+                                  <ChevronUp className="w-3 h-3" />
+                                  Show only confident results
+                                </motion.button>
+                              )}
+                              
+                              {/* Info about completely hidden categories */}
+                              {hiddenCount > 0 && !showAll && (
+                                <p className="text-[11px] text-gray-300 text-center pt-1">
+                                  {hiddenCount} {hiddenCount === 1 ? 'category' : 'categories'} filtered out (below 25% confidence)
+                                </p>
+                              )}
+                            </div>
+                          )
+                        })()}
 
                         {/* Transparency for regular results */}
                         {msg.categories && msg.categories.length > 0 && !msg.isCrisis && !msg.isClarify && msg.transparencyItems && (
