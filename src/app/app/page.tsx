@@ -50,6 +50,30 @@ import {
   ChevronUp,
 } from 'lucide-react'
 
+// ─── CLEARPATH LOGO MARK ──────────────────────────────────
+function ClearPathLogo({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" className={className} fill="none">
+      {/* C-arc (Clarity) */}
+      <path 
+        d="M 318 138 A 155 155 0 1 0 318 374" 
+        stroke="currentColor" 
+        strokeWidth="50" 
+        strokeLinecap="round" 
+      />
+      {/* Forward path (Direction) */}
+      <path 
+        d="M 318 138 C 358 122, 404 118, 448 132" 
+        stroke="currentColor" 
+        strokeWidth="42" 
+        strokeLinecap="round" 
+      />
+      {/* AI Insight accent */}
+      <circle cx="450" cy="133" r="14" fill="#3b82f6"/>
+    </svg>
+  )
+}
+
 // ─── TYPES ───────────────────────────────────────────────
 interface Resource {
   name: string
@@ -283,7 +307,7 @@ function ProcessingPipeline() {
     >
       {/* AI Avatar */}
       <div className="w-10 h-10 rounded-2xl ai-avatar-orb flex items-center justify-center shrink-0 shadow-lg shadow-gray-900/20">
-        <Layers className="w-4 h-4 text-white" />
+        <ClearPathLogo className="w-4 h-4 text-white" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="glass-card rounded-2xl p-4 border border-gray-100/40">
@@ -1143,7 +1167,7 @@ function Sidebar({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shadow-lg shadow-black/20">
-                  <Layers className="w-4 h-4 text-white" />
+                  <ClearPathLogo className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-[14px] font-bold text-white tracking-tight">ClearPath AI</span>
               </div>
@@ -1935,7 +1959,7 @@ export default function Home() {
                 className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100/80 transition-colors"
               >
                 <div className="w-6 h-6 rounded-lg ai-avatar-orb flex items-center justify-center shadow-sm shadow-gray-900/15">
-                  <Layers className="w-3 h-3 text-white" />
+                  <ClearPathLogo className="w-3 h-3 text-white" />
                 </div>
                 <span className="text-[13px] font-bold text-gray-900 tracking-tight hidden sm:inline">ClearPath AI v1.0</span>
                 <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${showModelSelector ? 'rotate-180' : ''}`} />
@@ -1953,7 +1977,7 @@ export default function Home() {
                     <div className="p-2">
                       <div className="px-3 py-2.5 rounded-lg bg-gray-50/80 flex items-start gap-3">
                         <div className="w-8 h-8 rounded-lg ai-avatar-orb flex items-center justify-center shrink-0 shadow-sm shadow-gray-900/15 mt-0.5">
-                          <Layers className="w-3.5 h-3.5 text-white" />
+                          <ClearPathLogo className="w-3.5 h-3.5 text-white" />
                         </div>
                         <div>
                           <p className="text-[13px] font-semibold text-gray-900">ClearPath AI v1.0</p>
@@ -2108,7 +2132,7 @@ export default function Home() {
                       background: 'linear-gradient(135deg, #111827, #1f2937, #111827)',
                     }}
                   >
-                    <Layers className="w-11 h-11 text-white" />
+                    <ClearPathLogo className="w-11 h-11 text-white" />
                   </motion.div>
                 </div>
 
@@ -2193,7 +2217,7 @@ export default function Home() {
                     <div className="flex gap-3 items-start">
                       {/* AI Avatar */}
                       <div className="w-10 h-10 rounded-2xl ai-avatar-orb flex items-center justify-center shrink-0 mt-0.5 shadow-lg shadow-gray-900/15">
-                        <Layers className="w-4 h-4 text-white" />
+                        <ClearPathLogo className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         {/* Status badge */}

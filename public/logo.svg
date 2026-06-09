@@ -1,71 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-  <defs>
-    <!-- Rock/grain texture filter -->
-    <filter id="rockTexture" x="0%" y="0%" width="100%" height="100%">
-      <!-- Base turbulence for stone grain -->
-      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="7" result="noise"/>
-      <!-- Subtle cracks -->
-      <feTurbulence type="turbulence" baseFrequency="0.035" numOctaves="2" seed="42" result="cracks"/>
-      <!-- Combine noise and cracks -->
-      <feDisplacementMap in="SourceGraphic" in2="cracks" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
-      <!-- Apply grain overlay -->
-      <feComposite in="displaced" in2="noise" operator="in" result="textured"/>
-      <!-- Bring back original shape with texture -->
-      <feComposite in="SourceGraphic" in2="textured" operator="arithmetic" k1="0" k2="1" k3="0.12" k4="0" result="final"/>
-    </filter>
-
-    <!-- Clip path for CP letters -->
-    <clipPath id="cpClip">
-      <text x="256" y="370" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="320" font-weight="800" text-anchor="middle" letter-spacing="-8">CP</text>
-    </clipPath>
-
-    <!-- Rock texture pattern to fill inside letters -->
-    <pattern id="rockGrain" width="200" height="200" patternUnits="userSpaceOnUse">
-      <rect width="200" height="200" fill="#000"/>
-      <!-- Fine grain dots -->
-      <circle cx="23" cy="17" r="0.6" fill="#1a1a1a" opacity="0.5"/>
-      <circle cx="67" cy="43" r="0.4" fill="#333" opacity="0.4"/>
-      <circle cx="112" cy="28" r="0.5" fill="#1a1a1a" opacity="0.3"/>
-      <circle cx="156" cy="61" r="0.3" fill="#2a2a2a" opacity="0.5"/>
-      <circle cx="38" cy="89" r="0.7" fill="#333" opacity="0.3"/>
-      <circle cx="91" cy="76" r="0.4" fill="#1a1a1a" opacity="0.4"/>
-      <circle cx="145" cy="94" r="0.5" fill="#2a2a2a" opacity="0.5"/>
-      <circle cx="178" cy="37" r="0.3" fill="#1a1a1a" opacity="0.3"/>
-      <circle cx="15" cy="132" r="0.6" fill="#333" opacity="0.4"/>
-      <circle cx="53" cy="156" r="0.4" fill="#1a1a1a" opacity="0.3"/>
-      <circle cx="98" cy="141" r="0.5" fill="#2a2a2a" opacity="0.5"/>
-      <circle cx="167" cy="128" r="0.3" fill="#333" opacity="0.4"/>
-      <circle cx="29" cy="183" r="0.7" fill="#1a1a1a" opacity="0.3"/>
-      <circle cx="76" cy="170" r="0.4" fill="#2a2a2a" opacity="0.5"/>
-      <circle cx="134" cy="175" r="0.5" fill="#333" opacity="0.3"/>
-      <circle cx="189" cy="158" r="0.3" fill="#1a1a1a" opacity="0.4"/>
-      <circle cx="48" cy="112" r="0.4" fill="#2a2a2a" opacity="0.3"/>
-      <circle cx="123" cy="105" r="0.6" fill="#1a1a1a" opacity="0.4"/>
-      <circle cx="72" cy="5" r="0.3" fill="#333" opacity="0.3"/>
-      <circle cx="183" cy="93" r="0.5" fill="#2a2a2a" opacity="0.4"/>
-      <!-- Micro cracks -->
-      <line x1="20" y1="30" x2="35" y2="32" stroke="#1a1a1a" stroke-width="0.3" opacity="0.4"/>
-      <line x1="80" y1="55" x2="95" y2="50" stroke="#2a2a2a" stroke-width="0.25" opacity="0.3"/>
-      <line x1="140" y1="80" x2="155" y2="85" stroke="#1a1a1a" stroke-width="0.3" opacity="0.35"/>
-      <line x1="45" y1="120" x2="60" y2="118" stroke="#333" stroke-width="0.2" opacity="0.3"/>
-      <line x1="110" y1="150" x2="125" y2="155" stroke="#1a1a1a" stroke-width="0.25" opacity="0.4"/>
-      <line x1="160" y1="40" x2="172" y2="45" stroke="#2a2a2a" stroke-width="0.2" opacity="0.3"/>
-      <line x1="30" y1="170" x2="48" y2="168" stroke="#1a1a1a" stroke-width="0.3" opacity="0.35"/>
-      <line x1="150" y1="140" x2="165" y2="142" stroke="#333" stroke-width="0.2" opacity="0.3"/>
-    </pattern>
-  </defs>
-
-  <!-- CP Letters with rock texture fill -->
-  <g clip-path="url(#cpClip)">
-    <!-- Base black fill -->
-    <rect width="512" height="512" fill="#000000"/>
-    <!-- Rock grain overlay inside letters -->
-    <rect width="512" height="512" fill="url(#rockGrain)" opacity="0.15"/>
-    <!-- Additional subtle noise layer -->
-    <rect width="512" height="512" filter="url(#rockTexture)" fill="none" opacity="0.08"/>
-  </g>
-
-  <!-- Clean CP letter outlines on top for sharpness -->
-  <text x="256" y="370" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="320" font-weight="800" text-anchor="middle" letter-spacing="-8" fill="none" stroke="#000000" stroke-width="0.5"/>
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- ClearPath AI Logo Mark -->
+  <!-- C-arc (Clarity) + Forward path (Direction) + Insight point (AI) -->
+  
+  <!-- C-shaped arc: ~260° of a circle, opening on the right -->
+  <!-- Center: (220, 256), Radius: 155 -->
+  <path 
+    d="M 318 138 A 155 155 0 1 0 318 374" 
+    stroke="#ffffff" 
+    stroke-width="50" 
+    stroke-linecap="round" 
+    fill="none"
+  />
+  
+  <!-- Forward path extending from the C opening -->
+  <!-- Curves upward-right suggesting progress and clarity -->
+  <path 
+    d="M 318 138 C 358 122, 404 118, 448 132" 
+    stroke="#ffffff" 
+    stroke-width="42" 
+    stroke-linecap="round" 
+    fill="none"
+  />
+  
+  <!-- AI Insight accent at the path tip -->
+  <circle cx="450" cy="133" r="14" fill="#3b82f6"/>
 </svg>
