@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { db } from "@/lib/db";
 
 // ─── Configuration ─────────────────────────────────────────
 const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
@@ -32,19 +29,6 @@ const LABELS = [
   "Senior Services",
 ];
 
-// ─── Category Colors ───────────────────────────────────────
-const CATEGORY_COLORS: Record<string, string> = {
-  "Housing Assistance": "#f59e0b",
-  "Food Assistance": "#22c55e",
-  "Mental Health": "#8b5cf6",
-  "Employment Services": "#3b82f6",
-  "Legal Aid": "#06b6d4",
-  "Healthcare": "#ef4444",
-  "Substance Abuse": "#f97316",
-  "Senior Services": "#6366f1",
-  "Crisis": "#dc2626",
-};
-
 // ─── Crisis Detection ──────────────────────────────────────
 function detectCrisis(text: string): boolean {
   const lower = text.toLowerCase().trim();
@@ -54,7 +38,6 @@ function detectCrisis(text: string): boolean {
 // ─── Classification via HuggingFace ────────────────────────
 async function classifyWithHF(text: string): Promise<Array<{ label: string; score: number }>> {
   if (!HF_API_KEY || HF_API_KEY === "hf_xxxxx") {
-    // Fallback: return simulated classification for demo
     return simulateClassification(text);
   }
 
@@ -139,6 +122,49 @@ function simulateClassification(text: string): Array<{ label: string; score: num
   return results.filter((r) => r.score > 0.3);
 }
 
+// ─── Optional DB save (non-blocking) ──────────────────────
+async function saveToDatabase(data: {
+  text: string;
+  isCrisis: boolean;
+  categories: Array<{ label: string; score: number }>;
+  topConfidence: number;
+  topCategory: string;
+  crisisLines?: Array<{ name: string; action: string; call?: string }>;
+  conversationId?: string | null;
+  userId?: string | null;
+}): Promise<string | null> {
+  try {
+    const { db } = await import("@/lib/db");
+
+    const conversation = await db.conversation.create({
+      data: {
+        userId: data.userId || null,
+        title: data.text.substring(0, 60) + (data.text.length > 60 ? "..." : ""),
+        preview: data.text.substring(0, 100),
+        category: data.topCategory,
+        categoryColor: data.isCrisis ? "#dc2626" : "#3b82f6",
+        confidence: data.topConfidence,
+        isCrisis: data.isCrisis,
+        isGuest: !data.userId,
+      },
+    });
+
+    await db.message.create({
+      data: {
+        conversationId: conversation.id,
+        role: "user",
+        text: data.text,
+        isCrisis: data.isCrisis,
+      },
+    });
+
+    return conversation.id;
+  } catch (error) {
+    console.error("DB save failed (non-blocking):", error);
+    return null;
+  }
+}
+
 // ─── POST Handler ──────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
@@ -152,15 +178,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get authenticated user (if any)
+    // Try to get authenticated user (non-blocking)
     let userId: string | null = null;
     try {
+      const { getServerSession } = await import("next-auth");
+      const { authOptions } = await import("@/app/api/auth/[...nextauth]/route");
       const session = await getServerSession(authOptions);
       if (session?.user?.id) {
         userId = session.user.id;
       }
     } catch {
-      // No session — guest user
+      // No session — guest user (this is fine for a demo)
     }
 
     // Layer 1: Crisis Detection (hardcoded, deterministic)
@@ -174,49 +202,20 @@ export async function POST(request: NextRequest) {
         { name: "Local Crisis Center", action: "Talk to a real person now", call: "211" },
       ];
 
-      // Save conversation to database
-      const conversation = await db.conversation.create({
-        data: {
-          userId: userId || null,
-          title: "Crisis: Immediate Support Needed",
-          preview: text.substring(0, 100),
-          category: "Crisis",
-          categoryColor: CATEGORY_COLORS["Crisis"],
-          confidence: 99,
-          isCrisis: true,
-          isGuest: !userId,
-        },
-      });
-
-      // Save user message
-      await db.message.create({
-        data: {
-          conversationId: conversation.id,
-          role: "user",
-          text,
-          isCrisis: true,
-        },
-      });
-
-      // Save AI response
-      const aiResponseText = "🚨 **Your safety is the top priority right now.**\n\nIf you are in immediate danger, please call **911**.\n\nHere are crisis resources available 24/7:\n\n📞 **988 Suicide & Crisis Lifeline** — Call or text 988\n📞 **Crisis Text Line** — Text HOME to 741741\n📞 **National Domestic Violence Hotline** — 1-800-799-7233\n📞 **211** — Local crisis center connections";
-      await db.message.create({
-        data: {
-          conversationId: conversation.id,
-          role: "ai",
-          text: aiResponseText,
-          category: "Crisis",
-          confidence: 99,
-          isCrisis: true,
-          resources: JSON.stringify(crisisLines.map(l => ({ title: l.name, action: l.action, call: l.call }))),
-          why: "Crisis keyword detected — immediate safety resources provided.",
-          warning: "If you are in immediate physical danger, call 911.",
-        },
+      // Try to save to DB (non-blocking)
+      const conversationId = await saveToDatabase({
+        text,
+        isCrisis: true,
+        categories: [],
+        topConfidence: 99,
+        topCategory: "Crisis",
+        crisisLines,
+        userId,
       });
 
       return NextResponse.json({
         isCrisis: true,
-        conversationId: conversation.id,
+        conversationId,
         crisisLines,
         categories: [],
         note: "Crisis keyword detected — AI classification bypassed entirely",
@@ -233,7 +232,7 @@ export async function POST(request: NextRequest) {
     // Smart filtering: separate into high/moderate/low confidence tiers
     const HIGH_THRESHOLD = 70;
     const MODERATE_THRESHOLD = 40;
-    const DISPLAY_THRESHOLD = 25; // Don't even return categories below this
+    const DISPLAY_THRESHOLD = 25;
 
     const highConfidence = classifications.filter(c => Math.round(c.score * 100) >= HIGH_THRESHOLD);
     const moderateConfidence = classifications.filter(c => {
@@ -245,106 +244,29 @@ export async function POST(request: NextRequest) {
       return pct >= DISPLAY_THRESHOLD && pct < MODERATE_THRESHOLD;
     });
 
-    // Only return categories above display threshold
     const displayCategories = classifications.filter(c => Math.round(c.score * 100) >= DISPLAY_THRESHOLD);
 
-    // Determine if clarification is needed
-    // Need clarification when: top result is below 50% OR no high-confidence results exist
     const needsClarification = (topResult && topResult.score < 0.5) || highConfidence.length === 0;
 
-    // Determine top category for conversation
     const topCategory = topResult?.label || "General";
 
-    // Build AI response text - only mention high and moderate confidence
-    let aiText = "";
-    const resources: Array<{ title: string; action: string; call?: string }> = [];
-    let whyText = "";
-    let alsoText = "";
-    let warningText: string | null = null;
-
-    if (needsClarification && highConfidence.length === 0) {
-      aiText = `I want to make sure I find the right help for you. Could you tell me a bit more?\n\n`;
-    } else if (moderateConfidence.length > 0 && highConfidence.length > 0) {
-      aiText = `Based on what you've shared, here are the best matches:\n\n`;
-    } else {
-      aiText = `Based on what you've shared, here's what I found:\n\n`;
-    }
-
-    // Only list high and moderate confidence in the text response
-    const listedCategories = [...highConfidence, ...moderateConfidence];
-    for (let i = 0; i < Math.min(listedCategories.length, 4); i++) {
-      const c = listedCategories[i];
-      const emoji = ["🏠", "🍎", "🧠", "💼", "⚖️", "🏥", "🚭", "👴"][LABELS.indexOf(c.label)] || "📋";
-      const confPct = Math.round(c.score * 100);
-      aiText += `${emoji} **${c.label}** (${confPct}% confidence)\n`;
-    }
-
-    if (lowConfidence.length > 0) {
-      aiText += `\n_I also considered ${lowConfidence.map(c => c.label).join(', ')} but with low confidence._`;
-    }
-
-    // Build why/also/warning
-    whyText = `Your description was classified as ${topCategory} based on ${highConfidence.length > 0 ? 'strong' : 'moderate'} semantic matching.`;
-    if (highConfidence.length > 1) {
-      alsoText = `You may also benefit from ${highConfidence.slice(1).map(c => c.label).join(' and ')} services.`;
-    } else if (moderateConfidence.length > 0) {
-      alsoText = `You might also need ${moderateConfidence.map(c => c.label).join(' or ')} — tell me more to improve accuracy.`;
-    }
-    if (topConfidence < HIGH_THRESHOLD) {
-      warningText = `${topConfidence}% confidence — a few more details would help me find better matches for you.`;
-    }
-
-    // Save conversation to database
-    const conversation = await db.conversation.create({
-      data: {
-        userId: userId || null,
-        title: text.substring(0, 60) + (text.length > 60 ? "..." : ""),
-        preview: text.substring(0, 100),
-        category: topCategory,
-        categoryColor: CATEGORY_COLORS[topCategory] || "#6b7280",
-        confidence: topConfidence,
-        isCrisis: false,
-        isGuest: !userId,
-      },
-    });
-
-    // Save user message
-    await db.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: "user",
-        text,
-      },
-    });
-
-    // Save AI response
-    await db.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: "ai",
-        text: aiText,
-        category: topCategory,
-        confidence: topConfidence,
-        isCrisis: false,
-        resources: resources.length > 0 ? JSON.stringify(resources) : null,
-        alternatives: classifications.length > 1
-          ? JSON.stringify(classifications.slice(1).map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })))
-          : null,
-        why: whyText,
-        also: alsoText || null,
-        warning: warningText,
-      },
+    // Try to save to DB (non-blocking)
+    const conversationId = await saveToDatabase({
+      text,
+      isCrisis: false,
+      categories: classifications,
+      topConfidence,
+      topCategory,
+      userId,
     });
 
     return NextResponse.json({
       isCrisis: false,
-      conversationId: conversation.id,
-      // Only return categories above display threshold, sorted by confidence
+      conversationId,
       categories: displayCategories.map((c) => ({
         label: c.label,
         confidence: Math.round(c.score * 100),
       })),
-      // Confidence tier info for smart frontend display
       confidenceTiers: {
         high: highConfidence.map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })),
         moderate: moderateConfidence.map(c => ({ label: c.label, confidence: Math.round(c.score * 100) })),
