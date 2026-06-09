@@ -1178,3 +1178,33 @@ Stage Summary:
 - New unified logo across all pages (Navbar, Footer, Sidebar, Welcome, AI avatars, Model selector)
 - Fixed welcome content scroll bug (scrollTop was 419px on load, now 0)
 - All brand marks consistent - no more mismatched Layers vs logo.svg
+
+---
+Task ID: restore-demo-app
+Agent: main
+Task: Restore simple demo app (remove sidebar, auth, conversation history)
+
+Work Log:
+- User reported the app was broken again - wrong version with sidebar, login, conversation history
+- Analyzed user screenshots (IMG_0433, IMG_0434, IMG_0435) showing the correct simple demo layout
+- Found the correct version in git history (commit 8203140 - "Premium Demo" 1379 lines)
+- Current broken version was 2505 lines with sidebar, next-auth, conversation history
+- Created new app page (1653 lines) based on the premium demo but connected to REAL API:
+  - Replaced mock chatSteps data with real /api/classify API calls
+  - Connected to /api/community-resources for fetching real resources
+  - Added working text input (was disabled in template)
+  - Added quick suggestion chips at bottom
+  - Added conversationId tracking for multi-turn
+  - Used ClearPathLogo component throughout
+  - Fixed scroll bug: scrollToBottom only fires when messages.length > 0
+- Removed ALL sidebar code
+- Removed ALL next-auth/useSession code
+- Removed ALL conversation history code
+- Verified with VLM: no sidebar, "How can I help?" heading visible, logo visible
+- Clean production build succeeds
+
+Stage Summary:
+- App page restored to simple demo layout matching user screenshots
+- No sidebar, no login, no conversation history - just cards + input + results
+- Connected to real API instead of mock data
+- 1653 lines (down from 2505)
