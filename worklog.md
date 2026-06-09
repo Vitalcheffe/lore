@@ -1154,3 +1154,27 @@ Stage Summary:
 - Background music: ambient chord progressions at 70 BPM
 - 19 timed sound effects at scene transitions
 - Production screenshots from clearpath-ai-prod.vercel.app in browser mockups
+---
+Task ID: logo-redesign
+Agent: main
+Task: Redesign ClearPath AI logo and fix app page scroll bug
+
+Work Log:
+- Analyzed current logo: "CP" text with rock texture in SVG, Lucide Layers icon on chat page
+- Designed new logo mark: C-arc (Clarity) + forward path (Direction) + blue AI insight dot
+- Created new logo.svg in /public/
+- Created ClearPathLogo inline React component in app/page.tsx
+- Replaced all brand-identity Layers icon usages (7 instances) with ClearPathLogo component
+- Updated Navbar.tsx and Footer.tsx to use inline SVG instead of Image component
+- Removed unused Image import from Footer.tsx
+- Removed unused Layers import from Footer.tsx
+- Generated new clearpath-logo.png (1024x1024, dark bg with rounded corners)
+- Fixed critical bug: scrollToBottom() was firing on initial empty state, scrolling welcome content out of view
+- Changed useEffect to only auto-scroll when messages.length > 0
+- Clean rebuild verified: no TypeScript errors, no runtime errors
+- Visual verification with VLM confirms both pages render correctly
+
+Stage Summary:
+- New unified logo across all pages (Navbar, Footer, Sidebar, Welcome, AI avatars, Model selector)
+- Fixed welcome content scroll bug (scrollTop was 419px on load, now 0)
+- All brand marks consistent - no more mismatched Layers vs logo.svg

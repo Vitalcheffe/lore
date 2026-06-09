@@ -1735,7 +1735,10 @@ export default function Home() {
   }, [inputText, handleSend])
 
   useEffect(() => {
-    scrollToBottom()
+    // Only auto-scroll when there are actual messages (not on initial empty state)
+    if (messages.length > 0) {
+      scrollToBottom()
+    }
   }, [messages, isTyping, suggestions, scrollToBottom])
 
   // Track scroll for header shadow
