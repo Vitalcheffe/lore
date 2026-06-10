@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -16,6 +16,7 @@ import {
   StickyNote,
   Sparkles,
   Search,
+  Loader2,
 } from 'lucide-react'
 import {
   Command,
@@ -24,6 +25,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
+  CommandSeparator,
 } from '@/components/ui/command'
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -57,6 +59,15 @@ interface ConversationItem {
   id: string
   title: string
   preview?: string
+}
+
+interface SearchResult {
+  id: string
+  type: 'node' | 'note' | 'conversation'
+  title: string
+  description: string
+  href: string
+  icon: string
 }
 
 // ─── Static Data ────────────────────────────────────────────────
@@ -101,13 +112,29 @@ const contentVariants = {
   },
 }
 
-// ─── Main Component ─────────────────────────────────────────────
+// ─── Search Result Helpers ────────────────────────────────────
+const searchResultIconMap: Record<string, React.ElementType> = {
+  Network,
+  BookOpen,
+  MessageSquare,
+}
+
+const searchResultColorMap: Record<string, string> = {
+  node: 'text-violet-500',
+  note: 'text-amber-500',
+  conversation: 'text-sky-500',
+}
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false)
   const [nodes, setNodes] = useState<NodeItem[]>([])
   const [notes, setNotes] = useState<NoteItem[]>([])
   const [conversations, setConversations] = useState<ConversationItem[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const router = useRouter()
 
   // ── Keyboard shortcut: Cmd+K / Ctrl+K ──────────────────────
@@ -185,6 +212,54 @@ export function CommandPalette() {
     return () => { cancelled = true }
   }, [open])
 
+  // ── Debounced search API call ───────────────────────────────
+  useEffect(() => {
+    // Clear previous timer
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current)
+    }
+
+    // Reset results if query is too short
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([])
+      setIsSearching(false)
+      return
+    }
+
+    setIsSearching(true)
+
+    // Debounce 300ms before hitting the API
+    searchTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        if (res.ok) {
+          const data = await res.json()
+          setSearchResults(data.results ?? [])
+        } else {
+          setSearchResults([])
+        }
+      } catch {
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current)
+      }
+    }
+  }, [searchQuery])
+
+  // ── Reset search when palette closes ─────────────────────────
+  useEffect(() => {
+    if (!open) {
+      setSearchQuery('')
+      setSearchResults([])
+    }
+  }, [open])
+
   // ── Navigate on select ─────────────────────────────────────
   const runCommand = useCallback(
     (command: () => void) => {
@@ -238,12 +313,57 @@ export function CommandPalette() {
             >
               <div className="w-full max-w-[560px] rounded-xl border border-gray-200/80 bg-white shadow-2xl overflow-hidden">
                 <Command className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
-                  <CommandInput placeholder="Search commands, pages, knowledge…" />
+                  <CommandInput
+                    placeholder="Search commands, pages, knowledge…"
+                    value={searchQuery}
+                    onValueChange={setSearchQuery}
+                  />
                   <CommandList className="max-h-[420px]">
                     <CommandEmpty>
-                      {isLoading ? 'Loading…' : 'No results found.'}
+                      {isLoading || isSearching ? 'Searching…' : 'No results found.'}
                     </CommandEmpty>
 
+                    {/* ── Search Results (from API) ─────────────── */}
+                    {searchResults.length > 0 && (
+                      <CommandGroup heading="Search Results">
+                        {searchResults.map((result) => {
+                          const IconComponent = searchResultIconMap[result.icon] || Search
+                          const colorClass = searchResultColorMap[result.type] || 'text-gray-400'
+                          return (
+                            <CommandItem
+                              key={`${result.type}-${result.id}`}
+                              value={`search-${result.title}`}
+                              onSelect={() =>
+                                runCommand(() => router.push(result.href))
+                              }
+                            >
+                              <IconComponent className={`w-4 h-4 ${colorClass}`} />
+                              <span className="truncate max-w-[220px]">{result.title}</span>
+                              <span className="ml-auto text-[11px] text-gray-400 truncate max-w-[180px]">
+                                {result.description}
+                              </span>
+                              <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 capitalize">
+                                {result.type}
+                              </span>
+                            </CommandItem>
+                          )
+                        })}
+                      </CommandGroup>
+                    )}
+
+                    {/* ── Searching indicator ──────────────────── */}
+                    {isSearching && searchResults.length === 0 && (
+                      <CommandGroup heading="Search Results">
+                        <div className="flex items-center gap-2 px-2 py-3 text-sm text-gray-400">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Searching…</span>
+                        </div>
+                      </CommandGroup>
+                    )}
+
+                    {/* Hide static groups when actively searching */}
+                    {searchQuery.trim().length < 2 && (
+                      <>
                     {/* ── Navigation ─────────────────────────── */}
                     <CommandGroup heading="Navigation">
                       {navigationItems.map((item) => (
@@ -349,6 +469,8 @@ export function CommandPalette() {
                           </CommandItem>
                         ))}
                       </CommandGroup>
+                    )}
+                  </>
                     )}
                   </CommandList>
                 </Command>

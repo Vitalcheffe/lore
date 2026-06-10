@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { z } from 'zod'
 import { db } from '@/lib/db'
+import { authRateLimit } from '@/lib/rate-limit'
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -11,6 +12,15 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit registration attempts
+    const limiter = authRateLimit(req.headers.get('x-forwarded-for') || 'unknown')
+    if (!limiter.success) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     const body = await req.json()
 
     // Validate input with zod

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import ZAI from 'z-ai-web-dev-sdk'
 import { db } from '@/lib/db'
 import { getAuthenticatedUserId } from '@/lib/auth-helpers'
+import { chatRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,6 +10,15 @@ export async function POST(req: NextRequest) {
     const userId = await getAuthenticatedUserId(req)
     if (!userId) {
       return Response.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    // Rate limit chat messages
+    const limiter = chatRateLimit(userId)
+    if (!limiter.success) {
+      return Response.json(
+        { error: 'Rate limit exceeded. Please wait a moment.' },
+        { status: 429 }
+      )
     }
 
     const body = await req.json()
