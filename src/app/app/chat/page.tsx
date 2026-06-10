@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import {
   MessageSquare,
   Plus,
@@ -14,6 +15,8 @@ import {
   X,
   Trash2,
   Network,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -46,6 +49,70 @@ interface Conversation {
   messagesLoaded?: boolean
 }
 
+// ─── Blinking Cursor Component ──────────────────────────────
+function BlinkingCursor() {
+  return (
+    <span className="inline-block w-[2px] h-[1em] bg-emerald-500 ml-0.5 align-text-bottom animate-[blink_1s_step-end_infinite]">
+      &ZeroWidthSpace;
+    </span>
+  )
+}
+
+// ─── Streaming Message Component ────────────────────────────
+function StreamingMessage({
+  content,
+  onComplete,
+}: {
+  content: string
+  onComplete: () => void
+}) {
+  const [displayedWordCount, setDisplayedWordCount] = useState(0)
+  const hasCompletedRef = useRef(false)
+
+  // Split content into words, preserving whitespace structure
+  const [words] = useState<string[]>(() => content.split(/(\s+)/))
+
+  // Animate word-by-word reveal
+  useEffect(() => {
+    if (words.length === 0) return
+
+    const interval = setInterval(() => {
+      setDisplayedWordCount((prev) => {
+        // Add 1-2 "words" at a time (including whitespace chunks) for more natural feel
+        const increment = Math.random() > 0.3 ? 2 : 1
+        const next = prev + increment
+        if (next >= words.length) {
+          clearInterval(interval)
+          return words.length
+        }
+        return next
+      })
+    }, 35)
+
+    return () => clearInterval(interval)
+  }, [words])
+
+  // Trigger onComplete when streaming finishes
+  useEffect(() => {
+    if (displayedWordCount >= words.length && words.length > 0 && !hasCompletedRef.current) {
+      hasCompletedRef.current = true
+      // Small delay so the user sees the final text before switching to MarkdownRenderer
+      const timer = setTimeout(onComplete, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [displayedWordCount, words.length, onComplete])
+
+  const visibleText = words.slice(0, displayedWordCount).join('')
+  const isStreaming = displayedWordCount < words.length
+
+  return (
+    <div className="text-sm leading-relaxed text-[#52525B] whitespace-pre-wrap break-words">
+      {visibleText}
+      {isStreaming && <BlinkingCursor />}
+    </div>
+  )
+}
+
 // ─── Typing Indicator ──────────────────────────────────────
 function TypingIndicator() {
   return (
@@ -66,8 +133,6 @@ function TypingIndicator() {
     </div>
   )
 }
-
-
 
 // ─── Source Badge Colors (dynamic hash-based for any source name) ──
 const sourceColorPalette = ['#059669', '#0891B2', '#7C3AED', '#DB2777', '#EA580C', '#3B82F6', '#0D9488']
@@ -100,8 +165,144 @@ function formatRelativeTime(dateStr: string): string {
   }
 }
 
+// ─── Enhanced Empty State with Animated Suggestion Chips ─────
+function AnimatedChatEmptyState({
+  onSuggestionClick,
+}: {
+  onSuggestionClick?: (suggestion: string) => void
+}) {
+  const suggestions = [
+    { text: 'What are my key concepts?', icon: '💡' },
+    { text: 'Show recent changes', icon: '🔄' },
+    { text: 'Find connections', icon: '🔗' },
+    { text: 'Summarize my knowledge', icon: '📝' },
+  ]
+
+  return (
+    <motion.div
+      className="flex flex-col items-center justify-center py-8 px-6 text-center w-full"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.12 } },
+      }}
+    >
+      {/* Chat icon with glow */}
+      <motion.div
+        variants={{
+          hidden: { opacity: 0, scale: 0.8 },
+          visible: {
+            opacity: 1,
+            scale: 1,
+            transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+          },
+        }}
+        className="relative mb-6"
+      >
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center border border-emerald-200/50 shadow-sm">
+          <MessageSquare className="w-7 h-7 text-emerald-600" />
+        </div>
+        {/* Animated glow ring */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl border-2 border-emerald-400/30"
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.5, 0, 0.5],
+          }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </motion.div>
+
+      {/* Title */}
+      <motion.h3
+        variants={{
+          hidden: { opacity: 0, y: 16 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+          },
+        }}
+        className="text-xl font-bold text-[#18181B] mb-2 tracking-tight"
+      >
+        Ask your knowledge graph
+      </motion.h3>
+
+      {/* Description */}
+      <motion.p
+        variants={{
+          hidden: { opacity: 0, y: 16 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+          },
+        }}
+        className="text-sm text-[#71717A] max-w-md leading-relaxed mb-8"
+      >
+        Start a conversation with your data. Ask questions, explore connections,
+        and get AI-powered insights from your knowledge base.
+      </motion.p>
+
+      {/* Animated Suggestion Chips - staggered one by one */}
+      <motion.div
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.15 } },
+        }}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg w-full"
+      >
+        {suggestions.map((suggestion, index) => (
+          <motion.button
+            key={suggestion.text}
+            variants={{
+              hidden: { opacity: 0, y: 20, scale: 0.9 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: {
+                  duration: 0.5,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  delay: index * 0.05,
+                },
+              },
+            }}
+            onClick={() => onSuggestionClick?.(suggestion.text)}
+            className={`
+              text-left px-4 py-3.5 rounded-xl
+              border border-[#E5E7EB] bg-white
+              hover:border-emerald-200 hover:bg-emerald-50/40
+              hover:shadow-md hover:shadow-emerald-500/5
+              transition-all duration-200
+              text-xs text-[#52525B] font-medium
+              group
+            `}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <span className="flex items-center gap-2.5">
+              <motion.span
+                className="text-sm shrink-0"
+                initial={{ rotate: -10 }}
+                whileHover={{ rotate: 10, scale: 1.2 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+              >
+                {suggestion.icon}
+              </motion.span>
+              {suggestion.text}
+            </span>
+          </motion.button>
+        ))}
+      </motion.div>
+    </motion.div>
+  )
+}
+
 // ─── Main Component ────────────────────────────────────────
 export default function AIChatPage() {
+  const router = useRouter()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeConvoId, setActiveConvoId] = useState<string>('')
   const [inputValue, setInputValue] = useState('')
@@ -110,6 +311,8 @@ export default function AIChatPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoadingConversations, setIsLoadingConversations] = useState(true)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null)
+  const [reactions, setReactions] = useState<Record<string, 'up' | 'down' | null>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const loadedConvoIds = useRef<Set<string>>(new Set())
@@ -214,7 +417,7 @@ export default function AIChatPage() {
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [activeConvo?.messages.length, isTyping])
+  }, [activeConvo?.messages.length, isTyping, streamingMessageId])
 
   // Auto-resize textarea
   useEffect(() => {
@@ -223,6 +426,24 @@ export default function AIChatPage() {
       textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px'
     }
   }, [inputValue])
+
+  // ─── Handle reaction click ────────────────────────────
+  const handleReaction = useCallback((messageId: string, type: 'up' | 'down') => {
+    setReactions((prev) => {
+      const current = prev[messageId]
+      // Toggle: if same reaction clicked again, remove it
+      if (current === type) {
+        return { ...prev, [messageId]: null }
+      }
+      return { ...prev, [messageId]: type }
+    })
+    toast.success('Thanks for the feedback!')
+  }, [])
+
+  // ─── Handle streaming complete ────────────────────────
+  const handleStreamingComplete = useCallback(() => {
+    setStreamingMessageId(null)
+  }, [])
 
   // ─── Send a message ──────────────────────────────────
   const handleSend = useCallback(async () => {
@@ -325,6 +546,9 @@ export default function AIChatPage() {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
 
+      // Mark this message as streaming
+      setStreamingMessageId(assistantMessage.id)
+
       // Update UI with assistant message
       setConversations((prev) =>
         prev.map((c) =>
@@ -375,6 +599,8 @@ export default function AIChatPage() {
         content: 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
+
+      setStreamingMessageId(errorMessage.id)
 
       setConversations((prev) =>
         prev.map((c) =>
@@ -641,9 +867,9 @@ export default function AIChatPage() {
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto">
           {!activeConvo || activeConvo.messages.length === 0 ? (
-            /* Empty State */
+            /* Empty State - using enhanced animated version */
             <div className="flex items-center justify-center h-full p-6">
-              <ChatEmptyState
+              <AnimatedChatEmptyState
                 onSuggestionClick={(suggestion) => {
                   setInputValue(suggestion)
                   textareaRef.current?.focus()
@@ -673,7 +899,7 @@ export default function AIChatPage() {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] ${
+                    className={`max-w-[85%] sm:max-w-[75%] group ${
                       msg.role === 'user' ? 'bubble-user' : 'bubble-assistant'
                     }`}
                   >
@@ -694,33 +920,102 @@ export default function AIChatPage() {
                       }`}
                     >
                       {msg.role === 'assistant' ? (
-                        <MarkdownRenderer content={msg.content} />
+                        streamingMessageId === msg.id ? (
+                          /* Streaming: show word-by-word reveal */
+                          <StreamingMessage
+                            content={msg.content}
+                            onComplete={handleStreamingComplete}
+                          />
+                        ) : (
+                          /* Normal: show full markdown rendered content */
+                          <MarkdownRenderer content={msg.content} />
+                        )
                       ) : (
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       )}
                     </div>
-                    {/* Sources */}
+                    {/* Sources - enhanced with pulse animation, tooltip, and click navigation */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                       <div className="px-3.5 pb-2.5 pt-1 border-t border-[rgba(0,0,0,0.04)]">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <Network className="w-2.5 h-2.5 text-[#A1A1AA]" />
-                          {msg.sources.map((source) => {
-                            const srcColor = getSourceColor(source)
-                            return (
-                            <Badge
-                              key={source}
-                              variant="outline"
-                              className="text-[9px] font-medium py-0 px-1.5 border-[#E5E7EB]"
-                              style={{
-                                color: srcColor,
-                                borderColor: `${srcColor}30`,
-                                backgroundColor: `${srcColor}08`,
-                              }}
-                            >
-                              {source}
-                            </Badge>
-                            )
-                          })}
+                          <TooltipProvider delayDuration={200}>
+                            {msg.sources.map((source) => {
+                              const srcColor = getSourceColor(source)
+                              return (
+                                <Tooltip key={source}>
+                                  <TooltipTrigger asChild>
+                                    <motion.div
+                                      className="inline-flex"
+                                      animate={{
+                                        boxShadow: [
+                                          `0 0 0 0 ${srcColor}00`,
+                                          `0 0 0 3px ${srcColor}20`,
+                                          `0 0 0 0 ${srcColor}00`,
+                                        ],
+                                      }}
+                                      transition={{
+                                        duration: 2.5,
+                                        repeat: Infinity,
+                                        ease: 'easeInOut',
+                                        delay: Math.random() * 1,
+                                      }}
+                                    >
+                                      <Badge
+                                        variant="outline"
+                                        className="text-[9px] font-medium py-0 px-1.5 border-[#E5E7EB] cursor-pointer hover:shadow-sm transition-shadow"
+                                        style={{
+                                          color: srcColor,
+                                          borderColor: `${srcColor}30`,
+                                          backgroundColor: `${srcColor}08`,
+                                        }}
+                                        onClick={() => router.push('/app/graph')}
+                                      >
+                                        {source}
+                                      </Badge>
+                                    </motion.div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="text-xs">
+                                    <span className="flex items-center gap-1.5">
+                                      <Network className="w-3 h-3" />
+                                      Click to view in Knowledge Graph
+                                    </span>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )
+                            })}
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    )}
+                    {/* Message Reactions - thumbs up/down for AI messages */}
+                    {msg.role === 'assistant' && streamingMessageId !== msg.id && (
+                      <div className="px-3.5 pb-2 pt-0">
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <motion.button
+                            onClick={() => handleReaction(msg.id, 'up')}
+                            className={`min-w-[28px] min-h-[28px] rounded-lg flex items-center justify-center transition-colors ${
+                              reactions[msg.id] === 'up'
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : 'hover:bg-[#F3F4F6] text-[#A1A1AA] hover:text-emerald-500'
+                            }`}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <ThumbsUp className="w-3 h-3" />
+                          </motion.button>
+                          <motion.button
+                            onClick={() => handleReaction(msg.id, 'down')}
+                            className={`min-w-[28px] min-h-[28px] rounded-lg flex items-center justify-center transition-colors ${
+                              reactions[msg.id] === 'down'
+                                ? 'bg-red-100 text-red-500'
+                                : 'hover:bg-[#F3F4F6] text-[#A1A1AA] hover:text-red-400'
+                            }`}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <ThumbsDown className="w-3 h-3" />
+                          </motion.button>
                         </div>
                       </div>
                     )}
@@ -791,6 +1086,14 @@ export default function AIChatPage() {
           </div>
         </div>
       </div>
+
+      {/* ─── Global CSS for blinking cursor ──────────────────── */}
+      <style jsx global>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `}</style>
     </div>
   )
 }

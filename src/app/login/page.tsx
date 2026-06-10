@@ -10,12 +10,61 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+
+/* ── CSS keyframes for graph animation ── */
+const graphStyles = `
+@keyframes float1 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(6px,-10px) } 66%{ transform: translate(-4px,6px) } }
+@keyframes float2 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(-8px,6px) } 66%{ transform: translate(5px,-8px) } }
+@keyframes float3 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(4px,8px) } 66%{ transform: translate(-6px,-5px) } }
+@keyframes float4 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(-5px,-7px) } 66%{ transform: translate(7px,4px) } }
+@keyframes float5 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(8px,3px) } 66%{ transform: translate(-3px,-9px) } }
+@keyframes float6 { 0%,100%{ transform: translate(0,0) } 33%{ transform: translate(-3px,9px) } 66%{ transform: translate(6px,-4px) } }
+@keyframes pulse-node { 0%,100%{ opacity:1 } 50%{ opacity:0.7 } }
+@keyframes glow-ring { 0%,100%{ opacity:0.2; r:20 } 50%{ opacity:0.05; r:28 } }
+@keyframes dot-float { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-8px) } }
+
+.login-input:focus {
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+  border-color: #10B981 !important;
+}
+`
+
+interface GraphNode {
+  cx: number
+  cy: number
+  r: number
+  fill: string
+  label: string
+  fontSize: number
+  float: string
+  duration: string
+  ringDuration: string
+}
+
+const graphNodes: GraphNode[] = [
+  { cx: 80, cy: 60, r: 16, fill: '#6EE7B7', label: 'API', fontSize: 8, float: 'float1', duration: '7s', ringDuration: '3.5s' },
+  { cx: 200, cy: 90, r: 22, fill: '#34D399', label: 'Core', fontSize: 10, float: 'float2', duration: '8s', ringDuration: '4s' },
+  { cx: 320, cy: 55, r: 14, fill: '#A7F3D0', label: 'DB', fontSize: 7, float: 'float3', duration: '6.5s', ringDuration: '3s' },
+  { cx: 130, cy: 155, r: 15, fill: '#6EE7B7', label: 'Auth', fontSize: 7, float: 'float4', duration: '9s', ringDuration: '3.8s' },
+  { cx: 280, cy: 150, r: 12, fill: '#A7F3D0', label: 'AI', fontSize: 6, float: 'float5', duration: '7.5s', ringDuration: '4.2s' },
+  { cx: 200, cy: 30, r: 11, fill: '#6EE7B7', label: 'ML', fontSize: 6, float: 'float6', duration: '8.5s', ringDuration: '3.2s' },
+]
+
+const graphEdges = [
+  { x1: 92, y1: 66, x2: 182, y2: 86 },
+  { x1: 218, y1: 86, x2: 308, y2: 60 },
+  { x1: 192, y1: 104, x2: 140, y2: 144 },
+  { x1: 212, y1: 104, x2: 272, y2: 142 },
+  { x1: 200, y1: 72, x2: 200, y2: 38 },
+]
 
 export default function LoginPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [authError, setAuthError] = useState('')
 
@@ -44,49 +93,101 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <style dangerouslySetInnerHTML={{ __html: graphStyles }} />
+
       {/* Top nav spacer */}
       <div className="h-0" />
 
       <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left — Branding */}
+          {/* Left — Animated Branding Panel */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="hidden lg:flex flex-col justify-center"
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="hidden lg:flex flex-col justify-center relative rounded-3xl overflow-hidden p-10 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 min-h-[580px]"
           >
-            <Link href="/" className="flex items-center gap-2.5 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
-                <Brain className="w-5 h-5 text-white" />
+            {/* Particle dot background */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {Array.from({ length: 40 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute rounded-full bg-white/10"
+                  style={{
+                    width: Math.random() * 4 + 1,
+                    height: Math.random() * 4 + 1,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                  }}
+                  animate={{
+                    y: [0, -(Math.random() * 20 + 5), 0],
+                    opacity: [0.1, 0.35, 0.1],
+                  }}
+                  transition={{
+                    duration: Math.random() * 4 + 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: Math.random() * 4,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <Link href="/" className="flex items-center gap-2.5 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                  <Brain className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">LORE</span>
+              </Link>
+              <h1 className="text-3xl font-extrabold text-white leading-tight mb-3">
+                Your team&apos;s memory,<br />
+                <span className="text-emerald-200">always alive.</span>
+              </h1>
+              <p className="text-emerald-100/80 leading-relaxed mb-8">
+                Sign in to access your knowledge graph, morning digest, and AI-powered recall. Lore keeps your team aligned, always.
+              </p>
+
+              {/* Animated Knowledge Graph */}
+              <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 p-6">
+                <svg viewBox="0 0 400 190" className="w-full h-auto" fill="none">
+                  {/* Edges */}
+                  {graphEdges.map((e, i) => (
+                    <line
+                      key={i}
+                      x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
+                      stroke="white"
+                      strokeWidth="1.5"
+                      opacity="0.2"
+                    />
+                  ))}
+
+                  {/* Animated nodes */}
+                  {graphNodes.map((n, i) => (
+                    <g key={i} style={{ animation: `${n.float} ${n.duration} ease-in-out infinite` }}>
+                      {/* Glow ring */}
+                      <circle
+                        cx={n.cx} cy={n.cy}
+                        style={{ animation: `glow-ring ${n.ringDuration} ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="1"
+                      />
+                      {/* Node */}
+                      <circle
+                        cx={n.cx} cy={n.cy} r={n.r}
+                        fill={n.fill}
+                        opacity="0.9"
+                        style={{ animation: `pulse-node ${n.ringDuration} ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
+                      />
+                      <text x={n.cx} y={n.cy + n.fontSize / 3} textAnchor="middle" fill="#065F46" fontSize={n.fontSize} fontWeight="700">
+                        {n.label}
+                      </text>
+                    </g>
+                  ))}
+                </svg>
               </div>
-              <span className="text-xl font-bold tracking-tight text-[#0F172A]">LORE</span>
-            </Link>
-            <h1 className="text-3xl font-extrabold text-[#0F172A] leading-tight mb-3">
-              Your team&apos;s memory,<br />
-              <span className="gradient-text">always alive.</span>
-            </h1>
-            <p className="text-[#475569] leading-relaxed mb-8">
-              Sign in to access your knowledge graph, morning digest, and AI-powered recall. Lore keeps your team aligned, always.
-            </p>
-            {/* Illustration */}
-            <div className="rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] p-6">
-              <svg viewBox="0 0 300 160" className="w-full h-auto" fill="none">
-                <line x1="60" y1="50" x2="150" y2="80" stroke="#D1FAE5" strokeWidth="2" />
-                <line x1="150" y1="80" x2="240" y2="45" stroke="#D1FAE5" strokeWidth="2" />
-                <line x1="150" y1="80" x2="100" y2="130" stroke="#D1FAE5" strokeWidth="2" />
-                <line x1="150" y1="80" x2="210" y2="125" stroke="#D1FAE5" strokeWidth="2" />
-                <circle cx="60" cy="50" r="14" fill="#10B981" opacity="0.9" />
-                <circle cx="150" cy="80" r="18" fill="#059669" opacity="0.95" />
-                <circle cx="240" cy="45" r="12" fill="#34D399" opacity="0.8" />
-                <circle cx="100" cy="130" r="13" fill="#0D9488" opacity="0.85" />
-                <circle cx="210" cy="125" r="10" fill="#14B8A6" opacity="0.75" />
-                <text x="60" y="54" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">API</text>
-                <text x="150" y="84" textAnchor="middle" fill="white" fontSize="9" fontWeight="700">Core</text>
-                <text x="240" y="49" textAnchor="middle" fill="white" fontSize="7" fontWeight="600">DB</text>
-                <text x="100" y="134" textAnchor="middle" fill="white" fontSize="7" fontWeight="600">Auth</text>
-                <text x="210" y="129" textAnchor="middle" fill="white" fontSize="6" fontWeight="600">AI</text>
-              </svg>
             </div>
           </motion.div>
 
@@ -127,7 +228,7 @@ export default function LoginPage() {
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white"
+                        className="login-input pl-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white transition-all duration-200"
                         required
                       />
                     </div>
@@ -149,7 +250,7 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 pr-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white"
+                        className="login-input pl-10 pr-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white transition-all duration-200"
                         required
                       />
                       <button
@@ -160,6 +261,19 @@ export default function LoginPage() {
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                  </div>
+
+                  {/* Remember me */}
+                  <div className="flex items-center gap-2.5">
+                    <Checkbox
+                      id="remember"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                    />
+                    <label htmlFor="remember" className="text-sm text-[#475569] cursor-pointer select-none">
+                      Remember me
+                    </label>
                   </div>
 
                   {/* Error */}
@@ -175,23 +289,25 @@ export default function LoginPage() {
                   )}
 
                   {/* Submit */}
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !email || !password}
-                    className="w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Signing in...
-                      </>
-                    ) : (
-                      <>
-                        Sign In
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </>
-                    )}
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      type="submit"
+                      disabled={isLoading || !email || !password}
+                      className="w-full h-11 rounded-xl text-sm font-semibold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Signing in...
+                        </>
+                      ) : (
+                        <>
+                          Sign In
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </>
+                      )}
+                    </Button>
+                  </motion.div>
                 </form>
 
                 {/* Divider */}
@@ -201,16 +317,18 @@ export default function LoginPage() {
                   <div className="flex-1 h-px bg-[#E5E7EB]" />
                 </div>
 
-                {/* Google OAuth */}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full h-11 rounded-xl text-sm font-medium border-[#E5E7EB] bg-white hover:bg-[#F9FAFB]"
-                  onClick={() => signIn('google', { callbackUrl: '/app' })}
-                >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                  Continue with Google
-                </Button>
+                {/* Google OAuth — more prominent */}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 rounded-xl text-sm font-semibold border-[#E5E7EB] bg-white hover:bg-[#F9FAFB] hover:border-gray-300 hover:shadow-md transition-all duration-200"
+                    onClick={() => signIn('google', { callbackUrl: '/app' })}
+                  >
+                    <svg className="w-5 h-5 mr-2.5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Continue with Google
+                  </Button>
+                </motion.div>
 
                 {/* Sign up link */}
                 <p className="text-center text-sm text-[#475569] mt-6">

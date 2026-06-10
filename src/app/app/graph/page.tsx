@@ -110,6 +110,14 @@ const edgeStyleMap: Record<string, { strokeDasharray: string; strokeWidth: numbe
   part_of: { strokeDasharray: '4 2 1 2', strokeWidth: 1.5 },
 }
 
+const edgeTypeIcons: Record<string, string> = {
+  related: '→',
+  depends_on: '⇢',
+  created_by: '✦',
+  references: '§',
+  part_of: '⊕',
+}
+
 // ─── API Response Types ─────────────────────────────────────
 interface ApiNode {
   id: string
@@ -259,6 +267,204 @@ function CopyIdButton({ id }: { id: string }) {
   )
 }
 
+// ─── Node Hover Preview Card ───────────────────────────────
+function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean }) {
+  const color = typeColors[node.type] || '#9CA3AF'
+  const contentPreview = node.content ? node.content.slice(0, 100) + (node.content.length > 100 ? '...' : '') : 'No description'
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, y: 8, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.95 }}
+          transition={{ duration: 0.15, ease: 'easeOut' }}
+          className="pointer-events-none absolute z-50 w-64 rounded-xl bg-white border border-[#E5E7EB] shadow-xl shadow-black/8 overflow-hidden"
+        >
+          {/* Colored top accent */}
+          <div className="h-1" style={{ background: color }} />
+
+          <div className="p-3 space-y-2">
+            {/* Title + Type */}
+            <div className="flex items-start gap-2">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                style={{ background: color }}
+              >
+                <span className="text-white text-[8px] font-bold">
+                  {node.title.slice(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-[#18181B] truncate">{node.title}</p>
+                <Badge
+                  className="mt-0.5 text-[8px] font-semibold capitalize px-1.5 py-0"
+                  style={{
+                    background: typeBgColors[node.type],
+                    color: color,
+                    borderColor: typeBorderColors[node.type],
+                    borderWidth: 1,
+                  }}
+                >
+                  {node.type}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Content Preview */}
+            <p className="text-[10px] text-[#71717A] leading-relaxed line-clamp-3">
+              {contentPreview}
+            </p>
+
+            {/* Tags */}
+            {node.tags && node.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {node.tags.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#71717A] font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+                {node.tags.length > 3 && (
+                  <span className="text-[8px] px-1.5 py-0.5 text-[#A1A1AA]">
+                    +{node.tags.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Created Date */}
+            {node.createdAt && (
+              <p className="text-[8px] text-[#A1A1AA]">
+                Created {node.createdAt}
+              </p>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+// ─── Minimap Component ──────────────────────────────────────
+function Minimap({
+  nodes,
+  edges,
+  pan,
+  zoom,
+  viewBoxWidth,
+  viewBoxHeight,
+  onNavigate,
+}: {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  pan: { x: number; y: number }
+  zoom: number
+  viewBoxWidth: number
+  viewBoxHeight: number
+  onNavigate: (panX: number, panY: number) => void
+}) {
+  const minimapRef = useRef<SVGSVGElement>(null)
+
+  // Calculate bounds of all nodes
+  const bounds = useMemo(() => {
+    if (nodes.length === 0) return { minX: 0, minY: 0, maxX: 900, maxY: 600 }
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    for (const n of nodes) {
+      minX = Math.min(minX, n.x)
+      minY = Math.min(minY, n.y)
+      maxX = Math.max(maxX, n.x)
+      maxY = Math.max(maxY, n.y)
+    }
+    const pad = 50
+    return { minX: minX - pad, minY: minY - pad, maxX: maxX + pad, maxY: maxY + pad }
+  }, [nodes])
+
+  const bw = bounds.maxX - bounds.minX || 1
+  const bh = bounds.maxY - bounds.minY || 1
+  const minimapW = 120
+  const minimapH = 80
+
+  // Viewport rect in minimap coordinates
+  const vpLeft = (-pan.x / zoom) / bw * minimapW
+  const vpTop = (-pan.y / zoom) / bh * minimapH
+  const vpW = (viewBoxWidth / zoom) / bw * minimapW
+  const vpH = (viewBoxHeight / zoom) / bh * minimapH
+
+  const handleMinimapClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!minimapRef.current) return
+    const rect = minimapRef.current.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const clickY = e.clientY - rect.top
+    // Map back to world coordinates
+    const worldX = (clickX / minimapW) * bw + bounds.minX
+    const worldY = (clickY / minimapH) * bh + bounds.minY
+    // Pan so that worldX is at center of viewport
+    const panX = -(worldX * zoom - viewBoxWidth / 2)
+    const panY = -(worldY * zoom - viewBoxHeight / 2)
+    onNavigate(panX, panY)
+  }
+
+  return (
+    <svg
+      ref={minimapRef}
+      width={minimapW}
+      height={minimapH}
+      className="rounded-lg cursor-pointer"
+      style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(0,0,0,0.08)' }}
+      onClick={handleMinimapClick}
+    >
+      {/* Edges as thin lines */}
+      {edges.map((edge) => {
+        const source = nodes.find((n) => n.id === edge.source)
+        const target = nodes.find((n) => n.id === edge.target)
+        if (!source || !target) return null
+        const sx = ((source.x - bounds.minX) / bw) * minimapW
+        const sy = ((source.y - bounds.minY) / bh) * minimapH
+        const tx = ((target.x - bounds.minX) / bw) * minimapW
+        const ty = ((target.y - bounds.minY) / bh) * minimapH
+        return (
+          <line
+            key={`mm-edge-${edge.id}`}
+            x1={sx} y1={sy} x2={tx} y2={ty}
+            stroke="rgba(0,0,0,0.08)"
+            strokeWidth={0.5}
+          />
+        )
+      })}
+      {/* Nodes as tiny dots */}
+      {nodes.map((node) => {
+        const nx = ((node.x - bounds.minX) / bw) * minimapW
+        const ny = ((node.y - bounds.minY) / bh) * minimapH
+        return (
+          <circle
+            key={`mm-node-${node.id}`}
+            cx={nx}
+            cy={ny}
+            r={2}
+            fill={typeColors[node.type] || '#9CA3AF'}
+            opacity={0.7}
+          />
+        )
+      })}
+      {/* Viewport rectangle */}
+      <rect
+        x={Math.max(0, vpLeft)}
+        y={Math.max(0, vpTop)}
+        width={Math.min(minimapW - Math.max(0, vpLeft), vpW)}
+        height={Math.min(minimapH - Math.max(0, vpTop), vpH)}
+        fill="rgba(5,150,105,0.08)"
+        stroke="rgba(5,150,105,0.3)"
+        strokeWidth={1}
+        rx={2}
+      />
+    </svg>
+  )
+}
+
 // ─── Main Component ────────────────────────────────────────
 export default function KnowledgeGraphPage() {
   // State
@@ -275,7 +481,7 @@ export default function KnowledgeGraphPage() {
   const [panStart, setPanStart] = useState({ x: 0, y: 0 })
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<string>('all')
-  const [rightPanelOpen, setRightPanelOpen] = useState(true)
+
   const [addNodeDialogOpen, setAddNodeDialogOpen] = useState(false)
   const [editNodeDialogOpen, setEditNodeDialogOpen] = useState(false)
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null)
@@ -292,8 +498,13 @@ export default function KnowledgeGraphPage() {
   const [editNodeTitle, setEditNodeTitle] = useState('')
   const [editNodeContent, setEditNodeContent] = useState('')
 
+  // Track newly created node IDs for pop animation
+  const [newlyCreatedIds, setNewlyCreatedIds] = useState<Set<string>>(new Set())
+  const [rippleNodes, setRippleNodes] = useState<{ id: string; x: number; y: number; color: string; createdAt: number }[]>([])
+
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   // ─── Fetch data on mount ──────────────────────────────────
   useEffect(() => {
@@ -336,6 +547,24 @@ export default function KnowledgeGraphPage() {
     fetchData()
   }, [])
 
+  // Clean up ripple nodes after animation
+  useEffect(() => {
+    if (rippleNodes.length === 0) return
+    const timer = setTimeout(() => {
+      setRippleNodes((prev) => prev.filter((r) => Date.now() - r.createdAt < 2000))
+    }, 2100)
+    return () => clearTimeout(timer)
+  }, [rippleNodes])
+
+  // Clean up newly created IDs after animation completes
+  useEffect(() => {
+    if (newlyCreatedIds.size === 0) return
+    const timer = setTimeout(() => {
+      setNewlyCreatedIds(new Set())
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [newlyCreatedIds])
+
   const selectedNode = useMemo(() => nodes.find((n) => n.id === selectedNodeId), [nodes, selectedNodeId])
   const connectedNodes = useMemo(() => {
     if (!selectedNodeId) return []
@@ -356,6 +585,9 @@ export default function KnowledgeGraphPage() {
     })
     return ids
   }, [hoveredNodeId, edges])
+
+  // Get the hovered node data
+  const hoveredNode = useMemo(() => nodes.find((n) => n.id === hoveredNodeId), [nodes, hoveredNodeId])
 
   // Filtered nodes
   const filteredNodes = useMemo(() => {
@@ -379,6 +611,18 @@ export default function KnowledgeGraphPage() {
       const svgX = (clientX - rect.left - pan.x) / zoom
       const svgY = (clientY - rect.top - pan.y) / zoom
       return { x: svgX, y: svgY }
+    },
+    [zoom, pan]
+  )
+
+  // Convert SVG coordinates to screen coordinates for the preview card
+  const svgToScreen = useCallback(
+    (svgX: number, svgY: number) => {
+      if (!svgRef.current) return { x: 0, y: 0 }
+      const rect = svgRef.current.getBoundingClientRect()
+      const screenX = svgX * zoom + pan.x + rect.left
+      const screenY = svgY * zoom + pan.y + rect.top
+      return { x: screenX, y: screenY }
     },
     [zoom, pan]
   )
@@ -477,8 +721,20 @@ export default function KnowledgeGraphPage() {
         }))
         setPanStart({ x: e.clientX, y: e.clientY })
       }
+
+      // Update hover preview position
+      if (hoveredNodeId && hoveredNode && previewRef.current && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const nodeRadius = getNodeRadius(hoveredNode.type)
+        const screenPos = svgToScreen(hoveredNode.x, hoveredNode.y)
+        const previewX = screenPos.x - containerRect.left + (nodeRadius * zoom) + 12
+        const previewY = screenPos.y - containerRect.top - 40
+
+        previewRef.current.style.left = `${Math.min(previewX, containerRect.width - 280)}px`
+        previewRef.current.style.top = `${Math.max(8, previewY)}px`
+      }
     },
-    [draggingNodeId, dragOffset, toolMode, screenToSvg, isPanning, panStart]
+    [draggingNodeId, dragOffset, toolMode, screenToSvg, isPanning, panStart, hoveredNodeId, hoveredNode, svgToScreen, zoom]
   )
 
   const handleMouseUp = useCallback(() => {
@@ -488,7 +744,7 @@ export default function KnowledgeGraphPage() {
 
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target === svgRef.current || (e.target as Element).tagName === 'rect') {
+      if (e.target === svgRef.current || (e.target as Element).tagName === 'rect' || (e.target as Element).tagName === 'circle') {
         if (toolMode === 'select') {
           setSelectedNodeId(null)
         }
@@ -510,14 +766,18 @@ export default function KnowledgeGraphPage() {
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault()
     const delta = e.deltaY > 0 ? -0.1 : 0.1
-    setZoom((prev) => Math.max(0.2, Math.min(3, prev + delta)))
+    setZoom((prev) => Math.max(0.2, Math.min(3, Math.round((prev + delta) * 100) / 100)))
   }, [])
 
-  const handleZoomIn = () => setZoom((prev) => Math.min(3, prev + 0.2))
-  const handleZoomOut = () => setZoom((prev) => Math.max(0.2, prev - 0.2))
+  const handleZoomIn = () => setZoom((prev) => Math.min(3, Math.round((prev + 0.2) * 100) / 100))
+  const handleZoomOut = () => setZoom((prev) => Math.max(0.2, Math.round((prev - 0.2) * 100) / 100))
   const handleFitToScreen = () => {
     setZoom(1)
     setPan({ x: 0, y: 0 })
+  }
+
+  const handleMinimapNavigate = (panX: number, panY: number) => {
+    setPan({ x: panX, y: panY })
   }
 
   const handleAddNode = async () => {
@@ -548,6 +808,14 @@ export default function KnowledgeGraphPage() {
         const createdNode = mapApiNodeToGraphNode(data.node)
         setNodes((prev) => [...prev, createdNode])
         setSelectedNodeId(createdNode.id)
+        setNewlyCreatedIds((prev) => new Set(prev).add(createdNode.id))
+        setRippleNodes((prev) => [...prev, {
+          id: createdNode.id,
+          x: createdNode.x,
+          y: createdNode.y,
+          color: typeColors[createdNode.type] || '#9CA3AF',
+          createdAt: Date.now(),
+        }])
         if (isFirstNode) {
           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#059669', '#10B981', '#34D399', '#6EE7B7'] })
           toast.success('🎉 First knowledge node created!', { description: "You've started building your knowledge graph!" })
@@ -569,6 +837,14 @@ export default function KnowledgeGraphPage() {
         }
         setNodes((prev) => [...prev, newNode])
         setSelectedNodeId(id)
+        setNewlyCreatedIds((prev) => new Set(prev).add(id))
+        setRippleNodes((prev) => [...prev, {
+          id,
+          x,
+          y,
+          color: typeColors[newNodeType] || '#9CA3AF',
+          createdAt: Date.now(),
+        }])
       }
     } catch {
       // Fallback: add locally
@@ -585,6 +861,14 @@ export default function KnowledgeGraphPage() {
       }
       setNodes((prev) => [...prev, newNode])
       setSelectedNodeId(id)
+      setNewlyCreatedIds((prev) => new Set(prev).add(id))
+      setRippleNodes((prev) => [...prev, {
+        id,
+        x,
+        y,
+        color: typeColors[newNodeType] || '#9CA3AF',
+        createdAt: Date.now(),
+      }])
     }
 
     setAddNodeDialogOpen(false)
@@ -669,6 +953,9 @@ export default function KnowledgeGraphPage() {
         return 18
     }
   }
+
+  // Whether labels are always visible for this node type (larger nodes)
+  const isLargeNodeType = (type: string) => type === 'project' || type === 'person'
 
   // Compute viewBox
   const viewBoxWidth = 900
@@ -1005,6 +1292,17 @@ export default function KnowledgeGraphPage() {
           </div>
         </div>
 
+        {/* Node Hover Preview Card */}
+        <div
+          ref={previewRef}
+          className="absolute z-40 pointer-events-none"
+          style={{ display: hoveredNode ? 'block' : 'none' }}
+        >
+          {hoveredNode && (
+            <NodeHoverPreview node={hoveredNode} visible={!!hoveredNodeId} />
+          )}
+        </div>
+
         {/* SVG Canvas */}
         <svg
           ref={svgRef}
@@ -1021,9 +1319,62 @@ export default function KnowledgeGraphPage() {
           }}
         >
           <defs>
+            {/* ── Enhanced Background Patterns ── */}
+            {/* Small dot grid */}
             <pattern id="dotGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <circle cx="15" cy="15" r="0.8" fill="rgba(0,0,0,0.06)" />
+              <circle cx="15" cy="15" r="0.6" fill="rgba(0,0,0,0.05)" />
             </pattern>
+            {/* Larger grid lines */}
+            <pattern id="lineGrid" width="150" height="150" patternUnits="userSpaceOnUse">
+              <line x1="150" y1="0" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" />
+              <line x1="0" y1="150" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" />
+            </pattern>
+            {/* Radial gradient for background */}
+            <radialGradient id="bgGradient" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stopColor="rgba(5,150,105,0.015)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+            </radialGradient>
+
+            {/* ── Glow Filters ── */}
+            {/* Edge glow filter */}
+            <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Stronger glow for highlighted edges */}
+            <filter id="edgeGlowStrong" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Node shadow/glow filter */}
+            <filter id="nodeShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="rgba(0,0,0,0.15)" />
+            </filter>
+            {/* Type-colored glow filters */}
+            {Object.entries(typeColors).map(([type, color]) => (
+              <filter key={`glow-${type}`} id={`glow-${type}`} x="-80%" y="-80%" width="260%" height="260%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor={color} floodOpacity="0.4" />
+              </filter>
+            ))}
+            {/* Pulse glow for selected nodes */}
+            <filter id="pulseGlow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            {/* ── Edge particle paths ── */}
+            {/* We'll generate path data per edge inline */}
+
             {/* Arrowhead markers for each color */}
             {Object.entries(typeColors).map(([type, color]) => (
               <marker
@@ -1042,16 +1393,17 @@ export default function KnowledgeGraphPage() {
           </defs>
 
           <g transform={`translate(${pan.x / zoom}, ${pan.y / zoom}) scale(${zoom})`}>
-            {/* Background grid */}
-            <rect
-              x="-2000"
-              y="-2000"
-              width="6000"
-              height="6000"
-              fill="url(#dotGrid)"
-            />
+            {/* ── Enhanced Background ── */}
+            {/* Base fill */}
+            <rect x="-2000" y="-2000" width="6000" height="6000" fill="#F9FAFB" />
+            {/* Radial gradient overlay */}
+            <rect x="-2000" y="-2000" width="6000" height="6000" fill="url(#bgGradient)" />
+            {/* Small dot grid */}
+            <rect x="-2000" y="-2000" width="6000" height="6000" fill="url(#dotGrid)" />
+            {/* Larger line grid */}
+            <rect x="-2000" y="-2000" width="6000" height="6000" fill="url(#lineGrid)" />
 
-            {/* Edges */}
+            {/* ── Edges ── */}
             {edges
               .filter((e) => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target))
               .map((edge, idx) => {
@@ -1079,15 +1431,29 @@ export default function KnowledgeGraphPage() {
                   strength <= 6 ? 0.45 :
                   0.75
 
-                // Calculate midpoint for label
-                const midX = (source.x + target.x) / 2
-                const midY = (source.y + target.y) / 2
-
-                // Calculate angle for label rotation
-                const angle = Math.atan2(target.y - source.y, target.x - source.x) * (180 / Math.PI)
+                // Edge path for particle animation
+                const edgePathId = `edge-path-${edge.id}`
+                const pathD = `M ${source.x} ${source.y} L ${target.x} ${target.y}`
 
                 return (
                   <g key={`edge-${edge.id}-${idx}`}>
+                    {/* Glow layer (behind the edge) */}
+                    <line
+                      x1={source.x}
+                      y1={source.y}
+                      x2={target.x}
+                      y2={target.y}
+                      stroke={isHighlighted || isConnectedToSelected ? color : 'transparent'}
+                      strokeWidth={
+                        isHighlighted || isConnectedToSelected ? strengthStrokeWidth + 4 : 0
+                      }
+                      strokeDasharray={style.strokeDasharray}
+                      opacity={isHighlighted ? 0.15 : isConnectedToSelected ? 0.1 : 0}
+                      filter="url(#edgeGlow)"
+                      className="transition-all duration-300"
+                    />
+
+                    {/* Main edge line */}
                     <line
                       x1={source.x}
                       y1={source.y}
@@ -1106,29 +1472,49 @@ export default function KnowledgeGraphPage() {
                       }
                       className="transition-all duration-200"
                     />
-                    {/* Edge label */}
-                    {(isHighlighted || isConnectedToSelected) && edge.label && (
-                      <g transform={`translate(${midX}, ${midY})`}>
+
+                    {/* Animated particle dots along edges - only for highlighted/selected */}
+                    {(isHighlighted || isConnectedToSelected) && (
+                      <>
+                        <path id={edgePathId} d={pathD} fill="none" stroke="none" />
+                        <circle r="2" fill={color} opacity="0.8">
+                          <animateMotion dur={`${3 + idx * 0.5}s`} repeatCount="indefinite">
+                            <mpath href={`#${edgePathId}`} />
+                          </animateMotion>
+                        </circle>
+                        <circle r="1.5" fill={color} opacity="0.5">
+                          <animateMotion dur={`${4 + idx * 0.7}s`} repeatCount="indefinite" begin="1.5s">
+                            <mpath href={`#${edgePathId}`} />
+                          </animateMotion>
+                        </circle>
+                      </>
+                    )}
+
+                    {/* Edge label on hover (when connected node is hovered) */}
+                    {(isHighlighted) && edge.label && (
+                      <g transform={`translate(${(source.x + target.x) / 2}, ${(source.y + target.y) / 2})`}>
                         <rect
-                          x={-edge.label.length * 3 - 4}
-                          y={-8}
-                          width={edge.label.length * 6 + 8}
-                          height={16}
-                          rx={4}
+                          x={-edge.label.length * 3 - 8}
+                          y={-10}
+                          width={edge.label.length * 6 + 16}
+                          height={20}
+                          rx={6}
                           fill="white"
                           stroke={color}
                           strokeWidth={0.5}
                           opacity={0.95}
+                          filter="url(#nodeShadow)"
                         />
                         <text
+                          x={-edge.label.length * 0.5}
+                          y={1}
                           textAnchor="middle"
                           dominantBaseline="central"
                           fill={color}
                           fontSize={8}
-                          fontWeight={500}
-                          style={{ transform: `rotate(${Math.abs(angle) > 90 ? angle + 180 : angle}deg)` }}
+                          fontWeight={600}
                         >
-                          {edge.label}
+                          {edgeTypeIcons[edge.type] || '→'} {edge.label}
                         </text>
                       </g>
                     )}
@@ -1136,7 +1522,46 @@ export default function KnowledgeGraphPage() {
                 )
               })}
 
-            {/* Nodes */}
+            {/* ── Ripple effects for newly created nodes ── */}
+            {rippleNodes.map((ripple) => (
+              <circle
+                key={`ripple-${ripple.id}-${ripple.createdAt}`}
+                cx={ripple.x}
+                cy={ripple.y}
+                r={0}
+                fill="none"
+                stroke={ripple.color}
+                strokeWidth={2}
+                opacity={0.6}
+              >
+                <animate
+                  attributeName="r"
+                  from="0"
+                  to="60"
+                  dur="1.2s"
+                  begin="0s"
+                  fill="freeze"
+                />
+                <animate
+                  attributeName="opacity"
+                  from="0.6"
+                  to="0"
+                  dur="1.2s"
+                  begin="0s"
+                  fill="freeze"
+                />
+                <animate
+                  attributeName="strokeWidth"
+                  from="2"
+                  to="0.5"
+                  dur="1.2s"
+                  begin="0s"
+                  fill="freeze"
+                />
+              </circle>
+            ))}
+
+            {/* ── Nodes ── */}
             {filteredNodes.map((node) => {
               const isSelected = node.id === selectedNodeId
               const isHovered = node.id === hoveredNodeId
@@ -1144,6 +1569,8 @@ export default function KnowledgeGraphPage() {
               const isAddEdgeSource = node.id === addEdgeSource
               const color = typeColors[node.type] || '#9CA3AF'
               const radius = getNodeRadius(node.type)
+              const isNewNode = newlyCreatedIds.has(node.id)
+              const showLabels = isLargeNodeType(node.type) || isHovered || isSelected
 
               return (
                 <g
@@ -1157,53 +1584,136 @@ export default function KnowledgeGraphPage() {
                   }}
                   className="cursor-pointer"
                   style={{ transition: 'opacity 0.2s ease' }}
-                  opacity={isDimmed ? 0.2 : 1}
+                  opacity={isDimmed ? 0.15 : 1}
                 >
-                  {/* Selection ring */}
+                  {/* Node shadow/glow based on type color */}
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={radius + 2}
+                    fill={color}
+                    opacity={0.12}
+                    filter={`url(#glow-${node.type})`}
+                    className="transition-all duration-200"
+                  />
+
+                  {/* Selection ring - double ring with pulsing outer */}
                   {(isSelected || isAddEdgeSource) && (
-                    <circle
-                      cx={node.x}
-                      cy={node.y}
-                      r={radius + 6}
-                      fill="none"
-                      stroke={isAddEdgeSource ? '#059669' : color}
-                      strokeWidth={2}
-                      strokeDasharray={isAddEdgeSource ? '4 2' : 'none'}
-                      opacity={0.6}
-                    >
-                      <animate
-                        attributeName="r"
-                        values={`${radius + 5};${radius + 8};${radius + 5}`}
-                        dur="2s"
-                        repeatCount="indefinite"
-                      />
-                    </circle>
+                    <>
+                      {/* Outer pulsing ring */}
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r={radius + 8}
+                        fill="none"
+                        stroke={isAddEdgeSource ? '#059669' : color}
+                        strokeWidth={1.5}
+                        opacity={0.3}
+                      >
+                        <animate
+                          attributeName="r"
+                          values={`${radius + 7};${radius + 12};${radius + 7}`}
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          values="0.3;0.1;0.3"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                      {/* Inner selection ring */}
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r={radius + 5}
+                        fill="none"
+                        stroke={isAddEdgeSource ? '#059669' : color}
+                        strokeWidth={2}
+                        strokeDasharray={isAddEdgeSource ? '4 2' : 'none'}
+                        opacity={0.6}
+                      >
+                        <animate
+                          attributeName="r"
+                          values={`${radius + 4};${radius + 7};${radius + 4}`}
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                    </>
                   )}
 
-                  {/* Hover glow */}
+                  {/* Hover pulsing emerald glow ring */}
                   {isHovered && !isSelected && (
-                    <circle
-                      cx={node.x}
-                      cy={node.y}
-                      r={radius + 4}
-                      fill="none"
-                      stroke={color}
-                      strokeWidth={1.5}
-                      opacity={0.3}
-                    />
+                    <>
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r={radius + 6}
+                        fill="none"
+                        stroke="#059669"
+                        strokeWidth={1.5}
+                        opacity={0.4}
+                      >
+                        <animate
+                          attributeName="r"
+                          values={`${radius + 5};${radius + 9};${radius + 5}`}
+                          dur="1.5s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          values="0.4;0.15;0.4"
+                          dur="1.5s"
+                          repeatCount="indefinite"
+                        />
+                      </circle>
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r={radius + 3}
+                        fill="none"
+                        stroke={color}
+                        strokeWidth={1}
+                        opacity={0.3}
+                      />
+                    </>
                   )}
 
-                  {/* Node circle */}
+                  {/* Node circle - with pop animation for new nodes */}
                   <circle
                     cx={node.x}
                     cy={node.y}
                     r={radius}
                     fill={color}
                     stroke="white"
-                    strokeWidth={2}
-                    filter={isSelected ? 'none' : undefined}
+                    strokeWidth={2.5}
+                    filter="url(#nodeShadow)"
                     className="transition-all duration-150"
-                  />
+                  >
+                    {/* Pop-in animation for newly created nodes */}
+                    {isNewNode && (
+                      <>
+                        <animate
+                          attributeName="r"
+                          values={`0;${radius * 1.2};${radius}`}
+                          dur="0.5s"
+                          begin="0s"
+                          fill="freeze"
+                          calcMode="spline"
+                          keySplines="0.175 0.885 0.32 1.275;0.175 0.885 0.32 1.275"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          values="0;1;1"
+                          dur="0.3s"
+                          begin="0s"
+                          fill="freeze"
+                        />
+                      </>
+                    )}
+                  </circle>
 
                   {/* Node icon/initial */}
                   {node.type === 'person' ? (
@@ -1215,7 +1725,11 @@ export default function KnowledgeGraphPage() {
                       fill="white"
                       fontSize={10}
                       fontWeight={700}
+                      opacity={isNewNode ? 0 : 1}
                     >
+                      {isNewNode && (
+                        <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="0.2s" fill="freeze" />
+                      )}
                       {node.title.slice(0, 2).toUpperCase()}
                     </text>
                   ) : (
@@ -1228,12 +1742,16 @@ export default function KnowledgeGraphPage() {
                       fontSize={7}
                       fontWeight={700}
                       letterSpacing="-0.02em"
+                      opacity={isNewNode ? 0 : 1}
                     >
+                      {isNewNode && (
+                        <animate attributeName="opacity" from="0" to="1" dur="0.3s" begin="0.2s" fill="freeze" />
+                      )}
                       {node.title.length > 6 ? node.title.slice(0, 5) + '…' : node.title}
                     </text>
                   )}
 
-                  {/* Title label below */}
+                  {/* Title label below - visible for large types or on hover */}
                   <text
                     x={node.x}
                     y={node.y + radius + 14}
@@ -1241,11 +1759,13 @@ export default function KnowledgeGraphPage() {
                     fill={isSelected ? color : '#52525B'}
                     fontSize={10}
                     fontWeight={isSelected ? 700 : 500}
+                    opacity={showLabels ? 1 : 0.5}
+                    className="transition-all duration-200"
                   >
                     {node.title}
                   </text>
 
-                  {/* Type badge */}
+                  {/* Type badge - visible for large types or on hover */}
                   <text
                     x={node.x}
                     y={node.y + radius + 25}
@@ -1254,7 +1774,8 @@ export default function KnowledgeGraphPage() {
                     fontSize={7}
                     fontWeight={600}
                     textTransform="uppercase"
-                    opacity={0.7}
+                    opacity={showLabels ? 0.7 : 0}
+                    className="transition-all duration-200"
                   >
                     {node.type}
                   </text>
@@ -1268,24 +1789,43 @@ export default function KnowledgeGraphPage() {
         {nodes.length === 0 && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F9FAFB]/80 backdrop-blur-sm">
             <GraphEmptyState onAddNode={() => setAddNodeDialogOpen(true)} />
-            <motion.p
-              className="mt-6 text-sm text-emerald-600/70 font-medium select-none"
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            <motion.button
+              onClick={() => setAddNodeDialogOpen(true)}
+              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white text-sm font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.97] transition-all duration-200"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
             >
-              Click anywhere to add your first node
-            </motion.p>
+              <Plus className="w-4 h-4" />
+              Create Your First Node
+            </motion.button>
           </div>
         )}
 
-        {/* Zoom indicator (desktop only) */}
-        <div className="hidden md:block absolute bottom-3 left-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A]">
-          {Math.round(zoom * 100)}%
+        {/* Zoom indicator (desktop only) - enhanced with badge style */}
+        <div className="hidden md:flex absolute bottom-3 left-3 z-20 items-center gap-1.5">
+          <div className="bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A] shadow-sm">
+            {Math.round(zoom * 100)}%
+          </div>
         </div>
 
-        {/* Legend (desktop only) */}
-        <div className="hidden md:block absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+        {/* Minimap (desktop only) */}
+        <div className="hidden md:block absolute bottom-3 right-3 z-20">
+          <Minimap
+            nodes={filteredNodes}
+            edges={edges.filter((e) => filteredNodeIds.has(e.source) && filteredNodeIds.has(e.target))}
+            pan={pan}
+            zoom={zoom}
+            viewBoxWidth={viewBoxWidth}
+            viewBoxHeight={viewBoxHeight}
+            onNavigate={handleMinimapNavigate}
+          />
+        </div>
+
+        {/* Legend (desktop only) - moved above minimap */}
+        <div className="hidden md:block absolute bottom-[90px] right-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
           <p className="text-[9px] font-bold text-[#71717A] uppercase tracking-wider mb-2">Legend</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {Object.entries(typeColors).map(([type, color]) => (

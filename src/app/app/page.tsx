@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -20,6 +20,8 @@ import {
   Zap,
   Download,
   Lightbulb,
+  Activity,
+  Heart,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -40,6 +42,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { ProfileCompletionCard } from '@/components/app/profile-completion'
 import { ACHIEVEMENTS } from '@/components/app/achievements'
 import { useAchievementStore } from '@/stores/achievement-store'
+import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 // ─── Types ──────────────────────────────────────────────────
 interface UserStats {
@@ -180,6 +183,232 @@ function MiniGraphSVG() {
   )
 }
 
+// ─── Health Score Calculation ──────────────────────────────
+interface HealthScoreBreakdown {
+  nodes: number
+  connections: number
+  diversity: number
+  activity: number
+  total: number
+}
+
+function calculateHealthScore(
+  nodeCount: number,
+  edgeCount: number,
+  uniqueTypes: number,
+  recentNodeCount: number
+): HealthScoreBreakdown {
+  // Node count score (0-25)
+  let nodesScore = 0
+  if (nodeCount >= 20) nodesScore = 25
+  else if (nodeCount >= 10) nodesScore = 20
+  else if (nodeCount >= 5) nodesScore = 15
+  else if (nodeCount >= 1) nodesScore = 8
+
+  // Edge density score (0-25)
+  let connectionsScore = 0
+  if (nodeCount > 0) {
+    const ratio = edgeCount / nodeCount
+    if (ratio > 2.0) connectionsScore = 25
+    else if (ratio > 1.0) connectionsScore = 20
+    else if (ratio > 0.5) connectionsScore = 15
+    else if (ratio > 0) connectionsScore = 8
+  }
+
+  // Type diversity score (0-25)
+  let diversityScore = 0
+  if (uniqueTypes >= 4) diversityScore = 25
+  else if (uniqueTypes === 3) diversityScore = 15
+  else if (uniqueTypes === 2) diversityScore = 10
+  else if (uniqueTypes === 1) diversityScore = 5
+
+  // Recent activity score (0-25)
+  let activityScore = 0
+  if (recentNodeCount >= 8) activityScore = 25
+  else if (recentNodeCount >= 4) activityScore = 20
+  else if (recentNodeCount >= 1) activityScore = 10
+
+  return {
+    nodes: nodesScore,
+    connections: connectionsScore,
+    diversity: diversityScore,
+    activity: activityScore,
+    total: nodesScore + connectionsScore + diversityScore + activityScore,
+  }
+}
+
+function getHealthLabel(score: number): string {
+  if (score >= 81) return 'Excellent'
+  if (score >= 61) return 'Good'
+  if (score >= 41) return 'Needs Work'
+  return 'Getting Started'
+}
+
+function getHealthColor(score: number): string {
+  if (score >= 81) return '#10B981' // bright emerald
+  if (score >= 61) return '#059669' // emerald
+  if (score >= 41) return '#F59E0B' // amber
+  return '#EF4444' // red
+}
+
+function getHealthGlow(score: number): string {
+  if (score >= 81) return '0 0 20px rgba(16,185,129,0.5), 0 0 40px rgba(16,185,129,0.2)'
+  if (score >= 61) return '0 0 10px rgba(5,150,105,0.3)'
+  return 'none'
+}
+
+// ─── Health Score Ring Component ───────────────────────────
+function HealthScoreRing({ score, color, glow }: { score: number; color: string; glow: string }) {
+  const [animatedScore, setAnimatedScore] = useState(0)
+  const [animatedOffset, setAnimatedOffset] = useState(0)
+  const radius = 58
+  const strokeWidth = 8
+  const circumference = 2 * Math.PI * radius
+
+  useEffect(() => {
+    const targetOffset = circumference - (score / 100) * circumference
+    const timer = setTimeout(() => {
+      // Animate the score number
+      let current = 0
+      const step = Math.max(1, Math.floor(score / 40))
+      const counter = setInterval(() => {
+        current += step
+        if (current >= score) {
+          current = score
+          clearInterval(counter)
+        }
+        setAnimatedScore(current)
+      }, 25)
+      // Animate the ring
+      setAnimatedOffset(targetOffset)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [score, circumference])
+
+  return (
+    <div className="relative" style={{ filter: glow }}>
+      <svg width="140" height="140" viewBox="0 0 140 140" className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx="70"
+          cy="70"
+          r={radius}
+          fill="none"
+          stroke="rgba(0,0,0,0.06)"
+          strokeWidth={strokeWidth}
+        />
+        {/* Progress circle */}
+        <circle
+          cx="70"
+          cy="70"
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={animatedOffset}
+          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+        />
+      </svg>
+      {/* Center text */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <motion.span
+          className="text-3xl font-bold"
+          style={{ color, fontVariantNumeric: 'tabular-nums' }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
+          {animatedScore}
+        </motion.span>
+        <span
+          className="text-[10px] font-semibold uppercase tracking-wider mt-0.5"
+          style={{ color: color, opacity: 0.8 }}
+        >
+          {getHealthLabel(score)}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ─── Mini Progress Bar ────────────────────────────────────
+function MiniProgressBar({
+  label,
+  value,
+  maxValue,
+  color,
+  icon,
+}: {
+  label: string
+  value: number
+  maxValue: number
+  color: string
+  icon: React.ReactNode
+}) {
+  const percentage = Math.min(100, (value / maxValue) * 100)
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="w-5 h-5 rounded flex items-center justify-center shrink-0" style={{ background: `${color}15` }}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-medium text-[#52525B]">{label}</span>
+          <span className="text-[10px] font-semibold" style={{ color }}>
+            {value}/{maxValue}
+          </span>
+        </div>
+        <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: color }}
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ delay: 0.6, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Weekly Activity Chart Component ──────────────────────
+function WeeklyActivityChart({ data }: { data: { day: string; count: number }[] }) {
+  return (
+    <div className="h-[120px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <defs>
+            <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#10B981" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          <XAxis
+            dataKey="day"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 10, fill: '#A1A1AA' }}
+            dy={5}
+          />
+          <YAxis hide />
+          <Area
+            type="monotone"
+            dataKey="count"
+            stroke="#10B981"
+            strokeWidth={2}
+            fill="url(#emeraldGradient)"
+            dot={false}
+            activeDot={{ r: 3, fill: '#059669', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
 // ─── Animation Variants ────────────────────────────────────
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -307,6 +536,23 @@ export default function DashboardPage() {
   todayStart.setHours(0, 0, 0, 0)
   const newTodayCount = nodes.filter(n => new Date(n.createdAt) >= todayStart).length
 
+  // Count nodes created in the last 7 days
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+  const recentNodeCount = nodes.filter(n => new Date(n.createdAt) >= sevenDaysAgo).length
+
+  // Count unique node types
+  const uniqueTypes = useMemo(() => {
+    const types = new Set(nodes.map(n => n.type))
+    return types.size
+  }, [nodes])
+
+  // Calculate health score
+  const healthScore = useMemo(
+    () => calculateHealthScore(nodeCount, edgeCount, uniqueTypes, recentNodeCount),
+    [nodeCount, edgeCount, uniqueTypes, recentNodeCount]
+  )
+
   // Build a map of node id → title for edge labels
   const nodeTitleMap = useMemo(() => {
     const map = new Map<string, string>()
@@ -387,6 +633,41 @@ export default function DashboardPage() {
       bgColor: 'rgba(124,58,237,0.08)',
     },
   ], [nodeCount, edgeCount, newTodayCount, stats, digest])
+
+  // Weekly activity data for chart
+  const weeklyChartData = useMemo(() => {
+    if (stats?.weeklyActivity && stats.weeklyActivity.length > 0) {
+      return stats.weeklyActivity.map(d => ({
+        day: d.day?.slice(0, 3) || d.date?.slice(0, 3) || '',
+        count: d.count,
+      }))
+    }
+    // Generate placeholder data from node creation dates
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const now = new Date()
+    const dayOfWeek = now.getDay() // 0=Sun, 1=Mon, ...
+    const data = days.map((day, i) => {
+      // Map index to day of week (Mon=0, Sun=6)
+      const jsDay = i === 6 ? 0 : i + 1 // Convert Mon=0 to JS day format
+      const count = nodes.filter(n => {
+        const d = new Date(n.createdAt)
+        // Simple: count if the day of week matches and within last 7 days
+        const diffMs = now.getTime() - d.getTime()
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+        return diffDays < 7 && d.getDay() === jsDay
+      }).length
+      return { day, count }
+    })
+    return data
+  }, [stats, nodes])
+
+  // Dynamic welcome message based on node count
+  const welcomeMessage = useMemo(() => {
+    if (nodeCount === 0) return "Welcome to Lore! Start by adding your first knowledge node."
+    if (nodeCount >= 1 && nodeCount <= 4) return "Great start! Add more nodes to unlock AI insights."
+    if (nodeCount >= 5 && nodeCount <= 9) return "Your knowledge graph is growing! Try connecting some nodes."
+    return "Your knowledge graph is thriving! Check your morning digest for insights."
+  }, [nodeCount])
 
   // Digest summary text
   const digestSummary = digest?.summary || 'Your morning digest is being prepared. Add some knowledge nodes to get started!'
@@ -486,22 +767,27 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* ═══════════════════════════════════════════════════════
-          WELCOME BACK BANNER
+          WELCOME BACK BANNER (Enhanced)
           ═══════════════════════════════════════════════════════ */}
-      {nodeCount > 0 && (
-        <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-r from-emerald-600 to-emerald-500 border-0 text-white overflow-hidden relative">
-            <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4">
+      <motion.div variants={itemVariants}>
+        <Card className="bg-gradient-to-r from-emerald-600 to-emerald-500 border-0 text-white overflow-hidden relative">
+          <CardContent className="p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <Sparkles className="w-4 h-4 text-emerald-200" />
                   <h2 className="text-sm sm:text-base font-bold text-white truncate">
-                    Welcome back, {firstName}!
+                    {nodeCount > 0 ? `Welcome back, ${firstName}!` : `Welcome to Lore, ${firstName}!`}
                   </h2>
                 </div>
-                <p className="text-xs sm:text-sm text-emerald-100">
-                  {nodeCount} node{nodeCount !== 1 ? 's' : ''}, {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
+                <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                  {welcomeMessage}
                 </p>
+                {nodeCount > 0 && (
+                  <p className="text-[11px] text-emerald-200/70 mt-1">
+                    {nodeCount} node{nodeCount !== 1 ? 's' : ''}, {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
+                  </p>
+                )}
               </div>
               {/* Mini sparkline indicator */}
               <div className="hidden sm:flex items-end gap-[3px] h-8 shrink-0">
@@ -513,13 +799,13 @@ export default function DashboardPage() {
                   />
                 ))}
               </div>
-              {/* Decorative circle */}
-              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/5" />
-              <div className="absolute -right-2 -bottom-8 w-20 h-20 rounded-full bg-white/5" />
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+            </div>
+            {/* Decorative circles */}
+            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/5" />
+            <div className="absolute -right-2 -bottom-8 w-20 h-20 rounded-full bg-white/5" />
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* ═══════════════════════════════════════════════════════
           PROFILE COMPLETION
@@ -568,6 +854,83 @@ export default function DashboardPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* ═══════════════════════════════════════════════════════
+          KNOWLEDGE HEALTH SCORE
+          ═══════════════════════════════════════════════════════ */}
+      <motion.div variants={itemVariants}>
+        <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
+                  <Heart className="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <h2 className="text-sm font-bold text-[#18181B]">
+                  Knowledge Health Score
+                </h2>
+              </div>
+              <Badge
+                variant="outline"
+                className="text-[9px] font-bold border-emerald-200 bg-emerald-50/50"
+                style={{ color: getHealthColor(healthScore.total) }}
+              >
+                {getHealthLabel(healthScore.total).toUpperCase()}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pb-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
+              {/* Circular gauge */}
+              <HealthScoreRing
+                score={healthScore.total}
+                color={getHealthColor(healthScore.total)}
+                glow={getHealthGlow(healthScore.total)}
+              />
+
+              {/* Component breakdown */}
+              <div className="flex-1 w-full space-y-3.5">
+                <MiniProgressBar
+                  label="Nodes"
+                  value={healthScore.nodes}
+                  maxValue={25}
+                  color="#059669"
+                  icon={<Network className="w-3 h-3 text-emerald-600" />}
+                />
+                <MiniProgressBar
+                  label="Connections"
+                  value={healthScore.connections}
+                  maxValue={25}
+                  color="#0D9488"
+                  icon={<Link2 className="w-3 h-3 text-teal-600" />}
+                />
+                <MiniProgressBar
+                  label="Diversity"
+                  value={healthScore.diversity}
+                  maxValue={25}
+                  color="#7C3AED"
+                  icon={<GitBranch className="w-3 h-3 text-violet-600" />}
+                />
+                <MiniProgressBar
+                  label="Activity"
+                  value={healthScore.activity}
+                  maxValue={25}
+                  color="#EA580C"
+                  icon={<Activity className="w-3 h-3 text-orange-600" />}
+                />
+              </div>
+
+              {/* Weekly Activity Mini Chart */}
+              <div className="flex-1 w-full sm:min-w-[180px] sm:max-w-[240px]">
+                <p className="text-[11px] font-semibold text-[#71717A] mb-2 uppercase tracking-wider">
+                  Weekly Activity
+                </p>
+                <WeeklyActivityChart data={weeklyChartData} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* ═══════════════════════════════════════════════════════
           KNOWLEDGE GRAPH PREVIEW + MORNING DIGEST
