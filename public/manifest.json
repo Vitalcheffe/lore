@@ -1,7 +1,7 @@
 {
-  "name": "LORE — Your Team's Memory, Alive",
-  "short_name": "LORE",
-  "description": "Knowledge management platform with AI-powered graph, digest, and chat",
+  "name": "Lore - Knowledge Management",
+  "short_name": "Lore",
+  "description": "Your team's memory, always alive. AI-powered knowledge management with structured graphs, morning digests, and intelligent recall.",
   "start_url": "/app",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,9 +11,8 @@
     {
       "src": "/logo.svg",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
+      "type": "image/svg+xml"
     }
   ],
-  "categories": ["productivity", "utilities"]
+  "categories": ["productivity", "business"]
 }

@@ -44,6 +44,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { NotesEmptyState } from '@/components/app/empty-states'
+import confetti from 'canvas-confetti'
 
 // ─── Types ─────────────────────────────────────────────────
 type NoteType = 'note' | 'bookmark' | 'insight' | 'snippet' | 'meeting' | 'idea'
@@ -263,6 +265,7 @@ export default function MemoryPage() {
   const handleCreateNote = async () => {
     if (!newTitle.trim()) return
 
+    const isFirstNote = notes.length === 0
     setCreating(true)
     try {
       const tagsArray = newTags
@@ -295,7 +298,12 @@ export default function MemoryPage() {
       setNewContent('')
       setNewTags('')
       setNewNoteOpen(false)
-      toast.success('Note saved! 📝')
+      if (isFirstNote) {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD'] })
+        toast.success('🎉 First note created!', { description: 'Your memory bank is growing!' })
+      } else {
+        toast.success('Note saved! 📝')
+      }
     } catch (err) {
       console.error('Failed to create note:', err)
     } finally {
@@ -650,7 +658,10 @@ export default function MemoryPage() {
               )}
 
               {/* Empty state */}
-              {!loading && filteredNotes.length === 0 && (
+              {!loading && filteredNotes.length === 0 && notes.length === 0 && (
+                <NotesEmptyState onCreateNote={() => setNewNoteOpen(true)} />
+              )}
+              {!loading && filteredNotes.length === 0 && notes.length > 0 && (
                 <div className="flex flex-col items-center justify-center py-16">
                   <div className="w-14 h-14 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center mb-4">
                     <Filter className="w-6 h-6 text-[#A1A1AA]" />

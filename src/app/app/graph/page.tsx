@@ -16,6 +16,8 @@ import {
   Pencil,
   Network,
   Filter,
+  Copy,
+  Check,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -45,6 +47,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
+import { GraphEmptyState } from '@/components/app/empty-states'
+import confetti from 'canvas-confetti'
 
 // ─── Types ─────────────────────────────────────────────────
 interface GraphNode {
@@ -224,6 +228,32 @@ function applyForceLayout(nodes: GraphNode[], edges: GraphEdge[], iterations: nu
   }
 
   return newNodes
+}
+
+// ─── Copy ID Button ────────────────────────────────────────
+function CopyIdButton({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(id)
+      setCopied(true)
+      toast.success('Copied to clipboard!')
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Failed to copy')
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+      title="Copy node ID"
+    >
+      {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+    </button>
+  )
 }
 
 // ─── Main Component ────────────────────────────────────────
@@ -488,6 +518,7 @@ export default function KnowledgeGraphPage() {
 
   const handleAddNode = async () => {
     if (!newNodeTitle.trim()) return
+    const isFirstNode = nodes.length === 0
     const tags = newNodeTags
       .split(',')
       .map((t) => t.trim())
@@ -513,7 +544,12 @@ export default function KnowledgeGraphPage() {
         const createdNode = mapApiNodeToGraphNode(data.node)
         setNodes((prev) => [...prev, createdNode])
         setSelectedNodeId(createdNode.id)
-        toast.success('Knowledge node created! 🧠')
+        if (isFirstNode) {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#059669', '#10B981', '#34D399', '#6EE7B7'] })
+          toast.success('🎉 First knowledge node created!', { description: "You've started building your knowledge graph!" })
+        } else {
+          toast.success('Knowledge node created! 🧠')
+        }
       } else {
         // Fallback: add locally
         const id = `local-${Date.now()}`
@@ -1090,6 +1126,13 @@ export default function KnowledgeGraphPage() {
           </g>
         </svg>
 
+        {/* Empty State Overlay */}
+        {nodes.length === 0 && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#F9FAFB]/80 backdrop-blur-sm">
+            <GraphEmptyState onAddNode={() => setAddNodeDialogOpen(true)} />
+          </div>
+        )}
+
         {/* Zoom indicator */}
         <div className="absolute bottom-3 left-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A]">
           {Math.round(zoom * 100)}%
@@ -1151,7 +1194,14 @@ export default function KnowledgeGraphPage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* Title */}
                 <div>
+                  <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-[#18181B]">{selectedNode.title}</h2>
+                </div>
+                {/* Node ID with copy button */}
+                <div className="flex items-center gap-1.5 mt-1">
+                  <p className="text-[10px] text-[#A1A1AA] font-mono truncate max-w-[180px]">{selectedNode.id}</p>
+                  <CopyIdButton id={selectedNode.id} />
+                </div>
                   <Badge
                     className="mt-2 text-[10px] font-semibold capitalize"
                     style={{

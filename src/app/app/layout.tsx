@@ -7,9 +7,11 @@ import { AppSidebar } from '@/components/app/sidebar'
 import { CommandPalette } from '@/components/app/command-palette'
 import { KeyboardShortcuts } from '@/components/app/keyboard-shortcuts'
 import { OnboardingModal } from '@/components/app/onboarding-modal'
+import { PageTransition } from '@/components/app/page-transition'
 import { PageSkeleton, type PageSkeletonVariant } from '@/components/app/page-skeleton'
 import { NotificationCenter } from '@/components/app/notification-center'
 import { useAuth } from '@/hooks/use-auth'
+import { ErrorBoundary } from '@/components/app/error-boundary'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
@@ -128,12 +130,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           ) : (
-            <>
-              {children}
+            <ErrorBoundary>
+              <PageTransition>{children}</PageTransition>
               <CommandPalette />
               <KeyboardShortcuts />
               <OnboardingModal />
-            </>
+            </ErrorBoundary>
           )}
         </div>
       </main>

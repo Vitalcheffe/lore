@@ -18,6 +18,8 @@ import {
   GitBranch,
   FileText,
   Zap,
+  Download,
+  Lightbulb,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -110,6 +112,31 @@ function timeAgo(dateStr: string): string {
   return `${diffDay}d ago`
 }
 
+// ─── Animated Number Counter ──────────────────────────────
+function AnimatedNumber({ value, duration = 1 }: { value: number; duration?: number }) {
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    let start = 0
+    const end = parseInt(String(value)) || 0
+    if (start === end) return
+
+    const timer = setTimeout(() => {
+      const incrementTime = (duration * 1000) / end
+      const counter = setInterval(() => {
+        start += 1
+        setDisplay(start)
+        if (start === end) clearInterval(counter)
+      }, incrementTime)
+      return () => clearInterval(counter)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [value, duration])
+
+  return <>{display}</>
+}
+
 // ─── Knowledge Graph SVG Preview ───────────────────────────
 function MiniGraphSVG() {
   return (
@@ -167,6 +194,32 @@ const itemVariants = {
     y: 0,
     transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   },
+}
+
+// ─── Pro Tip Card ──────────────────────────────────────────
+const PRO_TIPS = [
+  "Use ⌘K to quickly search across your knowledge base",
+  "Link related nodes to help AI make better connections",
+  "Pin important notes to find them faster",
+  "Check your morning digest daily for AI-powered insights",
+]
+
+function ProTipCard() {
+  const [tipIndex] = useState(() => Math.floor(Math.random() * PRO_TIPS.length))
+
+  return (
+    <Card className="bg-gradient-to-r from-amber-50/80 to-amber-100/40 border-amber-200/60 hover:shadow-sm transition-shadow">
+      <CardContent className="p-4 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+          <Lightbulb className="w-4 h-4 text-amber-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Pro Tip</p>
+          <p className="text-sm text-amber-900/80 leading-relaxed">{PRO_TIPS[tipIndex]}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -393,6 +446,10 @@ export default function DashboardPage() {
           <p className="text-sm text-[#71717A] mt-1">
             Here&apos;s what&apos;s happening in your knowledge graph today.
           </p>
+          <p className="text-[11px] text-[#A1A1AA] mt-1.5 flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            Last updated just now
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Badge
@@ -402,6 +459,16 @@ export default function DashboardPage() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {isLoading ? 'Loading...' : `${nodeCount} nodes active`}
           </Badge>
+          <a href="/api/export?type=all" download>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 gap-1 h-7"
+            >
+              <Download className="w-3 h-3" />
+              Export
+            </Button>
+          </a>
         </div>
       </motion.div>
 
@@ -415,8 +482,13 @@ export default function DashboardPage() {
           ═══════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statsCards.map((card) => (
-          <motion.div key={card.label} variants={itemVariants}>
-            <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow">
+          <motion.div
+            key={card.label}
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow cursor-default">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div
@@ -431,7 +503,7 @@ export default function DashboardPage() {
                   className="text-2xl font-bold text-[#18181B]"
                   style={{ fontVariantNumeric: 'tabular-nums' }}
                 >
-                  {card.value}
+                  <AnimatedNumber value={parseInt(card.value)} />
                   {card.suffix && (
                     <span className="text-sm font-medium text-[#71717A] ml-0.5">
                       {card.suffix}
@@ -454,7 +526,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Knowledge Graph Preview */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-white border-[#E5E7EB] h-full">
+          <Card className="bg-white border-[#E5E7EB] h-full" style={{ animation: 'pulseGlow 3s ease-in-out infinite' }}>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-bold text-[#18181B]">
@@ -740,6 +812,12 @@ export default function DashboardPage() {
           </Card>
         </motion.div>
       </div>
+      {/* ═══════════════════════════════════════════════════════
+          PRO TIP
+          ═══════════════════════════════════════════════════════ */}
+      <motion.div variants={itemVariants}>
+        <ProTipCard />
+      </motion.div>
     </motion.div>
   )
 }

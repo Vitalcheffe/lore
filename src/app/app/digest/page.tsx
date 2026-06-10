@@ -30,6 +30,7 @@ import { Progress } from '@/components/ui/progress'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { DigestEmptyState } from '@/components/app/empty-states'
 
 // ─── Types ────────────────────────────────────────────────────
 interface DigestData {
@@ -233,17 +234,7 @@ export default function DigestPage() {
     return (
       <ScrollArea className="h-full">
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-          <div className="flex flex-col items-center justify-center py-32">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mb-4 shadow-sm">
-              <Calendar className="w-6 h-6 text-amber-600" />
-            </div>
-            <h2 className="text-lg font-semibold text-[#18181B] mb-1">
-              No digest yet
-            </h2>
-            <p className="text-sm text-[#71717A] text-center max-w-md">
-              Add some nodes to your knowledge graph to generate your first digest!
-            </p>
-          </div>
+          <DigestEmptyState />
         </div>
       </ScrollArea>
     )

@@ -1,29 +1,27 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db } from '@/lib/db'
 
 export async function GET() {
-  let dbConnected = false;
-  
+  const startTime = Date.now()
+
   try {
-    // Actually verify database connection by counting resources
-    await db.resource.count();
-    dbConnected = true;
+    // Check database connection
+    await db.$queryRaw`SELECT 1`
+
+    return Response.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: 'connected',
+      responseTime: `${Date.now() - startTime}ms`,
+      version: '1.0.0',
+    })
   } catch (error) {
-    console.error("Health check - DB connection failed:", error);
-    dbConnected = false;
+    return Response.json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+      responseTime: `${Date.now() - startTime}ms`,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, { status: 503 })
   }
-
-  const healthy = dbConnected;
-
-  return NextResponse.json(
-    {
-      status: healthy ? "healthy" : "degraded",
-      model_loaded: true,
-      crisis_module_active: true,
-      database_connected: dbConnected,
-      version: "1.0.0",
-      ...(healthy ? {} : { note: "Database connection unavailable. Crisis detection still active." }),
-    },
-    { status: healthy ? 200 : 503 }
-  );
 }

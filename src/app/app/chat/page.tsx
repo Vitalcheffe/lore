@@ -24,6 +24,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
+import { ChatEmptyState } from '@/components/app/empty-states'
 
 // ─── Types ─────────────────────────────────────────────────
 interface ChatMessage {
@@ -674,38 +675,12 @@ export default function AIChatPage() {
           {!activeConvo || activeConvo.messages.length === 0 ? (
             /* Empty State */
             <div className="flex items-center justify-center h-full p-6">
-              <div className="text-center max-w-md">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-6">
-                  <MessageSquare className="w-7 h-7 text-emerald-600" />
-                </div>
-                <h3 className="text-lg font-bold text-[#18181B] mb-2">
-                  Ask your knowledge graph
-                </h3>
-                <p className="text-sm text-[#71717A] mb-6 leading-relaxed">
-                  I can help you find information, understand connections, and explore your
-                  team&apos;s collective knowledge. Try asking about your API architecture, sprint goals,
-                  or database design.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {[
-                    'What are our API design principles?',
-                    'Who leads the Lore Platform?',
-                    'How does the database handle scaling?',
-                    'What are our Q2 sprint goals?',
-                  ].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      onClick={() => {
-                        setInputValue(suggestion)
-                        textareaRef.current?.focus()
-                      }}
-                      className="text-left p-3 rounded-xl border border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30 transition-all text-xs text-[#52525B] font-medium"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <ChatEmptyState
+                onSuggestionClick={(suggestion) => {
+                  setInputValue(suggestion)
+                  textareaRef.current?.focus()
+                }}
+              />
             </div>
           ) : isLoadingMessages ? (
             <div className="flex items-center justify-center h-full">

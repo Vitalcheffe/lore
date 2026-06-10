@@ -1,27 +1,41 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- ClearPath AI Logo Mark -->
-  <!-- C-arc (Clarity) + Forward path (Direction) + Insight point (AI) -->
+  <!-- Lore Logo - Brain/Knowledge Icon -->
   
-  <!-- C-shaped arc: ~260° of a circle, opening on the right -->
-  <!-- Center: (220, 256), Radius: 155 -->
-  <path 
-    d="M 318 138 A 155 155 0 1 0 318 374" 
-    stroke="#ffffff" 
-    stroke-width="50" 
-    stroke-linecap="round" 
-    fill="none"
-  />
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#059669"/>
   
-  <!-- Forward path extending from the C opening -->
-  <!-- Curves upward-right suggesting progress and clarity -->
-  <path 
-    d="M 318 138 C 358 122, 404 118, 448 132" 
-    stroke="#ffffff" 
-    stroke-width="42" 
-    stroke-linecap="round" 
-    fill="none"
-  />
+  <!-- Brain left hemisphere -->
+  <path d="M220 140 C180 140, 140 170, 140 220 C140 250, 150 270, 160 285 C150 300, 145 320, 150 340 C155 360, 175 375, 195 375 C210 375, 220 370, 230 360 L230 160 C228 150, 225 145, 220 140Z" 
+        fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
   
-  <!-- AI Insight accent at the path tip -->
-  <circle cx="450" cy="133" r="14" fill="#3b82f6"/>
+  <!-- Brain right hemisphere -->
+  <path d="M292 140 C332 140, 372 170, 372 220 C372 250, 362 270, 352 285 C362 300, 367 320, 362 340 C357 360, 337 375, 317 375 C302 375, 292 370, 282 360 L282 160 C284 150, 287 145, 292 140Z"
+        fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Brain center fold -->
+  <line x1="256" y1="145" x2="256" y2="365" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Brain folds - left hemisphere -->
+  <path d="M160 210 C180 210, 200 195, 230 195" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M155 270 C180 270, 210 255, 235 260" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M160 330 C185 330, 210 320, 235 325" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Brain folds - right hemisphere -->
+  <path d="M352 210 C332 210, 312 195, 282 195" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M357 270 C332 270, 302 255, 277 260" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M352 330 C327 330, 302 320, 277 325" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Knowledge nodes (small dots representing connected knowledge) -->
+  <circle cx="160" cy="195" r="4" fill="#34d399" opacity="0.9"/>
+  <circle cx="185" cy="170" r="3" fill="#6ee7b7" opacity="0.8"/>
+  <circle cx="350" cy="195" r="4" fill="#34d399" opacity="0.9"/>
+  <circle cx="325" cy="170" r="3" fill="#6ee7b7" opacity="0.8"/>
+  
+  <!-- Connection lines between knowledge nodes -->
+  <line x1="160" y1="195" x2="185" y2="170" stroke="#6ee7b7" stroke-width="1.5" opacity="0.6"/>
+  <line x1="350" y1="195" x2="325" y2="170" stroke="#6ee7b7" stroke-width="1.5" opacity="0.6"/>
+  <line x1="185" y1="170" x2="325" y2="170" stroke="#6ee7b7" stroke-width="1.5" opacity="0.4"/>
+  
+  <!-- Subtle glow at bottom -->
+  <ellipse cx="256" cy="380" rx="60" ry="8" fill="#34d399" opacity="0.3"/>
 </svg>

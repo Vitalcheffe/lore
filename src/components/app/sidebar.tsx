@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Network,
   Sun,
+  Moon,
   MessageSquare,
   BookOpen,
   Users,
@@ -21,17 +22,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAuth } from '@/hooks/use-auth'
+import { useTheme } from 'next-themes'
 
 // ─── Navigation Items ──────────────────────────────────────
 const navItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '/app', shortcut: '⌘D' },
-  { label: 'Knowledge Graph', icon: Network, href: '/app/graph', shortcut: '⌘G' },
-  { label: 'Morning Digest', icon: Sun, href: '/app/digest', shortcut: '⌘M' },
-  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat', shortcut: '⌘K' },
-  { label: 'Memory', icon: BookOpen, href: '/app/memory', shortcut: '⌘N' },
-  { label: 'Team', icon: Users, href: '/app/team', shortcut: '⌘T' },
-  { label: 'Settings', icon: Settings, href: '/app/settings', shortcut: '⌘S' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/app', shortcut: '⌘D', description: 'Overview of your knowledge base' },
+  { label: 'Knowledge Graph', icon: Network, href: '/app/graph', shortcut: '⌘G', description: 'Visualize and connect your knowledge' },
+  { label: 'Morning Digest', icon: Sun, href: '/app/digest', shortcut: '⌘M', description: 'Daily AI-powered briefing' },
+  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat', shortcut: '⌘K', description: 'Ask questions about your knowledge' },
+  { label: 'Memory', icon: BookOpen, href: '/app/memory', shortcut: '⌘N', description: 'Notes, bookmarks, and insights' },
+  { label: 'Team', icon: Users, href: '/app/team', shortcut: '⌘T', description: 'Collaborate with your team' },
+  { label: 'Settings', icon: Settings, href: '/app/settings', shortcut: '⌘S', description: 'Customize your experience' },
 ]
 
 // ─── Plan badge styles ──────────────────────────────────────
@@ -51,6 +54,7 @@ interface AppSidebarProps {
 export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
+  const { theme, setTheme } = useTheme()
 
   const plan = (user?.plan || 'free').toLowerCase()
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1) + ' Plan'
@@ -131,40 +135,48 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         <SidebarSearch />
 
         {/* ── Navigation ────────────────────────────────── */}
-        <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const active = isActive(item.href)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={`
-                  group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-                  ${
-                    active
-                      ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100'
-                      : 'text-[#52525B] hover:bg-[#F9FAFB] hover:text-[#18181B] border border-transparent'
-                  }
-                `}
-              >
-                <item.icon
-                  className={`w-4 h-4 ${
-                    active ? 'text-emerald-600' : 'text-[#71717A]'
-                  }`}
-                />
-                {item.label}
-                {active ? (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                ) : (
-                  <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {item.shortcut}
-                  </span>
-                )}
-              </Link>
-            )
-          })}
-        </nav>
+        <TooltipProvider delayDuration={300}>
+          <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
+            {navItems.map((item) => {
+              const active = isActive(item.href)
+              return (
+                <Tooltip key={item.href}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={item.href}
+                      onClick={onClose}
+                      className={`
+                        group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+                        ${
+                          active
+                            ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100'
+                            : 'text-[#52525B] hover:bg-[#F9FAFB] hover:text-[#18181B] border border-transparent'
+                        }
+                      `}
+                    >
+                      <item.icon
+                        className={`w-4 h-4 ${
+                          active ? 'text-emerald-600' : 'text-[#71717A]'
+                        }`}
+                      />
+                      {item.label}
+                      {active ? (
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      ) : (
+                        <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {item.shortcut}
+                        </span>
+                      )}
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="text-xs hidden lg:block">
+                    <p>{item.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )
+            })}
+          </nav>
+        </TooltipProvider>
 
         {/* ── User Section ──────────────────────────────── */}
         <div className="shrink-0 border-t border-[#E5E7EB] p-4">
@@ -191,6 +203,17 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
             >
               {planLabel}
             </Badge>
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="h-8 w-8 flex items-center justify-center rounded-lg text-[#71717A] hover:bg-[#F9FAFB] dark:hover:bg-white/10 transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </button>
             <Button
               variant="ghost"
               size="sm"
