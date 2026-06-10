@@ -75,6 +75,11 @@ async function oauthFindOrCreate(params: {
     },
   });
 
+  // Create default UserSettings for new OAuth users
+  await db.userSettings.create({
+    data: { userId: newUser.id },
+  });
+
   return newUser;
 }
 

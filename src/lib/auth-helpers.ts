@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "@/lib/auth";
 
 // Get the authenticated user ID from the session, or null if not authenticated
 export async function getAuthenticatedUserId(request?: NextRequest): Promise<string | null> {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     return (session as any)?.user?.id || null;
   } catch {
     return null;

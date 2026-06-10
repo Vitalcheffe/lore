@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════════════
 // LORE — Knowledge Management Platform
-// Powered by Aurora DSQL
 // ═══════════════════════════════════════════════════════════
 
 generator client {
@@ -8,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -41,6 +40,7 @@ model User {
   userSettings    UserSettings?
   savedResources  SavedResource[]
   teamMemberships TeamMember[]
+  blogPosts       BlogPost[]
 }
 
 model Account {
@@ -54,7 +54,7 @@ model Account {
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String?  @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -85,7 +85,7 @@ model KnowledgeNode {
   id          String   @id @default(cuid())
   userId      String
   title       String
-  content     String   @default("")
+  content     String   @default("") @db.Text
   type        String   @default("concept") // concept, person, project, resource, idea
   color       String   @default("#4F46E5")
   icon        String?
@@ -128,12 +128,12 @@ model Digest {
   id          String   @id @default(cuid())
   userId      String
   date        String   // YYYY-MM-DD
-  summary     String
-  keyInsights String   // JSON array of strings
-  connections String?  // JSON array of connection objects
+  summary     String   @db.Text
+  keyInsights String   @db.Text // JSON array of strings
+  connections String?  @db.Text // JSON array of connection objects
   mood        String?  // productive, neutral, slow
-  focusAreas  String?  // JSON array
-  aiComment   String?  // AI-generated personalized comment
+  focusAreas  String?  @db.Text // JSON array
+  aiComment   String?  @db.Text // AI-generated personalized comment
   read        Boolean  @default(false)
   createdAt   DateTime @default(now())
 
@@ -149,12 +149,12 @@ model Note {
   id          String   @id @default(cuid())
   userId      String
   title       String
-  content     String   @default("")
+  content     String   @default("") @db.Text
   type        String   @default("note") // note, bookmark, insight, snippet, meeting
   category    String?  // project name, topic, etc.
   tags        String?  // comma-separated
   pinned      Boolean  @default(false)
-  aiSummary   String?  // AI-generated summary
+  aiSummary   String?  @db.Text // AI-generated summary
   sourceUrl   String?  // for bookmarks
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -190,16 +190,16 @@ model ChatMessage {
   id             String   @id @default(cuid())
   conversationId String
   role           String   // "user" | "assistant" | "system"
-  content        String
+  content        String   @db.Text
   category       String?
   confidence     Float?
   isCrisis       Boolean  @default(false)
-  resources      String?  // JSON array
-  alternatives   String?  // JSON array
-  why            String?
-  also           String?
-  warning        String?
-  metadata       String?  // JSON: { sources, confidence, tokens }
+  resources      String?  @db.Text // JSON array
+  alternatives   String?  @db.Text // JSON array
+  why            String?  @db.Text
+  also           String?  @db.Text
+  warning        String?  @db.Text
+  metadata       String?  @db.Text // JSON: { sources, confidence, tokens }
   createdAt      DateTime @default(now())
 
   conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
@@ -282,7 +282,7 @@ model TeamInvitation {
   teamId     String
   email      String
   role       String   @default("viewer")
-  message    String?
+  message    String?  @db.Text
   token      String   @unique
   accepted   Boolean  @default(false)
   expiresAt  DateTime
@@ -304,7 +304,7 @@ model SavedResource {
   confidence    Int      @default(0)
   verifiedDate  String?
   action        String?
-  detail        String?
+  detail        String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -319,8 +319,8 @@ model CommunityResource {
   id            String   @id @default(cuid())
   name          String
   category      String
-  description   String
-  services      String?
+  description   String   @db.Text
+  services      String?  @db.Text
   lastVerified  String?
   distance      String?
   createdAt     DateTime @default(now())
@@ -338,10 +338,65 @@ model ContactSubmission {
   organization String?
   subject      String?
   urgency      String   @default("medium")
-  message      String
+  message      String   @db.Text
   status       String   @default("new") // new, read, resolved
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@map("ContactSubmission")
+}
+
+// ─── Resource (Community Resource Directory) ───────────
+
+model Resource {
+  id            String   @id @default(cuid())
+  name          String
+  category      String
+  description   String   @db.Text
+  services      String   @default("[]") @db.Text // JSON array
+  languages     String   @default("[]") @db.Text // JSON array
+  phone         String?
+  address       String?
+  hours         String?
+  eligibility   String?
+  url           String?
+  zip           String?
+  lastVerified  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("Resource")
+}
+
+// ─── Blog Posts ────────────────────────────────────────
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String    @db.Text
+  excerpt     String?   @db.Text
+  coverImage  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  tags        String    @default("[]") @db.Text // JSON array
+  authorId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("BlogPost")
+}
+
+// ─── Newsletter Subscriptions ──────────────────────────
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("NewsletterSubscription")
 }

@@ -439,7 +439,7 @@ async function main() {
       },
       {
         conversationId: conv1.id,
-        role: "ai",
+        role: "assistant",
         content: "I understand this is a very stressful situation. Based on what you've shared, I've identified several areas where you can get help right away:\n\n🏠 **Housing Assistance (78% confidence)** — Emergency rental assistance programs can help cover past-due rent and prevent eviction.\n🍎 **Food Assistance (85% confidence)** — SNAP and local food banks can ensure your kids don't go hungry.\n💼 **Employment Services (71% confidence)** — Workforce development centers offer job search help, resume assistance, and training programs.",
         category: "Housing Assistance",
         confidence: 78,
@@ -460,7 +460,7 @@ async function main() {
       },
       {
         conversationId: conv1.id,
-        role: "ai",
+        role: "assistant",
         content: "Given that you already have a notice from your landlord, here's what I recommend:\n\n⚡ **Act quickly** — Call the Austin Emergency Rental Assistance Program at **(512) 974-3100** as soon as possible. They can sometimes expedite cases where eviction is imminent.\n📋 **Gather documents** — You'll need your lease, the eviction notice, proof of income loss, and ID.\n🏠 **Legal protection** — The Legal Aid Society of Central Texas **(512) 476-1188** can provide free legal help if your landlord proceeds with eviction.\n\nIn Austin, tenants have specific rights during the eviction process, and an attorney can help you understand those protections.",
         category: "Housing Assistance",
         confidence: 85,
@@ -499,7 +499,7 @@ async function main() {
       },
       {
         conversationId: conv2.id,
-        role: "ai",
+        role: "assistant",
         content: "Thank you for reaching out — that takes courage. What you're describing sounds like it could be depression and anxiety, and there is help available.\n\n🧠 **Mental Health (91% confidence)** — Your description strongly matches mental health services. Here are immediate options:\n\n1. **Austin Public Health Community Counseling** — (512) 972-5759 — Affordable therapy on a sliding scale\n2. **Integral Care** — (512) 472-4357 — 24/7 crisis line and outpatient services\n3. **NAMI Central Texas** — (512) 420-9810 — Free support groups and peer support\n\nIf you're ever in a crisis, please call **988** — it's free, confidential, and available 24/7.",
         category: "Mental Health",
         confidence: 91,
@@ -540,7 +540,7 @@ async function main() {
       },
       {
         conversationId: conv3.id,
-        role: "ai",
+        role: "assistant",
         content: "I hear you — medication costs, especially insulin, are a serious concern. Here's what can help:\n\n💊 **Healthcare (68% confidence)** — While I'm somewhat confident this is primarily a healthcare issue, the resources below may also connect you with broader financial assistance:\n\n1. **Patient Assistance Programs** — 1-888-477-2669 — Many pharmaceutical companies offer free or low-cost insulin through these programs\n2. **CommUnityCare Health Centers** — (512) 978-9015 — Sliding-scale clinics that can prescribe and help you access affordable medications\n3. **Medicaid** — 1-877-541-7905 — You may qualify for health insurance that covers prescriptions\n\n⚠️ **Important**: Since my confidence is only 68%, I recommend also exploring if you qualify for SNAP food benefits, as diabetes management is closely tied to nutrition.",
         category: "Healthcare",
         confidence: 68,
@@ -580,7 +580,7 @@ async function main() {
       },
       {
         conversationId: conv4.id,
-        role: "ai",
+        role: "assistant",
         content: "Thank you for your service. There are indeed several programs specifically designed to help veterans with housing:\n\n🏠 **Housing Assistance (88% confidence)** — Veteran-specific housing resources:\n\n1. **VA Homeless Programs** — Call 1-877-424-3838 — The VA offers specialized housing vouchers (VASH) and transitional housing for veterans\n2. **Foundation Communities** — (512) 610-4000 — Has affordable housing units with preference for veterans\n3. **Section 8 / HACA** — (512) 477-4488 — Veterans receive priority placement on waiting lists\n\n🎖️ **Veterans Crisis Line**: If you're in crisis, call **988 then press 1** — dedicated line for veterans.\n\nI'd recommend starting with the VA's homeless programs line — they can connect you with a case manager who specializes in veteran housing.",
         category: "Housing Assistance",
         confidence: 88,
@@ -620,7 +620,7 @@ async function main() {
       },
       {
         conversationId: conv5.id,
-        role: "ai",
+        role: "assistant",
         content: "🚨 **Your safety is the top priority right now.**\n\nIf you are in immediate danger, please call **911**.\n\nHere are resources that can help you right now:\n\n📞 **National Domestic Violence Hotline** — 1-800-799-7233 — Available 24/7, confidential, in 200+ languages\n📞 **SAFE Alliance Austin** — (512) 267-7233 — Local shelter, legal help, and counseling\n📞 **Family Violence Prevention Services** — Legal aid specifically for domestic violence survivors\n\n**If you need to leave quickly:**\n- Pack essential documents (ID, birth certificates, medications)\n- The hotline can help you find emergency shelter\n- You do NOT need money or a plan to call — they will help you create one\n\n**Your children:** Domestic violence shelters accept children, and your kids' safety is also a priority.",
         category: "Crisis",
         confidence: 99,
@@ -641,7 +641,7 @@ async function main() {
       },
       {
         conversationId: conv5.id,
-        role: "ai",
+        role: "assistant",
         content: "That's an important first step — wanting to leave and reaching out for help. Here's a plan:\n\n1. **Call the National DV Hotline** (1-800-799-7233) when it's safe to talk — they can help you create a detailed safety plan and find shelter space\n\n2. **Emergency shelter**: SAFE Alliance Austin has emergency shelter for women and children. Call **(512) 267-7233** to check availability.\n\n3. **Legal protection**: You can get a protective order through Family Violence Prevention Services — it's free and they'll help you through the process.\n\n4. **Financial help**: Once you're in a shelter, a case manager can help you apply for housing assistance, SNAP benefits, and other support.\n\n🔒 **Safety tip**: If you're looking at this on a shared device, consider clearing your browser history or using incognito mode.",
         category: "Crisis",
         confidence: 99,

@@ -43,6 +43,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Create default UserSettings for the new user
+    await db.userSettings.create({
+      data: { userId: user.id },
+    });
+
     return NextResponse.json(
       {
         id: user.id,

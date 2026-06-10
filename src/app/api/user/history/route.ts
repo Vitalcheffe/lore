@@ -1,19 +1,18 @@
 // ═══════════════════════════════════════════════════════════
-// ClearPath AI — User Classification History API
-// GET: Return user's classification history (paginated, requires auth)
-// DELETE: Clear all classification history (requires auth)
+// LORE — User Activity History API
+// GET: Return user's recent activity (nodes, notes, edges)
+// DELETE: Clear old activity data
 // ═══════════════════════════════════════════════════════════
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getAuthenticatedUserId } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import { authOptions } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const userId = await getAuthenticatedUserId(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -24,22 +23,59 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(searchParams.get('page')) || 1);
     const pageSize = Math.min(100, Math.max(1, Number(searchParams.get('pageSize')) || 20));
 
-    const [classifications, total] = await Promise.all([
-      db.classification.findMany({
-        where: { userId: session.user.id },
+    // Get recent activity from various models
+    const [recentNodes, recentNotes, recentEdges] = await Promise.all([
+      db.knowledgeNode.findMany({
+        where: { userId },
         orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
+        take: 10,
+        select: { id: true, title: true, type: true, createdAt: true },
       }),
-      db.classification.count({
-        where: { userId: session.user.id },
+      db.note.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: { id: true, title: true, type: true, createdAt: true },
+      }),
+      db.knowledgeEdge.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: { id: true, label: true, type: true, createdAt: true, sourceId: true, targetId: true },
       }),
     ]);
 
+    // Combine into a unified activity feed
+    const activities = [
+      ...recentNodes.map(n => ({
+        id: n.id,
+        type: 'node' as const,
+        title: n.title,
+        category: n.type,
+        createdAt: n.createdAt,
+      })),
+      ...recentNotes.map(n => ({
+        id: n.id,
+        type: 'note' as const,
+        title: n.title,
+        category: n.type,
+        createdAt: n.createdAt,
+      })),
+      ...recentEdges.map(e => ({
+        id: e.id,
+        type: 'edge' as const,
+        title: e.label || e.type,
+        category: e.type,
+        createdAt: e.createdAt,
+      })),
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const total = activities.length;
+    const paginatedActivities = activities.slice((page - 1) * pageSize, page * pageSize);
     const hasNext = page * pageSize < total;
 
     return NextResponse.json({
-      data: classifications,
+      data: paginatedActivities,
       total,
       page,
       pageSize,
@@ -48,35 +84,36 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('History fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch classification history' },
+      { error: 'Failed to fetch activity history' },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const userId = await getAuthenticatedUserId(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const result = await db.classification.deleteMany({
-      where: { userId: session.user.id },
+    // Only delete edges and nodes, not the user's core data
+    const deletedEdges = await db.knowledgeEdge.deleteMany({
+      where: { userId },
     });
 
     return NextResponse.json({
       success: true,
-      message: `Deleted ${result.count} classification(s) from history.`,
+      message: `Deleted ${deletedEdges.count} edge(s) from history.`,
     });
   } catch (error) {
     console.error('History clear error:', error);
     return NextResponse.json(
-      { error: 'Failed to clear classification history' },
+      { error: 'Failed to clear activity history' },
       { status: 500 }
     );
   }
