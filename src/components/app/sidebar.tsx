@@ -102,7 +102,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         `}
       >
         {/* ── Logo Section ──────────────────────────────── */}
-        <div className="h-16 flex items-center gap-2.5 px-6 border-b border-[#E5E7EB] shrink-0">
+        <div role="banner" className="h-16 flex items-center gap-2.5 px-6 border-b border-[#E5E7EB] shrink-0">
           <Link
             href="/"
             className="flex items-center gap-2.5 group"
@@ -136,7 +136,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
 
         {/* ── Navigation ────────────────────────────────── */}
         <TooltipProvider delayDuration={300}>
-          <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
+          <nav aria-label="Navigation" className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => {
               const active = isActive(item.href)
               return (
@@ -145,6 +145,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                     <Link
                       href={item.href}
                       onClick={onClose}
+                      aria-current={active ? 'page' : undefined}
                       className={`
                         group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                         ${

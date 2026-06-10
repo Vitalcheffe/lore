@@ -21,7 +21,7 @@ import {
   Download,
   Lightbulb,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -491,20 +491,20 @@ export default function DashboardPage() {
       {nodeCount > 0 && (
         <motion.div variants={itemVariants}>
           <Card className="bg-gradient-to-r from-emerald-600 to-emerald-500 border-0 text-white overflow-hidden relative">
-            <CardContent className="p-5 flex items-center justify-between gap-4">
+            <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <Sparkles className="w-4 h-4 text-emerald-200" />
-                  <h2 className="text-base font-bold text-white">
+                  <h2 className="text-sm sm:text-base font-bold text-white truncate">
                     Welcome back, {firstName}!
                   </h2>
                 </div>
-                <p className="text-sm text-emerald-100">
+                <p className="text-xs sm:text-sm text-emerald-100">
                   {nodeCount} node{nodeCount !== 1 ? 's' : ''}, {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
                 </p>
               </div>
               {/* Mini sparkline indicator */}
-              <div className="flex items-end gap-[3px] h-8 shrink-0">
+              <div className="hidden sm:flex items-end gap-[3px] h-8 shrink-0">
                 {[0.4, 0.6, 0.45, 0.8, 0.65, 0.9, 1.0].map((h, i) => (
                   <div
                     key={i}
@@ -578,9 +578,9 @@ export default function DashboardPage() {
           <Card className="bg-white border-[#E5E7EB] h-full" style={{ animation: 'pulseGlow 3s ease-in-out infinite' }}>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-bold text-[#18181B]">
+                <h2 className="text-sm font-bold text-[#18181B]">
                   Knowledge Graph
-                </CardTitle>
+                </h2>
                 <Badge
                   variant="outline"
                   className="text-[9px] font-bold text-emerald-700 border-emerald-200 bg-emerald-50/50"
@@ -623,9 +623,9 @@ export default function DashboardPage() {
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
                     <Sun className="w-3.5 h-3.5 text-amber-600" />
                   </div>
-                  <CardTitle className="text-sm font-bold text-[#18181B]">
+                  <h2 className="text-sm font-bold text-[#18181B]">
                     Morning Digest
-                  </CardTitle>
+                  </h2>
                 </div>
                 <Badge
                   variant="outline"
@@ -642,7 +642,7 @@ export default function DashboardPage() {
                   {digestSummary}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <div className="flex -space-x-1.5">
                   {contributorInitials.map((initials, i) => (
                     <div
@@ -660,7 +660,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-[#71717A]">
                   {contributorCount} contributor{contributorCount !== 1 ? 's' : ''} active today
                 </p>
-                <Link href="/app/digest" className="ml-auto">
+                <Link href="/app/digest" className="sm:ml-auto">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -684,9 +684,9 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <Card className="bg-white border-[#E5E7EB]">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold text-[#18181B]">
+              <h2 className="text-sm font-bold text-[#18181B]">
                 Recent Activity
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="pb-6">
               <div className="space-y-1">
@@ -732,9 +732,9 @@ export default function DashboardPage() {
         <motion.div variants={itemVariants}>
           <Card className="bg-white border-[#E5E7EB] h-full">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-bold text-[#18181B]">
+              <h2 className="text-sm font-bold text-[#18181B]">
                 Quick Actions
-              </CardTitle>
+              </h2>
             </CardHeader>
             <CardContent className="pb-6 space-y-3">
               {/* Add Node - opens dialog */}

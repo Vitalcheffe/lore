@@ -23,13 +23,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Lore Team" }],
   manifest: "/manifest.json",
   icons: {
-    icon: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   openGraph: {
     title: "LORE — Your Team's Memory, Alive",
     description: "Inconsistent memory is misinformation. Lore gives your team a memory that's always consistent, everywhere.",
     type: "website",
+    images: [{ url: "/og-image.png", width: 1344, height: 768 }],
   },
 };
 
@@ -48,6 +49,9 @@ export default function RootLayout({
         className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" }}
       >
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-emerald-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold">
+          Skip to main content
+        </a>
         <Providers>
           {children}
         </Providers>

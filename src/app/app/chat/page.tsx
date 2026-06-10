@@ -478,7 +478,7 @@ export default function AIChatPage() {
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-50
-          w-72 bg-[#F9FAFB] border-r border-[#E5E7EB]
+          w-80 sm:w-72 bg-[#F9FAFB] border-r border-[#E5E7EB]
           flex flex-col
           transform transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]
           lg:translate-x-0
@@ -496,9 +496,9 @@ export default function AIChatPage() {
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden w-7 h-7 rounded-lg hover:bg-white flex items-center justify-center"
+              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-white flex items-center justify-center"
             >
-              <X className="w-4 h-4 text-[#71717A]" />
+              <X className="w-5 h-5 text-[#71717A]" />
             </button>
           </div>
           <Button
@@ -549,7 +549,7 @@ export default function AIChatPage() {
                 className={`w-full text-left p-3 rounded-xl transition-all group ${
                   activeConvoId === convo.id
                     ? 'bg-white border border-emerald-100 shadow-sm'
-                    : 'hover:bg-white/60 border border-transparent'
+                    : 'hover:bg-white/60 active:bg-white/80 border border-transparent'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -567,18 +567,18 @@ export default function AIChatPage() {
                     <p className="text-[10px] text-[#A1A1AA] mt-0.5 truncate">{convo.preview}</p>
                     <p className="text-[9px] text-[#D4D4D8] mt-1">{convo.updatedAt}</p>
                   </div>
-                  <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-0.5 lg:opacity-0 lg:group-hover:opacity-100 opacity-70 transition-opacity">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         handleTogglePin(convo.id)
                       }}
-                      className="w-5 h-5 rounded flex items-center justify-center hover:bg-emerald-50 transition-colors"
+                      className="min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
                     >
                       {convo.pinned ? (
-                        <PinOff className="w-2.5 h-2.5 text-emerald-500" />
+                        <PinOff className="w-3.5 h-3.5 text-emerald-500" />
                       ) : (
-                        <Pin className="w-2.5 h-2.5 text-[#A1A1AA]" />
+                        <Pin className="w-3.5 h-3.5 text-[#A1A1AA]" />
                       )}
                     </button>
                     <button
@@ -586,9 +586,9 @@ export default function AIChatPage() {
                         e.stopPropagation()
                         handleDeleteConvo(convo.id)
                       }}
-                      className="w-5 h-5 rounded flex items-center justify-center hover:bg-red-50 transition-colors"
+                      className="min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center hover:bg-red-50 active:bg-red-100 transition-colors"
                     >
-                      <Trash2 className="w-2.5 h-2.5 text-[#A1A1AA] hover:text-red-500" />
+                      <Trash2 className="w-3.5 h-3.5 text-[#A1A1AA] hover:text-red-500" />
                     </button>
                   </div>
                 </div>
@@ -605,9 +605,9 @@ export default function AIChatPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden w-8 h-8 rounded-lg hover:bg-[#F9FAFB] flex items-center justify-center"
+              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] active:bg-[#F3F4F6] flex items-center justify-center"
             >
-              <Menu className="w-4 h-4 text-[#52525B]" />
+              <Menu className="w-5 h-5 text-[#52525B]" />
             </button>
             <div>
               <h2 className="text-sm font-bold text-[#18181B]">
@@ -760,7 +760,7 @@ export default function AIChatPage() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-[#E5E7EB] bg-white p-4 shrink-0">
+        <div className="border-t border-[#E5E7EB] bg-white p-3 sm:p-4 shrink-0 safe-area-bottom">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-end gap-2">
               <div className="flex-1 relative">
@@ -784,7 +784,7 @@ export default function AIChatPage() {
                 <Send className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-[10px] text-[#A1A1AA] mt-2 text-center">
+            <p className="hidden sm:block text-[10px] text-[#A1A1AA] mt-2 text-center">
               Press <kbd className="px-1 py-0.5 bg-[#F4F4F5] rounded text-[9px] font-mono">Enter</kbd> to send,{' '}
               <kbd className="px-1 py-0.5 bg-[#F4F4F5] rounded text-[9px] font-mono">Shift+Enter</kbd> for new line
             </p>

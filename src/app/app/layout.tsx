@@ -70,7 +70,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* ── Main Content Area ────────────────────────────── */}
-      <main className="flex-1 min-w-0 flex flex-col">
+      <main id="main-content" className="flex-1 min-w-0 flex flex-col">
         {/* ── Top bar (mobile hamburger) ─────────────────── */}
         <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 lg:px-6 shrink-0 lg:hidden">
           <Button

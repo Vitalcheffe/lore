@@ -278,6 +278,7 @@ export default function KnowledgeGraphPage() {
   const [editNodeDialogOpen, setEditNodeDialogOpen] = useState(false)
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   // New node form
   const [newNodeTitle, setNewNodeTitle] = useState('')
@@ -699,8 +700,8 @@ export default function KnowledgeGraphPage() {
   return (
     <div className="h-full flex flex-col bg-[#F9FAFB]" ref={containerRef}>
       {/* ─── Top Bar ────────────────────────────────────────── */}
-      <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 shrink-0 z-20">
-        <div className="flex items-center gap-3">
+      <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-3 sm:px-4 shrink-0 z-20">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
             <Network className="w-4 h-4 text-emerald-600" />
           </div>
@@ -712,7 +713,8 @@ export default function KnowledgeGraphPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Desktop search + filter */}
+        <div className="hidden md:flex items-center gap-2">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA]" />
@@ -721,7 +723,7 @@ export default function KnowledgeGraphPage() {
               placeholder="Search nodes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-40 sm:w-56 pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
+              className="h-8 w-56 pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
             />
           </div>
 
@@ -742,12 +744,69 @@ export default function KnowledgeGraphPage() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Mobile search/filter toggle */}
+        <div className="flex md:hidden items-center gap-1">
+          <button
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] active:bg-[#F3F4F6] transition-colors"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="h-10 w-10 !px-0 !justify-center border-[#E5E7EB] bg-white rounded-lg">
+              <Filter className="w-4 h-4 text-[#71717A]" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="concept">Concept</SelectItem>
+              <SelectItem value="person">Person</SelectItem>
+              <SelectItem value="project">Project</SelectItem>
+              <SelectItem value="resource">Resource</SelectItem>
+              <SelectItem value="idea">Idea</SelectItem>
+              <SelectItem value="feature">Feature</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
+      {/* Mobile Search Bar (expandable) */}
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden overflow-hidden bg-white border-b border-[#E5E7EB] z-20"
+          >
+            <div className="px-3 py-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA]" />
+                <input
+                  type="text"
+                  placeholder="Search nodes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="h-10 w-full pl-8 pr-10 text-sm rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
+                />
+                <button
+                  onClick={() => { setMobileSearchOpen(false); setSearchQuery('') }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center text-[#A1A1AA] hover:text-[#18181B]"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ─── Main Canvas Area ────────────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Stats Badge */}
-        <div className="absolute top-3 left-16 z-20 bg-emerald-600 text-white text-[10px] font-semibold px-3 py-1 rounded-full shadow-md shadow-emerald-500/20 pointer-events-none select-none">
+        {/* Stats Badge (desktop only) */}
+        <div className="hidden md:block absolute top-3 left-16 z-20 bg-emerald-600 text-white text-[10px] font-semibold px-3 py-1 rounded-full shadow-md shadow-emerald-500/20 pointer-events-none select-none">
           {nodes.length} nodes · {edges.length} edges
         </div>
 
@@ -774,8 +833,8 @@ export default function KnowledgeGraphPage() {
           )}
         </AnimatePresence>
 
-        {/* Left Toolbar */}
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-1.5 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-1.5 shadow-lg">
+        {/* Left Toolbar (desktop only) */}
+        <div className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-1.5 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-1.5 shadow-lg">
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -882,6 +941,66 @@ export default function KnowledgeGraphPage() {
               <TooltipContent side="right" className="text-xs">Fit to Screen</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        </div>
+
+        {/* Mobile Bottom Toolbar */}
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] px-2 py-1.5 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+          <button
+            onClick={() => { setToolMode('select'); setAddEdgeSource(null) }}
+            className={`min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all ${
+              toolMode === 'select'
+                ? 'bg-emerald-50 text-emerald-600'
+                : 'text-[#71717A] active:bg-[#F9FAFB]'
+            }`}
+          >
+            <MousePointer2 className="w-4 h-4" />
+            <span className="text-[9px] font-medium">Select</span>
+          </button>
+          <button
+            onClick={() => setAddNodeDialogOpen(true)}
+            className="min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 text-[#71717A] active:bg-emerald-50 active:text-emerald-600 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="text-[9px] font-medium">Add</span>
+          </button>
+          <button
+            onClick={() => { setToolMode('addEdge'); setAddEdgeSource(null) }}
+            className={`min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all ${
+              toolMode === 'addEdge'
+                ? 'bg-emerald-50 text-emerald-600'
+                : 'text-[#71717A] active:bg-[#F9FAFB]'
+            }`}
+          >
+            <Link2 className="w-4 h-4" />
+            <span className="text-[9px] font-medium">Link</span>
+          </button>
+          <button
+            onClick={handleDeleteNode}
+            disabled={!selectedNodeId}
+            className={`min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all ${
+              selectedNodeId
+                ? 'text-red-500 active:bg-red-50'
+                : 'text-[#D4D4D8] cursor-not-allowed'
+            }`}
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="text-[9px] font-medium">Delete</span>
+          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={handleZoomOut}
+              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] active:bg-[#F9FAFB] transition-all"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <span className="text-[9px] font-mono text-[#A1A1AA] w-8 text-center">{Math.round(zoom * 100)}%</span>
+            <button
+              onClick={handleZoomIn}
+              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] active:bg-[#F9FAFB] transition-all"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* SVG Canvas */}
@@ -1147,13 +1266,13 @@ export default function KnowledgeGraphPage() {
           </div>
         )}
 
-        {/* Zoom indicator */}
-        <div className="absolute bottom-3 left-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A]">
+        {/* Zoom indicator (desktop only) */}
+        <div className="hidden md:block absolute bottom-3 left-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A]">
           {Math.round(zoom * 100)}%
         </div>
 
-        {/* Legend */}
-        <div className="absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+        {/* Legend (desktop only) */}
+        <div className="hidden md:block absolute bottom-3 right-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
           <p className="text-[9px] font-bold text-[#71717A] uppercase tracking-wider mb-2">Legend</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {Object.entries(typeColors).map(([type, color]) => (
@@ -1183,15 +1302,15 @@ export default function KnowledgeGraphPage() {
           </div>
         </div>
 
-        {/* ─── Right Info Panel ─────────────────────────────── */}
+        {/* ─── Right Info Panel (desktop: side panel / mobile: bottom sheet) ── */}
         <AnimatePresence>
           {selectedNode && (
             <motion.div
-              initial={{ x: 320, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 320, opacity: 0 }}
+              initial={{ x: 320, opacity: 0, y: 0 }}
+              animate={{ x: 0, opacity: 1, y: 0 }}
+              exit={{ x: 320, opacity: 0, y: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="absolute right-0 top-0 bottom-0 w-80 bg-white border-l border-[#E5E7EB] shadow-xl z-20 flex flex-col overflow-hidden"
+              className="absolute right-0 top-0 bottom-0 w-80 bg-white border-l border-[#E5E7EB] shadow-xl z-20 flex flex-col overflow-hidden hidden md:flex"
             >
               {/* Panel Header */}
               <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between shrink-0">
@@ -1338,6 +1457,175 @@ export default function KnowledgeGraphPage() {
                   size="sm"
                   onClick={handleDeleteNode}
                   className="flex-1 text-xs border-[#E5E7EB] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ─── Mobile Bottom Sheet Panel ────────────────────── */}
+        <AnimatePresence>
+          {selectedNode && (
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="md:hidden absolute left-0 right-0 bottom-0 z-30 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden"
+              style={{ maxHeight: '65vh' }}
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-2 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+              </div>
+
+              {/* Panel Header */}
+              <div className="px-4 pb-2 flex items-center justify-between shrink-0">
+                <h3 className="text-sm font-bold text-[#18181B]">Node Details</h3>
+                <button
+                  onClick={() => setSelectedNodeId(null)}
+                  className="min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 text-[#71717A]" />
+                </button>
+              </div>
+
+              {/* Panel Content */}
+              <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+                {/* Title */}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-[#18181B]">{selectedNode.title}</h2>
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <p className="text-[10px] text-[#A1A1AA] font-mono truncate max-w-[200px]">{selectedNode.id}</p>
+                    <CopyIdButton id={selectedNode.id} />
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(`${window.location.origin}/app/graph?node=${selectedNode.id}`)
+                          toast.success('Share link copied to clipboard!')
+                        } catch {
+                          toast.error('Failed to copy share link')
+                        }
+                      }}
+                      className="min-w-[44px] min-h-[44px] rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+                      title="Share node link"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <Badge
+                    className="mt-2 text-[10px] font-semibold capitalize"
+                    style={{
+                      background: typeBgColors[selectedNode.type],
+                      color: typeColors[selectedNode.type],
+                      borderColor: typeBorderColors[selectedNode.type],
+                      borderWidth: 1,
+                    }}
+                  >
+                    {selectedNode.type}
+                  </Badge>
+                </div>
+
+                <Separator />
+
+                {/* Content */}
+                <div>
+                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Description</p>
+                  <p className="text-sm text-[#52525B] leading-relaxed">{selectedNode.content}</p>
+                </div>
+
+                {/* Tags */}
+                {selectedNode.tags && selectedNode.tags.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">Tags</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedNode.tags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-[10px] font-medium text-[#71717A] border-[#E5E7EB]"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                {/* Connected Nodes */}
+                <div>
+                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">
+                    Connected ({connectedNodes.length})
+                  </p>
+                  <div className="space-y-1">
+                    {connectedNodes.map((cn) => {
+                      const edge = edges.find(
+                        (e) =>
+                          (e.source === selectedNode.id && e.target === cn.id) ||
+                          (e.target === selectedNode.id && e.source === cn.id)
+                      )
+                      return (
+                        <button
+                          key={cn.id}
+                          onClick={() => setSelectedNodeId(cn.id)}
+                          className="w-full flex items-center gap-2 p-2 rounded-lg active:bg-[#F9FAFB] transition-colors text-left"
+                        >
+                          <div
+                            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                            style={{ background: typeBgColors[cn.type] }}
+                          >
+                            <div
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ background: typeColors[cn.type] }}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-[#18181B] truncate">
+                              {cn.title}
+                            </p>
+                            {edge && (
+                              <p className="text-[10px] text-[#A1A1AA] truncate">{edge.label}</p>
+                            )}
+                          </div>
+                          <ChevronRight className="w-3 h-3 text-[#D4D4D8]" />
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Created Date */}
+                {selectedNode.createdAt && (
+                  <div>
+                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Created</p>
+                    <p className="text-xs text-[#A1A1AA]">{selectedNode.createdAt}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Panel Actions */}
+              <div className="p-4 border-t border-[#E5E7EB] flex gap-2 shrink-0 safe-area-bottom">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={openEditDialog}
+                  className="flex-1 h-11 text-xs border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30"
+                >
+                  <Pencil className="w-3 h-3 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeleteNode}
+                  className="flex-1 h-11 text-xs border-[#E5E7EB] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
                   Delete
