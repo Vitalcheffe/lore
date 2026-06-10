@@ -518,6 +518,155 @@ const partnerTiers = [
   },
 ]
 
+/* ═══ Contact Illustration - Animated floating envelope ═══ */
+function ContactIllustration() {
+  return (
+    <motion.svg
+      viewBox="0 0 320 400"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-full max-w-[280px]"
+    >
+      {/* Background glow */}
+      <motion.circle
+        cx="160" cy="180" r="120"
+        fill="#059669" fillOpacity="0.04"
+        animate={{ scale: [1, 1.05, 1], opacity: [0.04, 0.07, 0.04] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
+      {/* Main envelope body */}
+      <motion.g
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        {/* Envelope back */}
+        <rect x="60" y="140" width="200" height="130" rx="12" fill="#059669" fillOpacity="0.1" stroke="#059669" strokeWidth="2" />
+        {/* Envelope flap */}
+        <motion.path
+          d="M60 152 L160 220 L260 152"
+          stroke="#059669"
+          strokeWidth="2"
+          fill="#059669"
+          fillOpacity="0.06"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1.5, delay: 0.3 }}
+        />
+        {/* Letter peeking out */}
+        <motion.g
+          animate={{ y: [0, -6, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        >
+          <rect x="90" y="120" width="140" height="100" rx="8" fill="white" stroke="#10B981" strokeWidth="1.5" />
+          {/* Letter lines */}
+          <motion.rect x="110" y="138" width="60" height="4" rx="2" fill="#10B981" fillOpacity="0.3"
+            initial={{ width: 0 }} animate={{ width: 60 }} transition={{ duration: 0.6, delay: 0.8 }}
+          />
+          <motion.rect x="110" y="150" width="80" height="4" rx="2" fill="#10B981" fillOpacity="0.2"
+            initial={{ width: 0 }} animate={{ width: 80 }} transition={{ duration: 0.6, delay: 1.0 }}
+          />
+          <motion.rect x="110" y="162" width="50" height="4" rx="2" fill="#10B981" fillOpacity="0.15"
+            initial={{ width: 0 }} animate={{ width: 50 }} transition={{ duration: 0.6, delay: 1.2 }}
+          />
+          {/* Send arrow */}
+          <motion.g
+            animate={{ x: [0, 4, 0], opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <circle cx="190" cy="160" r="12" fill="#059669" fillOpacity="0.15" />
+            <path d="M186 160 L194 160 M191 157 L194 160 L191 163" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </motion.g>
+        </motion.g>
+      </motion.g>
+
+      {/* Floating notification dots */}
+      <motion.circle cx="70" cy="130" r="8" fill="#10B981" fillOpacity="0.3"
+        animate={{ y: [0, -5, 0], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.circle cx="250" cy="160" r="6" fill="#059669" fillOpacity="0.25"
+        animate={{ y: [0, -4, 0], opacity: [0.25, 0.5, 0.25] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+      />
+      <motion.circle cx="80" cy="290" r="5" fill="#0D9488" fillOpacity="0.2"
+        animate={{ y: [0, -3, 0], opacity: [0.2, 0.4, 0.2] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+      />
+
+      {/* Connection lines */}
+      <motion.line x1="70" y1="130" x2="100" y2="150" stroke="#10B981" strokeWidth="1" strokeOpacity="0.2" strokeDasharray="4 3"
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 0.5 }}
+      />
+      <motion.line x1="250" y1="160" x2="220" y2="180" stroke="#059669" strokeWidth="1" strokeOpacity="0.2" strokeDasharray="4 3"
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: 0.7 }}
+      />
+
+      {/* @ symbol floating */}
+      <motion.g
+        animate={{ y: [0, -6, 0], rotate: [0, 5, -5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      >
+        <text x="240" y="110" fontSize="28" fill="#059669" fillOpacity="0.2" fontFamily="monospace" fontWeight="bold">@</text>
+      </motion.g>
+
+      {/* Chat bubble */}
+      <motion.g
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+      >
+        <rect x="40" y="310" width="60" height="40" rx="10" fill="#10B981" fillOpacity="0.08" stroke="#10B981" strokeWidth="1" />
+        <motion.rect x="52" y="322" width="20" height="3" rx="1.5" fill="#10B981" fillOpacity="0.3"
+          initial={{ width: 0 }} animate={{ width: 20 }} transition={{ delay: 1.5, duration: 0.5 }}
+        />
+        <motion.rect x="52" y="330" width="30" height="3" rx="1.5" fill="#10B981" fillOpacity="0.2"
+          initial={{ width: 0 }} animate={{ width: 30 }} transition={{ delay: 1.7, duration: 0.5 }}
+        />
+      </motion.g>
+
+      {/* Reply arrow */}
+      <motion.g
+        animate={{ x: [0, -4, 0], opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+      >
+        <path d="M230 330 C230 320, 240 310, 250 310 L260 310 M255 305 L260 310 L255 315" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      </motion.g>
+    </motion.svg>
+  )
+}
+
+/* ═══ Quick Contact Method Cards (Email, Discord, Twitter) ═══ */
+const quickContactMethods = [
+  {
+    icon: Mail,
+    label: 'Email',
+    value: 'amineharchelkorane5@gmail.com',
+    description: 'General inquiries & support',
+    color: '#059669',
+    href: 'mailto:amineharchelkorane5@gmail.com',
+    gradient: 'from-emerald-500 to-teal-600',
+  },
+  {
+    icon: MessageCircle,
+    label: 'Discord',
+    value: 'Lore Community',
+    description: 'Real-time chat & community',
+    color: '#5865f2',
+    href: '#',
+    gradient: 'from-indigo-500 to-violet-600',
+    comingSoon: true,
+  },
+  {
+    icon: Twitter,
+    label: 'Twitter / X',
+    value: '@LoreKnowledge',
+    description: 'Updates & announcements',
+    color: '#0ea5e9',
+    href: 'https://twitter.com',
+    gradient: 'from-sky-500 to-blue-600',
+  },
+]
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -533,6 +682,7 @@ export default function ContactPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [attachedFile, setAttachedFile] = useState<string | null>(null)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -566,6 +716,8 @@ export default function ContactPage() {
       })
       if (res.ok) {
         setFormSubmitted(true)
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 4000)
       } else {
         const data = await res.json().catch(() => ({}))
         setFormError(data.error || 'Failed to send your message. Please try again later.')
@@ -679,7 +831,7 @@ export default function ContactPage() {
                 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-tight"
               >
                 Get in{' '}
-                <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent gradient-text-animate">
+                <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 bg-clip-text text-transparent gradient-text-animate">
                   Touch
                 </span>
               </motion.h1>
@@ -726,7 +878,7 @@ export default function ContactPage() {
               <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10">
                 <a
                   href="#contact-form"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 transition-all"
                 >
                   Send a Message
                   <Send className="w-4 h-4" />
@@ -934,7 +1086,7 @@ export default function ContactPage() {
             SECTION 4: CONTACT FORM (COMPREHENSIVE)
             ═══════════════════════════════════════════════════════ */}
         <section id="contact-form" className="py-20 bg-white/40">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -955,6 +1107,20 @@ export default function ContactPage() {
               </p>
             </motion.div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+              {/* Animated SVG Illustration - Left side */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="hidden lg:flex lg:col-span-2 items-center justify-center"
+              >
+                <ContactIllustration />
+              </motion.div>
+
+              {/* Form - Right side */}
+              <div className="lg:col-span-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -968,22 +1134,87 @@ export default function ContactPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="glass-card rounded-2xl p-8 md:p-12 shadow-premium text-center max-w-2xl mx-auto"
+                    className="glass-card rounded-2xl p-8 md:p-12 shadow-premium text-center max-w-2xl mx-auto relative overflow-hidden"
                   >
-                    <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle2 className="w-8 h-8 text-emerald-600" />
-                    </div>
-                    <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-3">
+                    {/* Confetti particles */}
+                    {showConfetti && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {Array.from({ length: 30 }).map((_, i) => {
+                          const colors = ['#059669', '#10B981', '#0D9488', '#34D399', '#6EE7B7', '#FCD34D', '#F59E0B']
+                          const color = colors[i % colors.length]
+                          const left = Math.random() * 100
+                          const delay = Math.random() * 0.5
+                          const duration = 2 + Math.random() * 2
+                          const size = 6 + Math.random() * 6
+                          const isCircle = Math.random() > 0.5
+                          return (
+                            <motion.div
+                              key={i}
+                              initial={{ y: -20, x: 0, opacity: 1, rotate: 0 }}
+                              animate={{
+                                y: 600,
+                                x: (Math.random() - 0.5) * 200,
+                                opacity: 0,
+                                rotate: Math.random() * 720 - 360,
+                              }}
+                              transition={{ duration, delay, ease: 'easeOut' }}
+                              style={{
+                                position: 'absolute',
+                                left: `${left}%`,
+                                top: -10,
+                                width: size,
+                                height: isCircle ? size : size * 0.4,
+                                backgroundColor: color,
+                                borderRadius: isCircle ? '50%' : '2px',
+                              }}
+                            />
+                          )
+                        })}
+                      </div>
+                    )}
+                    {/* Animated Checkmark */}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
+                      className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6 relative"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.3 }}
+                      >
+                        <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                      </motion.div>
+                      {/* Ring pulse */}
+                      <motion.div
+                        className="absolute inset-0 rounded-full border-2 border-emerald-400"
+                        initial={{ scale: 1, opacity: 0.8 }}
+                        animate={{ scale: 1.6, opacity: 0 }}
+                        transition={{ duration: 1.2, repeat: 2, ease: 'easeOut' }}
+                      />
+                    </motion.div>
+                    <motion.h3
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-2xl font-extrabold text-gray-900 tracking-tight mb-3"
+                    >
                       Message Sent!
-                    </h3>
-                    <p className="text-[15px] text-gray-500 leading-relaxed mb-6">
+                    </motion.h3>
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="text-[15px] text-gray-500 leading-relaxed mb-6"
+                    >
                       Thank you for reaching out, {formData.name || 'friend'}. Our team has received your
                       message and will respond within{' '}
                       <span className="font-semibold text-gray-700">
                         {getResponseTimeForPriority(formData.urgency)}
                       </span>
                       . We read every single message.
-                    </p>
+                    </motion.p>
                     {formData.urgency === 'crisis' && (
                       <div className="glass-card rounded-xl p-4 bg-red-50/50 border border-red-200/60 mb-6">
                         <div className="flex items-center gap-2 mb-2">
@@ -1004,7 +1235,7 @@ export default function ContactPage() {
                         setFormData({ name: '', email: '', organization: '', subject: '', urgency: 'medium', message: '', contactMethod: 'email' })
                         setAttachedFile(null)
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all"
+                      className="inline-flex items-center gap-2 px-6 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 shadow-md shadow-emerald-500/20 transition-all"
                     >
                       Send Another Message
                       <ArrowRight className="w-4 h-4" />
@@ -1049,7 +1280,7 @@ export default function ContactPage() {
                             onChange={handleInputChange}
                             required
                             placeholder="Your name"
-                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
+                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all placeholder:text-gray-400"
                           />
                         </div>
                         <div>
@@ -1063,7 +1294,7 @@ export default function ContactPage() {
                             onChange={handleInputChange}
                             required
                             placeholder="you@example.com"
-                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
+                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all placeholder:text-gray-400"
                           />
                         </div>
                       </div>
@@ -1079,7 +1310,7 @@ export default function ContactPage() {
                           value={formData.organization}
                           onChange={handleInputChange}
                           placeholder="Your organization, company, or institution"
-                          className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
+                          className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all placeholder:text-gray-400"
                         />
                       </div>
 
@@ -1094,7 +1325,7 @@ export default function ContactPage() {
                             value={formData.subject}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-gray-700 appearance-none cursor-pointer"
+                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-gray-700 appearance-none cursor-pointer"
                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
                           >
                             <option value="">Select a subject...</option>
@@ -1115,7 +1346,7 @@ export default function ContactPage() {
                             value={formData.urgency}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-gray-700 appearance-none cursor-pointer"
+                            className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all text-gray-700 appearance-none cursor-pointer"
                             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
                           >
                             <option value="low">Low — General question</option>
@@ -1143,17 +1374,17 @@ export default function ContactPage() {
                                 key={method.value}
                                 type="button"
                                 onClick={() => setFormData((prev) => ({ ...prev, contactMethod: method.value }))}
-                                className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${
+                                className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200 ${
                                   formData.contactMethod === method.value
-                                    ? 'border-blue-300 bg-blue-50/50 ring-2 ring-blue-100'
+                                    ? 'border-emerald-300 bg-emerald-50/50 ring-2 ring-emerald-100'
                                     : 'border-gray-200 bg-white/60 hover:bg-white/80 hover:border-gray-300'
                                 }`}
                               >
                                 <MethodIcon
-                                  className={`w-5 h-5 shrink-0 mt-0.5 ${formData.contactMethod === method.value ? 'text-blue-600' : 'text-gray-400'}`}
+                                  className={`w-5 h-5 shrink-0 mt-0.5 ${formData.contactMethod === method.value ? 'text-emerald-600' : 'text-gray-400'}`}
                                 />
                                 <div>
-                                  <div className={`text-[13px] font-semibold ${formData.contactMethod === method.value ? 'text-blue-700' : 'text-gray-700'}`}>
+                                  <div className={`text-[13px] font-semibold ${formData.contactMethod === method.value ? 'text-emerald-700' : 'text-gray-700'}`}>
                                     {method.label}
                                   </div>
                                   <div className="text-[11px] text-gray-400 mt-0.5">{method.description}</div>
@@ -1216,7 +1447,7 @@ export default function ContactPage() {
                           required
                           rows={6}
                           placeholder="Tell us how we can help... Be as specific as possible — it helps us respond faster and more accurately."
-                          className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400 resize-y min-h-[140px]"
+                          className="w-full px-4 py-3 text-[14px] rounded-xl border border-gray-200 bg-white/80 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none transition-all placeholder:text-gray-400 resize-y min-h-[140px]"
                         />
                         <div className="flex items-center justify-between mt-2">
                           <p className="text-[11px] text-gray-400">
@@ -1281,7 +1512,7 @@ export default function ContactPage() {
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           {isSubmitting ? (
                             <>
@@ -1303,6 +1534,59 @@ export default function ContactPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </motion.div>
+              </div>{/* end lg:col-span-3 */}
+            </div>{/* end grid */}
+
+            {/* Quick Contact Method Cards - Below form */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-10"
+            >
+              <p className="text-center text-[13px] text-gray-400 mb-4">Or reach us directly through</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {quickContactMethods.map((method) => {
+                  const Icon = method.icon
+                  return (
+                    <motion.a
+                      key={method.label}
+                      href={method.href}
+                      target={method.href.startsWith('http') ? '_blank' : undefined}
+                      rel={method.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      whileHover={{ y: -4, scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="glass-card rounded-xl p-4 flex items-center gap-3 group relative overflow-hidden transition-shadow hover:shadow-lg"
+                      style={{ cursor: method.comingSoon ? 'default' : 'pointer' }}
+                    >
+                      {/* Hover glow */}
+                      <div
+                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"
+                        style={{ boxShadow: `inset 0 0 30px ${method.color}08, 0 0 20px ${method.color}06` }}
+                      />
+                      <div className="relative flex items-center gap-3 w-full">
+                        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${method.gradient} flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-[13px] font-bold text-gray-900">{method.label}</h4>
+                            {method.comingSoon && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-600">Soon</span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-gray-500 truncate">{method.value}</p>
+                        </div>
+                        {!method.comingSoon && (
+                          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all" />
+                        )}
+                      </div>
+                    </motion.a>
+                  )
+                })}
+              </div>
             </motion.div>
           </div>
         </section>
@@ -2651,7 +2935,7 @@ export default function ContactPage() {
 
                 <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
                   Ready to Experience{' '}
-                  <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-teal-500 bg-clip-text text-transparent gradient-text-animate">
+                  <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 bg-clip-text text-transparent gradient-text-animate">
                     Honest AI
                   </span>
                   ?
@@ -2666,7 +2950,7 @@ export default function ContactPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                   <Link
                     href="/app"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 transition-all"
                   >
                     Try the Demo
                     <ArrowRight className="w-4 h-4" />
