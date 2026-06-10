@@ -353,33 +353,69 @@ export default function DigestPage() {
             {/* ── Key Insights Section ────────────────────── */}
             {keyInsightsMapped.length > 0 && (
               <motion.div variants={itemVariants}>
-                <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-600" />
-                  Key Insights
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {keyInsightsMapped.map((insight) => (
-                    <Card
-                      key={insight.title}
-                      className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow group cursor-default"
-                    >
-                      <CardContent className="p-4">
-                        <div
-                          className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
-                          style={{ background: insight.bgColor }}
-                        >
-                          <insight.icon className="w-4 h-4" style={{ color: insight.color }} />
-                        </div>
-                        <h4 className="text-sm font-semibold text-[#18181B] mb-1 leading-snug">
-                          {insight.title}
-                        </h4>
-                        <p className="text-xs text-[#71717A] leading-relaxed">
-                          {insight.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-[#18181B] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    Key Insights
+                  </h3>
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-semibold gap-1.5 border-emerald-200 bg-emerald-50/50 text-emerald-700"
+                  >
+                    <Sparkles className="w-2.5 h-2.5" />
+                    AI Insight
+                  </Badge>
                 </div>
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.1 } },
+                  }}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                >
+                  {keyInsightsMapped.map((insight) => (
+                    <motion.div
+                      key={insight.title}
+                      variants={{
+                        hidden: { opacity: 0, y: 16, scale: 0.97 },
+                        visible: {
+                          opacity: 1,
+                          y: 0,
+                          scale: 1,
+                          transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] },
+                        },
+                      }}
+                    >
+                      <Card
+                        className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow group cursor-default overflow-hidden"
+                      >
+                        {/* Emerald left border accent */}
+                        <div className="flex">
+                          <div className="w-1 bg-gradient-to-b from-emerald-400 to-emerald-600 shrink-0" />
+                          <CardContent className="p-4 flex-1 bg-gradient-to-br from-emerald-50/30 via-white to-white">
+                            <div className="flex items-center gap-2 mb-3">
+                              <div
+                                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                style={{ background: insight.bgColor }}
+                              >
+                                <insight.icon className="w-3.5 h-3.5" style={{ color: insight.color }} />
+                              </div>
+                              <Sparkles className="w-3.5 h-3.5 text-emerald-500 ml-auto opacity-60 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            <h4 className="text-sm font-semibold text-[#18181B] mb-1.5 leading-snug">
+                              {insight.title}
+                            </h4>
+                            <p className="text-xs text-[#71717A] leading-relaxed">
+                              {insight.description}
+                            </p>
+                          </CardContent>
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </motion.div>
             )}
 

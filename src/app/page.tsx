@@ -24,6 +24,9 @@ import {
   GitBranch,
   Link2,
   Eye,
+  Activity,
+  Key,
+  Lock,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -675,6 +678,29 @@ export default function LandingPage() {
               </FadeIn>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          TRUST / SECURITY BADGES
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-12 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn>
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+              {[
+                { icon: Shield, label: 'SOC 2 Compliant' },
+                { icon: Lock, label: 'GDPR Ready' },
+                { icon: Activity, label: '99.9% Uptime' },
+                { icon: Key, label: '256-bit Encryption' },
+              ].map((badge) => (
+                <div key={badge.label} className="flex items-center gap-2 text-gray-400">
+                  <badge.icon className="w-4 h-4" />
+                  <span className="text-xs font-medium tracking-wide uppercase">{badge.label}</span>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
         </div>
       </section>
 

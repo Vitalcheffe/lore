@@ -746,6 +746,11 @@ export default function KnowledgeGraphPage() {
 
       {/* ─── Main Canvas Area ────────────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">
+        {/* Stats Badge */}
+        <div className="absolute top-3 left-16 z-20 bg-emerald-600 text-white text-[10px] font-semibold px-3 py-1 rounded-full shadow-md shadow-emerald-500/20 pointer-events-none select-none">
+          {nodes.length} nodes · {edges.length} edges
+        </div>
+
         {/* Add Edge Mode Banner */}
         <AnimatePresence>
           {toolMode === 'addEdge' && (
@@ -1129,8 +1134,16 @@ export default function KnowledgeGraphPage() {
 
         {/* Empty State Overlay */}
         {nodes.length === 0 && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#F9FAFB]/80 backdrop-blur-sm">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F9FAFB]/80 backdrop-blur-sm">
             <GraphEmptyState onAddNode={() => setAddNodeDialogOpen(true)} />
+            <motion.p
+              className="mt-6 text-sm text-emerald-600/70 font-medium select-none"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              Click anywhere to add your first node
+            </motion.p>
           </div>
         )}
 

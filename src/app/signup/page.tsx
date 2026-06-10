@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
-import { Brain, Mail, Lock, User, ArrowRight, Eye, EyeOff, Shield, Check, Loader2 } from 'lucide-react'
+import { Brain, Mail, Lock, User, ArrowRight, Eye, EyeOff, Shield, Check, Loader2, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -243,6 +244,25 @@ export default function SignupPage() {
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    {/* Password strength progress bar */}
+                    {password.length > 0 && (
+                      <div className="pt-2">
+                        <div className="h-1 w-full rounded-full bg-gray-200 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-300 ease-out"
+                            style={{
+                              width: `${(passwordChecks.filter(c => c.met).length / passwordChecks.length) * 100}%`,
+                              backgroundColor:
+                                passwordChecks.filter(c => c.met).length <= 1
+                                  ? '#EF4444'
+                                  : passwordChecks.filter(c => c.met).length <= 2
+                                    ? '#F59E0B'
+                                    : '#10B981',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     {/* Password strength checks */}
                     {password.length > 0 && (
                       <div className="grid grid-cols-2 gap-2 pt-1">
@@ -308,6 +328,16 @@ export default function SignupPage() {
                       {' '}and{' '}
                       <Link href="/privacy" className="font-medium text-emerald-600 hover:text-emerald-500 transition-colors">Privacy Policy</Link>
                     </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="mt-0.5 shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+                          <Info className="w-3.5 h-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[260px] text-[11px] leading-relaxed bg-[#0F172A] text-white px-3 py-2 rounded-lg">
+                        By signing up, you agree to our Terms of Service and Privacy Policy. We respect your data and never sell it to third parties.
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
 
                   {/* Error */}

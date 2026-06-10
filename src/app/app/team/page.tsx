@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
+import { LoreEmptyState } from '@/components/app/empty-states';
 
 // ═══════════════════════════════════════════════════════════════
 // LORE — Team Management Page (Light Mode)
@@ -259,7 +260,13 @@ export default function TeamPage() {
         <motion.div variants={staggerItem} className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
-              <p className="text-xs font-bold tracking-widest uppercase text-emerald-600 mb-2">[ TEAM ]</p>
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-bold tracking-widest uppercase text-emerald-600 mb-2">[ TEAM ]</p>
+                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 text-[11px] font-semibold gap-1.5">
+                  <Users className="w-3 h-3" />
+                  {stats.totalMembers} member{stats.totalMembers !== 1 ? 's' : ''}
+                </Badge>
+              </div>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#18181B] mt-2">
                 Team Management
               </h1>
@@ -315,10 +322,13 @@ export default function TeamPage() {
                   <span className="text-[11px] text-[#71717A]" style={{ fontVariantNumeric: 'tabular-nums' }}>{members.length} total</span>
                 </div>
                 {members.length === 0 ? (
-                  <div className="px-5 py-8 text-center">
-                    <Users className="h-8 w-8 text-[#D4D4D8] mx-auto mb-2" />
-                    <p className="text-sm text-[#71717A]">No team members yet</p>
-                  </div>
+                  <LoreEmptyState
+                    icon={Users}
+                    title="Build your team"
+                    description="Invite team members to collaborate on your knowledge graph"
+                    actionLabel="Invite Members"
+                    onAction={() => setShowInviteModal(true)}
+                  />
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">

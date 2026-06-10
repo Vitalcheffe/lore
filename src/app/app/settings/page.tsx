@@ -1402,6 +1402,64 @@ export default function SettingsPage() {
             </motion.div>
           </AnimatePresence>
           )}
+
+          {/* ═══ DANGER ZONE ═══ */}
+          {!loadingData && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="mt-8"
+            >
+              <Card className="bg-red-50/50 border-red-200/60 shadow-sm">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg text-red-700">Danger Zone</CardTitle>
+                      <CardDescription className="text-red-500/80">These actions are irreversible. Please be certain.</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white border border-red-200/50">
+                    <div>
+                      <p className="text-sm font-medium text-[#18181B]">Delete Account</p>
+                      <p className="text-xs text-[#71717A]">Permanently delete your account and all associated data</p>
+                    </div>
+                    <Button
+                      disabled
+                      className="bg-red-600 text-white opacity-60 cursor-not-allowed sm:shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Coming Soon
+                    </Button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white border border-red-200/50">
+                    <div>
+                      <p className="text-sm font-medium text-[#18181B]">Export All Data</p>
+                      <p className="text-xs text-[#71717A]">Download a complete export of your knowledge graph and settings</p>
+                    </div>
+                    <a
+                      href="/api/export?type=all"
+                      download
+                      className="sm:shrink-0"
+                    >
+                      <Button
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Data
+                      </Button>
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
