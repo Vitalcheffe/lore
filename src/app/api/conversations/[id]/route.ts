@@ -11,7 +11,7 @@ export async function GET(
     const { id } = await params;
     const sessionUserId = await getAuthenticatedUserId(request);
 
-    const conversation = await db.conversation.findUnique({
+    const conversation = await db.chatConversation.findUnique({
       where: { id },
       include: {
         messages: {
@@ -27,7 +27,6 @@ export async function GET(
       );
     }
 
-    // If conversation belongs to a user, verify the session user owns it
     if (conversation.userId && conversation.userId !== sessionUserId) {
       return NextResponse.json(
         { error: "You can only access your own conversations" },
@@ -39,6 +38,7 @@ export async function GET(
       id: conversation.id,
       title: conversation.title,
       preview: conversation.preview,
+      pinned: conversation.pinned,
       category: conversation.category,
       categoryColor: conversation.categoryColor,
       confidence: conversation.confidence,
@@ -50,24 +50,76 @@ export async function GET(
       messages: conversation.messages.map((m) => ({
         id: m.id,
         role: m.role,
-        text: m.text,
-        category: m.category,
-        confidence: m.confidence,
-        isCrisis: m.isCrisis,
-        resources: m.resources ? (() => {
-          try { return JSON.parse(m.resources); } catch { return m.resources; }
-        })() : null,
-        alternatives: m.alternatives ? (() => {
-          try { return JSON.parse(m.alternatives); } catch { return m.alternatives; }
-        })() : null,
-        why: m.why,
-        also: m.also,
-        warning: m.warning,
+        content: m.content,
+        sources: m.resources
+          ? (() => {
+              try {
+                return JSON.parse(m.resources);
+              } catch {
+                return null;
+              }
+            })()
+          : null,
+        timestamp: m.createdAt.toISOString(),
         createdAt: m.createdAt.toISOString(),
       })),
     });
   } catch (error) {
     console.error("Get conversation error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH /api/conversations/[id] — Update conversation (pin, title, etc.)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const sessionUserId = await getAuthenticatedUserId(request);
+    const body = await request.json();
+
+    const conversation = await db.chatConversation.findUnique({
+      where: { id },
+    });
+
+    if (!conversation) {
+      return NextResponse.json(
+        { error: "Conversation not found" },
+        { status: 404 }
+      );
+    }
+
+    if (conversation.userId && conversation.userId !== sessionUserId) {
+      return NextResponse.json(
+        { error: "You can only update your own conversations" },
+        { status: 403 }
+      );
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.preview !== undefined) updateData.preview = body.preview;
+    if (body.pinned !== undefined) updateData.pinned = body.pinned;
+
+    const updated = await db.chatConversation.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      id: updated.id,
+      title: updated.title,
+      preview: updated.preview,
+      pinned: updated.pinned,
+      updatedAt: updated.updatedAt.toISOString(),
+    });
+  } catch (error) {
+    console.error("Update conversation error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -84,8 +136,7 @@ export async function DELETE(
     const { id } = await params;
     const sessionUserId = await getAuthenticatedUserId(request);
 
-    // Verify conversation exists
-    const conversation = await db.conversation.findUnique({
+    const conversation = await db.chatConversation.findUnique({
       where: { id },
     });
 
@@ -96,7 +147,6 @@ export async function DELETE(
       );
     }
 
-    // If conversation belongs to a user, verify the session user owns it
     if (conversation.userId && conversation.userId !== sessionUserId) {
       return NextResponse.json(
         { error: "You can only delete your own conversations" },
@@ -104,13 +154,11 @@ export async function DELETE(
       );
     }
 
-    // Delete all messages first (cascade should handle this, but be explicit)
-    await db.message.deleteMany({
+    await db.chatMessage.deleteMany({
       where: { conversationId: id },
     });
 
-    // Delete the conversation
-    await db.conversation.delete({
+    await db.chatConversation.delete({
       where: { id },
     });
 

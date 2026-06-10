@@ -3,185 +3,124 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Layers, Menu, X, ChevronDown, Shield } from 'lucide-react'
+import { Menu, X, ArrowRight, Brain } from 'lucide-react'
 
-interface NavbarProps {
-  scrolled?: boolean
-}
+const navLinks = [
+  { label: 'Features', href: '/#features' },
+  { label: 'How it Works', href: '/#how-it-works' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Architecture', href: '/architecture' },
+  { label: 'About', href: '/about' },
+]
 
-export default function Navbar({ scrolled: scrolledProp }: NavbarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [internalScrolled, setInternalScrolled] = useState(false)
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setInternalScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const scrolled = scrolledProp ?? internalScrolled
-
-  const navLinks = [
-    { label: 'How It Works', href: '/how-it-works' },
-    { label: 'About', href: '/about' },
-    { label: 'Responsible AI', href: '/responsible-ai' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'API Docs', href: '/api-docs' },
-    { label: 'Team', href: '/team' },
-    { label: 'Verification', href: '/verification' },
-    { label: 'Contact', href: '/contact' },
-  ]
-
   return (
-    <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 header-glass transition-shadow duration-300 ${
-          scrolled ? 'shadow-[0_1px_3px_rgba(0,0,0,0.05),0_4px_20px_rgba(0,0,0,0.03)]' : ''
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center shadow-md shadow-gray-900/20 group-hover:shadow-lg group-hover:shadow-gray-900/30 transition-shadow">
-                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none">
-                  <path d="M 318 138 A 155 155 0 1 0 318 374" stroke="white" strokeWidth="50" strokeLinecap="round" />
-                  <path d="M 318 138 C 358 122, 404 118, 448 132" stroke="white" strokeWidth="42" strokeLinecap="round" />
-                  <circle cx="450" cy="133" r="14" fill="#3b82f6"/>
-                </svg>
-              </div>
-              <span className="text-[15px] font-bold tracking-tight text-gray-900">
-                ClearPath AI
-              </span>
-              <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold tracking-wider uppercase bg-orange-50 text-orange-600 border border-orange-100/60">
-                LIVE
-              </span>
-            </Link>
-
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.slice(0, 3).map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="relative group">
-                <button className="flex items-center gap-1 px-4 py-2 text-[13px] font-medium text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50/80 transition-all">
-                  More
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-                <div className="absolute top-full right-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-gray-100/60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
-                  {navLinks.slice(3).map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="block px-4 py-2.5 text-[13px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-
-                </div>
-              </div>
-            </nav>
-
-            {/* Desktop CTAs */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/app"
-                className="px-5 py-2.5 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
-              >
-                Try ClearPath AI
-              </Link>
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        background: scrolled ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.80)',
+        backdropFilter: scrolled ? 'blur(20px)' : 'blur(12px)',
+        borderBottom: scrolled ? '1px solid rgba(0,0,0,0.06)' : '1px solid transparent',
+        boxShadow: scrolled ? '0 1px 3px rgba(0,0,0,0.04)' : 'none',
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:shadow-lg group-hover:shadow-emerald-500/30 transition-shadow">
+              <Brain className="w-4 h-4 text-white" />
             </div>
+            <span className="text-lg font-bold tracking-tight text-[#0F172A]">LORE</span>
+          </Link>
 
-            {/* Mobile hamburger */}
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="nav-link text-sm font-medium text-[#475569] px-3 py-2 rounded-lg hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA + Mobile Toggle */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/login"
+              className="hidden sm:inline-flex text-sm font-medium text-[#475569] hover:text-emerald-600 px-3 py-2 rounded-lg hover:bg-emerald-50/50 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="hidden sm:inline-flex btn-primary text-sm h-10 px-5"
+            >
+              Get Started
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
             <button
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50/80 transition-all"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden h-10 w-10 flex items-center justify-center rounded-xl border border-gray-200 bg-white shadow-sm transition-colors hover:bg-gray-50"
               aria-label="Toggle menu"
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? (
+                <X className="h-4 w-4 text-gray-600" />
+              ) : (
+                <Menu className="h-4 w-4 text-gray-600" />
+              )}
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Mobile slide-out */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm md:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-white shadow-2xl md:hidden"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
+              className="md:hidden overflow-hidden"
+              style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
             >
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                  <span className="text-[15px] font-bold tracking-tight text-gray-900">Menu</span>
-                  <button
-                    className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all"
-                    onClick={() => setMobileOpen(false)}
-                    aria-label="Close menu"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <nav className="flex flex-col p-4 gap-1 overflow-y-auto flex-1">
-                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Platform</p>
-                  {navLinks.slice(0, 3).map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                  <p className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-2">Resources</p>
-                  {navLinks.slice(3).map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="px-4 py-3 text-[14px] font-medium text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-50 transition-all"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                  <div className="border-t border-gray-100 my-2" />
-                  <Link href="/privacy" className="px-4 py-3 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Privacy</Link>
-                  <Link href="/terms" className="px-4 py-3 text-[13px] font-medium text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all" onClick={() => setMobileOpen(false)}>Terms</Link>
-                </nav>
-                <div className="mt-auto p-4 border-t border-gray-100 space-y-3">
+              <div className="py-4 space-y-1">
+                {navLinks.map((link) => (
                   <Link
-                    href="/app"
-                    className="block w-full text-center px-5 py-3 text-[13px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 shadow-md shadow-blue-500/20 transition-all"
-                    onClick={() => setMobileOpen(false)}
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-left text-sm font-medium py-2.5 px-3 rounded-lg text-[#475569] hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors"
                   >
-                    Try ClearPath AI
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="pt-3 px-3 flex flex-col gap-2">
+                  <Link href="/login" className="w-full text-center text-sm font-medium py-2.5 rounded-lg text-[#475569] hover:text-emerald-600 hover:bg-emerald-50/50 transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                    Sign In
+                  </Link>
+                  <Link href="/signup" className="btn-primary w-full justify-center text-sm h-11" onClick={() => setMobileMenuOpen(false)}>
+                    Get Started
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
+          )}
+        </AnimatePresence>
+      </div>
+    </nav>
   )
 }

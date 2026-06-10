@@ -1,5 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// ═══════════════════════════════════════════════════════════
+// LORE — Knowledge Management Platform
+// Powered by Aurora DSQL
+// ═══════════════════════════════════════════════════════════
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +12,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── Auth Models (NextAuth) ─────────────────────────────
+
 model User {
   id            String   @id @default(cuid())
   name          String?
@@ -17,21 +21,26 @@ model User {
   emailVerified DateTime?
   image         String?
   username      String?  @unique
-  location      String?
-  language      String   @default("en")
-  phone         String?
-  password      String?
-  plan          String   @default("free")
-  hearAbout     String?
-  interests     String?  // comma-separated
+  passwordHash  String?
+  plan          String   @default("free") // free, pro, enterprise
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  stripeCurrentPeriodEnd DateTime?
+  onboardingComplete Boolean @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  accounts     Account[]
-  sessions     Session[]
-  conversations Conversation[]
-  savedResources SavedResource[]
-  userSettings   UserSettings?
+  accounts        Account[]
+  sessions        Session[]
+  knowledgeNodes  KnowledgeNode[]
+  knowledgeEdges  KnowledgeEdge[]
+  notes           Note[]
+  digests         Digest[]
+  chatConversations ChatConversation[]
+  userSettings    UserSettings?
+  savedResources  SavedResource[]
+  teamMemberships TeamMember[]
 }
 
 model Account {
@@ -70,110 +79,252 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Conversation {
+// ─── Knowledge Graph Models ─────────────────────────────
+
+model KnowledgeNode {
   id          String   @id @default(cuid())
-  userId      String?
+  userId      String
   title       String
-  preview     String
-  category    String?
-  categoryColor String?
-  confidence  Int      @default(0)
-  isCrisis    Boolean  @default(false)
-  isGuest     Boolean  @default(true)
+  content     String   @default("")
+  type        String   @default("concept") // concept, person, project, resource, idea
+  color       String   @default("#4F46E5")
+  icon        String?
+  source      String?  // manual, ai, import, digest
+  tags        String?  // comma-separated
+  isFavorite  Boolean  @default(false)
+  x           Float?   // position on graph
+  y           Float?   // position on graph
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user     User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceEdges KnowledgeEdge[]  @relation("SourceNodes")
+  targetEdges KnowledgeEdge[]  @relation("TargetNodes")
 
-  @@map("Conversation")
+  @@map("KnowledgeNode")
 }
 
-model Message {
+model KnowledgeEdge {
+  id          String   @id @default(cuid())
+  userId      String
+  sourceId    String
+  targetId    String
+  label       String?  // relationship label
+  type        String   @default("related") // related, depends_on, created_by, references, part_of
+  strength    Int      @default(5) // 1-10
+  createdAt   DateTime @default(now())
+
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source      KnowledgeNode  @relation("SourceNodes", fields: [sourceId], references: [id], onDelete: Cascade)
+  target      KnowledgeNode  @relation("TargetNodes", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId, label])
+  @@map("KnowledgeEdge")
+}
+
+// ─── Morning Digest Models ──────────────────────────────
+
+model Digest {
+  id          String   @id @default(cuid())
+  userId      String
+  date        String   // YYYY-MM-DD
+  summary     String
+  keyInsights String   // JSON array of strings
+  connections String?  // JSON array of connection objects
+  mood        String?  // productive, neutral, slow
+  focusAreas  String?  // JSON array
+  aiComment   String?  // AI-generated personalized comment
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("Digest")
+}
+
+// ─── Structured Memory / Notes ──────────────────────────
+
+model Note {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  content     String   @default("")
+  type        String   @default("note") // note, bookmark, insight, snippet, meeting
+  category    String?  // project name, topic, etc.
+  tags        String?  // comma-separated
+  pinned      Boolean  @default(false)
+  aiSummary   String?  // AI-generated summary
+  sourceUrl   String?  // for bookmarks
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Note")
+}
+
+// ─── AI Chat Models ─────────────────────────────────────
+
+model ChatConversation {
+  id            String   @id @default(cuid())
+  userId        String?
+  title         String
+  preview       String   @default("")
+  pinned        Boolean  @default(false)
+  category      String?
+  categoryColor String?
+  confidence    Float    @default(0)
+  isCrisis      Boolean  @default(false)
+  isGuest       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user     User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@map("ChatConversation")
+}
+
+model ChatMessage {
   id             String   @id @default(cuid())
   conversationId String
-  role           String   // "user" | "ai" | "system"
-  text           String
+  role           String   // "user" | "assistant" | "system"
+  content        String
   category       String?
-  confidence     Int?
+  confidence     Float?
   isCrisis       Boolean  @default(false)
-  alternatives   String?  // JSON string
-  resources      String?  // JSON string
+  resources      String?  // JSON array
+  alternatives   String?  // JSON array
   why            String?
   also           String?
   warning        String?
+  metadata       String?  // JSON: { sources, confidence, tokens }
   createdAt      DateTime @default(now())
 
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  @@map("Message")
+  @@map("ChatMessage")
 }
 
-model SavedResource {
-  id             String   @id @default(cuid())
-  userId         String
-  title          String
-  category       String
-  categoryColor  String   @default("#3b82f6")
-  confidence     Int      @default(0)
-  verifiedDate   String?
-  action         String?
-  detail         String?
-  createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Resource {
-  id          String   @id @default(cuid())
-  name        String
-  category    String
-  description String
-  phone       String?
-  address     String?
-  hours       String?
-  eligibility String?
-  services    String?  // comma-separated
-  languages   String?  // comma-separated
-  lastVerified String?
-  url         String?
-  createdAt   DateTime @default(now())
-}
+// ─── User Settings ──────────────────────────────────────
 
 model UserSettings {
   id                    String  @id @default(cuid())
   userId                String  @unique
-  language              String  @default("English")
   theme                 String  @default("light")
-  zipCode               String?
+  language              String  @default("en")
+  digestTime            String  @default("08:00")
+  digestEnabled         Boolean @default(true)
+  digestEmailNotif      Boolean @default(true)
+  includeAIComment      Boolean @default(true)
+  graphLayout           String  @default("force") // force, radial, tree
+  graphShowLabels       Boolean @default(true)
+  nodeSize              String  @default("medium") // small, medium, large
+  edgeStyle             String  @default("solid") // solid, dashed
+  animationSpeed        String  @default("normal") // slow, normal, fast
+  chatModel             String  @default("default")
+  chatStreamResponses   Boolean @default(true)
+  showSources           Boolean @default(true)
   confidenceThreshold   Int     @default(70)
-  defaultCategory       String  @default("All")
-  autoClarification     Boolean @default(true)
-  distanceUnit          String  @default("miles")
-  notificationSound     Boolean @default(true)
-  dataRetention         Boolean @default(true)
-  shareUsage            Boolean @default(false)
-  sessionTimeout        String  @default("30")
-  ipMasking             Boolean @default(false)
-  doNotTrack            Boolean @default(false)
-  blockThirdPartyCookies Boolean @default(true)
-  twoFactor             Boolean @default(false)
-  emailNotifs           Boolean @default(true)
-  resourceUpdates       Boolean @default(true)
-  newFeatures           Boolean @default(false)
-  weeklySummary         Boolean @default(false)
-  largeText             Boolean @default(false)
-  highContrast          Boolean @default(false)
-  screenReader          Boolean @default(false)
-  reducedMotion         Boolean @default(false)
-  fontSize              String  @default("normal")
-  density               String  @default("comfortable")
+  memoryAutoTag         Boolean @default(true)
+  memoryAutoLink        Boolean @default(true)
   sidebarPosition       String  @default("left")
-  animationSpeed        String  @default("normal")
-  autoDelete            String  @default("never")
-  downloadFormat        String  @default("json")
+  fontSize              String  @default("normal")
+  reducedMotion         Boolean @default(false)
+  emailNotifs           Boolean @default(true)
+  weeklySummary         Boolean @default(true)
+  newFeatures           Boolean @default(true)
+  digestReminders       Boolean @default(true)
+  twoFactor             Boolean @default(false)
+  dataRetention         String  @default("90") // 30, 90, 365, forever
   developerMode         Boolean @default(false)
-  debugLogging          Boolean @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("UserSettings")
+}
+
+// ─── Team Models ────────────────────────────────────────
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  plan        String   @default("free")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      TeamMember[]
+  invitations  TeamInvitation[]
+
+  @@map("Team")
+}
+
+model TeamMember {
+  id         String   @id @default(cuid())
+  teamId     String
+  userId     String
+  role       String   @default("viewer") // admin, editor, viewer
+  joinedAt   DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("TeamMember")
+}
+
+model TeamInvitation {
+  id         String   @id @default(cuid())
+  teamId     String
+  email      String
+  role       String   @default("viewer")
+  message    String?
+  token      String   @unique
+  accepted   Boolean  @default(false)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("TeamInvitation")
+}
+
+// ─── Saved Resources ────────────────────────────────────
+
+model SavedResource {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String
+  category      String
+  categoryColor String   @default("#3b82f6")
+  confidence    Int      @default(0)
+  verifiedDate  String?
+  action        String?
+  detail        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("SavedResource")
+}
+
+// ─── Community Resources ────────────────────────────────
+
+model CommunityResource {
+  id            String   @id @default(cuid())
+  name          String
+  category      String
+  description   String
+  services      String?
+  lastVerified  String?
+  distance      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("CommunityResource")
 }

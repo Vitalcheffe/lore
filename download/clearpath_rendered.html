@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <title>ClearPath AI - Project Showcase</title>
+    <style>
+        :root {
+  /* 60% ground */
+  --c-bg: #121414;
+  --c-bg-rgb: 18,20,20;
+  /* 30% structure */
+  --c-mid: #252d31;
+  --c-mid-rgb: 37,45,49;
+  /* 10% emphasis */
+  --c-accent: #c74b60;
+  --c-accent-rgb: 199,75,96;
+  /* Typography */
+  --c-text: #e3e5e6;
+  --c-muted: #6d7478;
+  /* Surfaces */
+  --c-surface: rgba(255,255,255,0.04);
+}
+        
+@page {
+  size: 720px 960px;
+  margin: 0;
+}
+:root {
+  --font-sans: 'Inter', 'Noto Sans SC', 'Helvetica Neue', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+  --font-serif: 'Playfair Display', 'Noto Serif SC', 'Cormorant Garamond', 'Apple Color Emoji', serif;
+  --font-mono: 'SF Mono', 'Consolas', 'Apple Color Emoji', monospace;
+
+  /* Typographic Scale — 6-level fluid type system (Modular Scale) */
+  --text-scale-6: clamp(64px, 12vw, 150px);   /* Hero / Display — oversized, single word or short phrase */
+  --text-scale-5: clamp(48px, 8vw, 96px);      /* Primary Title — poster headline */
+  --text-scale-4: clamp(32px, 5vw, 56px);      /* Subheadline — chapter opener or key quote */
+  --text-scale-3: clamp(20px, 3vw, 32px);      /* Lead Paragraph — slightly larger than body */
+  --text-scale-2: 16px;                         /* Body — standard body text */
+  --text-scale-1: 12px;                         /* Meta / Caption — minimum readable size */
+}
+html, body {
+  margin: 0; padding: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+/* Browser preview: scale poster to fit viewport & center on matching background */
+@media screen {
+  html {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: var(--c-bg);
+  }
+  body {
+    transform-origin: top center;
+    margin: 0 auto;
+    box-shadow: 0 0 60px rgba(0,0,0,0.3);
+    /* scale injected by override_css with concrete canvas dimensions */
+  }
+}
+.canvas {
+  width: var(--canvas-w, 720px);
+  min-height: var(--canvas-h, 960px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  page-break-after: always;
+}
+/* ═══ Continuous Canvas Mode (multi-page as one seamless surface) ═══ */
+.continuous-canvas {
+  width: var(--canvas-w, 720px);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* height is set inline: canvas_h * total_pages */
+}
+.continuous-canvas .bg-layer-full {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.continuous-canvas .bg-layer-full svg {
+  width: 100%;
+  height: 100%;
+}
+.continuous-canvas .page-section {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+  /* top and height set inline per page */
+}
+.continuous-canvas .page-section .safe-zone {
+  position: absolute;
+  inset: 10% 12%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, minmax(0, auto));
+  align-content: start;
+}
+.continuous-canvas .page-section .page-ghost {
+  position: absolute;
+  bottom: -5%;
+  right: 5%;
+  font-size: 240px;
+  font-weight: 900;
+  color: var(--c-mid);
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+/* 12% Breathing Margin Enforcer (balanced: enough air without wasting space) */
+.safe-zone {
+  position: absolute;
+  inset: 10% 12%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, minmax(0, auto));
+  align-content: start;
+  /* gap is injected dynamically by compile_blueprint via inline style */
+}
+/* Grid-item wrapper — every component gets one */
+.grid-item {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+}
+/* Global content-overflow protection — prevents ANY text/block from breaking out of its container */
+.grid-item * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.grid-item p, .grid-item li, .grid-item span, .grid-item h1, .grid-item h2, .grid-item h3, .grid-item h4, .grid-item td, .grid-item th, .grid-item div {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+/* CJK-safe text wrapping: prefer keeping CJK word groups intact, but allow break when necessary */
+.hero-type, .hero-sub, .glass-canvas, .shaped-content, .stat-label, .delta-metric, .delta-label {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-break: strict;
+}
+
+/* ═══ Micro-Typography: Computational Typesetting ═══ */
+p, .glass-canvas, .shaped-content, li {
+  /* Algorithmic justification — eliminates white rivers between words */
+  text-align: justify;
+  hyphens: auto;
+  word-spacing: -0.05em;
+  /* Hanging punctuation — visually aligned optical edges */
+  hanging-punctuation: first last;
+  /* Kill orphans & widows — force min 3 lines carried across page breaks */
+  orphans: 3;
+  widows: 3;
+}
+.grid-item table {
+  width: 100%;
+  table-layout: fixed;
+  overflow: hidden;
+}
+.grid-item img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Archetype Layouts --- */
+/* All archetypes share the 12×12 grid via .safe-zone.
+   Archetype classes may override alignment defaults on the canvas level. */
+.archetype-cover_hero .safe-zone {
+  align-content: start;
+  inset: 12% 14%;
+}
+/* Cover hero typography scale: larger text for covers */
+.archetype-cover_hero .hero-type {
+  font-size: clamp(42px, 8vw, 72px);
+  line-height: 1.15;
+}
+.archetype-cover_hero .hero-sub {
+  font-size: clamp(22px, 4vw, 32px);
+  line-height: 1.3;
+  opacity: 0.85;
+}
+.archetype-cover_hero .floating-meta {
+  font-size: clamp(16px, 2.5vw, 22px);
+}
+.archetype-split_vertical { display: grid; grid-template-columns: 1fr 1fr; min-height: 960px; }
+.archetype-split_vertical .safe-zone { position: relative; inset: auto; padding: 10%; display: grid; grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(12, 1fr); align-content: center; }
+.archetype-split_vertical.single-column { grid-template-columns: 1fr; }
+.archetype-editorial_flow .safe-zone { align-content: center; }
+.archetype-scattered_canvas .safe-zone { /* same 12×12 grid — scattered effect via grid_area placement */ }
+.archetype-data_dashboard .safe-zone { /* same 12×12 grid — dashboard tiles via grid_area placement */ }
+.archetype-shaped_editorial .safe-zone { align-content: center; }
+
+/* Continuous canvas archetype overrides (page-section inherits archetype class) */
+.continuous-canvas .page-section.archetype-cover_hero .safe-zone { align-content: start; inset: 12% 14%; }
+.continuous-canvas .page-section.archetype-cover_hero .hero-type { font-size: clamp(42px, 8vw, 72px); line-height: 1.15; }
+.continuous-canvas .page-section.archetype-cover_hero .hero-sub { font-size: clamp(22px, 4vw, 32px); line-height: 1.3; opacity: 0.85; }
+.continuous-canvas .page-section.archetype-cover_hero .floating-meta { font-size: clamp(16px, 2.5vw, 22px); }
+.continuous-canvas .page-section.archetype-editorial_flow .safe-zone { align-content: center; }
+.continuous-canvas .page-section.archetype-shaped_editorial .safe-zone { align-content: center; inset: 5% 6%; }
+
+/* --- Components --- */
+.hero-type {
+  font-size: clamp(48px, 10vw, 110px);
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  position: relative;
+  z-index: 10;
+}
+.hero-type.weight-black { font-weight: 900; }
+.hero-type.weight-thin { font-weight: 100; letter-spacing: 0.05em; font-family: var(--font-serif), sans-serif; }
+.hero-sub {
+  margin: 8px 0 0 0;
+  font-size: var(--text-scale-2);
+  line-height: 1.3;
+  opacity: 0.8;
+}
+/* Hero container needs vertical stacking */
+.grid-item:has(.hero-type) {
+  flex-direction: column;
+  justify-content: center;
+}
+.hero-type, .hero-sub {
+  width: 100%;
+}
+.hero-type {
+  color: var(--c-text);
+}
+
+.glass-canvas {
+  background: var(--c-surface);
+  border: 1px solid rgba(128, 128, 128, 0.08);
+  border-radius: 2px;
+  padding: 36px;
+  font-size: 16px;
+  line-height: 1.6;
+  z-index: 5;
+  position: relative;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.floating-meta {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-family: var(--font-mono), sans-serif;
+  letter-spacing: 0.1em;
+  color: var(--c-muted);
+  opacity: 0.6;
+  z-index: 20;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Positioned via grid_area in .grid-item wrapper — no absolute needed */
+}
+/* Legacy position helpers (kept for backwards compat with old blueprints) */
+.pos-top-left { align-self: start; justify-self: start; }
+.pos-top-right { align-self: start; justify-self: end; text-align: right; }
+.pos-bottom-left { align-self: end; justify-self: start; }
+.pos-bottom-right { align-self: end; justify-self: end; text-align: right; }
+
+.stat-block { display: flex; flex-direction: column; margin-bottom: 24px; }
+.stat-num { font-size: clamp(32px, 5vw, 56px); font-weight: 900; line-height: 0.9; color: var(--c-text); }
+.stat-unit { font-size: clamp(14px, 2vw, 20px); font-weight: 300; color: var(--c-muted); margin-left: 4px; display: inline;}
+.stat-label { font-size: 12px; letter-spacing: 0.15em; color: var(--c-accent); margin-top: 8px; text-transform: uppercase; }
+
+.hairline { border: none; border-top: 0.5px solid var(--c-muted); opacity: 0.3; margin: 8px 0; width: 100%; }
+.hairline.style-accent { border-top-color: var(--c-accent); width: 30%; margin-left: 0; opacity: 0.8;}
+
+.page-ghost {
+  position: absolute; bottom: -5%; right: 5%;
+  font-size: 240px; font-weight: 900; color: var(--c-mid);
+  opacity: 0.05; pointer-events: none; z-index: 0;
+}
+
+.bg-layer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.bg-layer svg { width: 100%; height: 100%; }
+
+/* --- Shaped_Canvas (Semantic Shape-Wrapping) --- */
+.shaped-canvas {
+  position: relative;
+  padding: 24px;
+  font-size: 16px;
+  line-height: 1.7;
+  z-index: 5;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.shape-float {
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+.shape-circle   { shape-outside: circle(45% at 50% 50%);   width: 40%; height: 90%; }
+.shape-wave     { shape-outside: polygon(0 0, 80% 0, 60% 25%, 80% 50%, 60% 75%, 80% 100%, 0 100%); width: 45%; height: 100%; }
+.shape-diagonal_slash { shape-outside: polygon(0 0, 100% 0, 0 100%); width: 50%; height: 100%; }
+.shape-diamond  { shape-outside: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); width: 45%; height: 90%; }
+.shape-wedge_right { shape-outside: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%); width: 50%; height: 100%; }
+
+/* --- Archetype: shaped_editorial --- */
+.archetype-shaped_editorial .safe-zone {
+  inset: 5% 6%;
+  /* Inherits 12×12 grid from .safe-zone */
+  align-content: center;
+}
+
+/* ═══ Tufte Marginalia System ═══ */
+/* 30% sidenote rail for report/long-form archetypes */
+.archetype-tufte_report .safe-zone {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
+  align-content: start;
+}
+.archetype-tufte_report .main-column {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+  gap: inherit;
+}
+.archetype-tufte_report .side-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 8px;
+}
+.sidenote {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-muted);
+  border-left: 2px solid var(--c-accent);
+  padding-left: 12px;
+  opacity: 0.85;
+}
+.sidenote .sidenote-label {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-accent);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ═══ Delta Widget — Data-to-Ink Ratio Component ═══ */
+.delta-widget {
+  text-align: center;
+  padding: 16px 12px;
+}
+.delta-widget .delta-metric {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-muted);
+  margin-bottom: 4px;
+}
+.delta-widget .delta-value {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--c-text);
+  line-height: 1.1;
+}
+.delta-widget .delta-change {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+.delta-widget .delta-label {
+  font-size: 12px;
+  color: var(--c-muted);
+  margin-top: 8px;
+}
+
+/* ═══ Polymorphic Process_List — Container Query Adaptive ═══ */
+.process-list-container {
+  container-type: inline-size;
+  width: 100%;
+  min-height: 100%;
+}
+/* Wide: horizontal timeline */
+.process-list {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+}
+.process-list .process-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 12px 4px;
+}
+.process-step .step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--c-accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.process-step .step-title { font-weight: 700; font-size: 13px; color: var(--c-text); }
+.process-step .step-desc { font-size: 12px; color: var(--c-muted); margin-top: 4px; line-height: 1.4; }
+/* Connector line between horizontal steps */
+.process-step:not(:last-child)::after {
+  content: ''; position: absolute; top: 28px; right: -6px;
+  width: 12px; height: 2px; background: var(--c-accent); opacity: 0.5;
+}
+/* Narrow: vertical numbered list */
+@container (max-width: 360px) {
+  .process-list {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .process-list .process-step {
+    flex-direction: row;
+    text-align: left;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 4px 0;
+  }
+  .process-step .step-num { margin-bottom: 0; }
+  .process-step:not(:last-child)::after { display: none; }
+}
+
+        :root { --canvas-w: 720px; --canvas-h: 960px; }
+@page { size: 720px 960px; margin: 0; }
+html, body { width: 720px; min-height: 960px; }
+@media screen { body { scale: min(1, calc(100vw / 720), calc(100vh / 960)); } }
+
+    </style>
+</head>
+<body>
+
+<div class="continuous-canvas" style="height: 7680px; background: var(--c-bg);">
+  <div class="bg-layer-full"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 7680" width="720" height="7680">
+  <defs>
+    <linearGradient id="fg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c74b60" stop-opacity="0.05"/>
+      <stop offset="50%" stop-color="#c74b60" stop-opacity="0.075"/>
+      <stop offset="100%" stop-color="#c74b60" stop-opacity="0.025"/>
+    </linearGradient>
+  </defs>
+  <path d="M440,0 C159,187 583,239 86,512 C580,721 245,781 230,1024 C689,1160 67,1281 201,1536 C610,1726 581,1920 496,2048 C386,2312 273,2396 462,2560 C597,2753 620,2913 586,3072 C507,3150 164,3368 122,3584 C57,3700 73,3878 315,4096 C458,4238 267,4376 89,4608 C192,4864 467,4968 198,5120 C123,5335 118,5434 363,5632 C712,5829 401,6007 87,6144 C607,6368 165,6388 187,6656 C227,6779 152,7083 446,7168 C631,7300 472,7485 386,7680" fill="none" stroke="url(#fg)" stroke-width="106" stroke-linecap="round" opacity="0.050"/>
+  <path d="M336,0 C304,82 275,437 225,512 C381,775 620,752 214,1024 C519,1229 387,1315 395,1536 C461,1627 313,1865 223,2048 C687,2292 190,2386 409,2560 C129,2811 627,2858 589,3072 C460,3263 110,3462 302,3584 C388,3809 382,3822 198,4096 C233,4169 669,4510 647,4608 C599,4738 42,5022 365,5120 C682,5206 350,5372 124,5632 C548,5854 92,5965 99,6144 C396,6266 628,6467 135,6656 C152,6833 526,6934 433,7168 C224,7436 468,7494 528,7680" fill="none" stroke="url(#fg)" stroke-width="86" stroke-linecap="round" opacity="0.060"/>
+  <path d="M142,0 C674,183 340,395 201,512 C581,619 70,836 267,1024 C305,1186 525,1397 411,1536 C709,1625 290,1842 205,2048 C620,2167 137,2376 199,2560 C304,2685 180,2983 113,3072 C319,3313 396,3320 436,3584 C719,3820 698,4007 204,4096 C611,4198 350,4377 594,4608 C289,4689 273,5043 567,5120 C191,5346 328,5443 113,5632 C689,5900 400,6014 209,6144 C111,6272 697,6498 457,6656 C390,6875 41,7011 195,7168 C362,7408 113,7598 148,7680" fill="none" stroke="url(#fg)" stroke-width="64" stroke-linecap="round" opacity="0.070"/>
+  <path d="M179,0 C285,203 216,301 415,512 C541,595 330,950 461,1024 C717,1108 153,1315 207,1536 C672,1781 633,1848 141,2048 C114,2284 507,2408 585,2560 C711,2760 6,2961 214,3072 C216,3274 676,3337 414,3584 C83,3674 398,3876 429,4096 C435,4308 147,4461 313,4608 C190,4775 652,5015 408,5120 C66,5274 199,5359 373,5632 C555,5828 189,6018 610,6144 C397,6298 7,6397 190,6656 C636,6906 393,7061 485,7168 C419,7267 92,7468 209,7680" fill="none" stroke="url(#fg)" stroke-width="105" stroke-linecap="round" opacity="0.080"/>
+</svg></div>
+
+  <div class="page-section archetype-cover_hero" style="top: 0px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px;">
+      <div class="grid-item" style="grid-area: 1 / 1 / 4 / 13; align-items: start; justify-content: start;">
+<div class="floating-meta pos-top-left"><span>USAII GLOBAL AI HACKATHON 2026</span><span>COMMUNITY TRACK</span></div>
+</div>
+      <div class="page-ghost">01</div>
+      <div class="grid-item" style="grid-area: 4 / 1 / 7 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-black" style="font-size: var(--text-scale-6)">CLEARPATH<br>AI</h1>
+</div>
+      <div class="grid-item" style="grid-area: 8 / 1 / 10 / 13; align-items: start; justify-content: start;">
+<hr class="hairline style-accent">
+</div>
+      <div class="grid-item" style="grid-area: 10 / 1 / 13 / 13; align-items: start; justify-content: start;">
+<div class="floating-meta pos-bottom-right"><span>WE DON'T JUST FIND HELP.</span><span>WE SHOW YOU WHY.</span></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-editorial_flow" style="top: 960px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 10% 12%;">
+      <div class="page-ghost">02</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 4 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-4)">THE PROBLEM</h1>
+</div>
+      <div class="grid-item" style="grid-area: 4 / 1 / 11 / 13; align-items: stretch; justify-content: start;">
+<div class="glass-canvas" style="width:100%; min-height:100%; box-sizing:border-box;font-variation-settings: 'wght' 780;"><p style="margin:0 0 12px 0;line-height:1.7"><strong>When someone needs help, a confident wrong answer is more dangerous than no answer at&nbsp;all.</strong></p>
+<p style="margin:0 0 12px 0;line-height:1.7">Someone types 'I can't pay rent.' A search engine gives rental assistance programs. An AI confidently recommends a 3-month waitlist. But what they actually needed was legal aid for an emergency eviction defense — help available within 24&nbsp;hours.</p>
+<p style="margin:0 0 12px 0;line-height:1.7">The confident match just cost them their&nbsp;home.</p></div>
+</div>
+      <div class="grid-item" style="grid-area: 11 / 1 / 13 / 13; align-items: start; justify-content: start;">
+<div class="stat-block">
+            <div><span class="stat-num">73</span><span class="stat-unit">%</span></div>
+            <span class="stat-label">OF COMMUNITY RESOURCE SEARCHES LEAD TO DEAD ENDS</span>
+        </div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-editorial_flow" style="top: 1920px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 10% 12%;">
+      <div class="page-ghost">03</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 5 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-4)">THE INSIGHT</h1>
+</div>
+      <div class="grid-item" style="grid-area: 5 / 1 / 13 / 13; align-items: stretch; justify-content: start;">
+<div class="glass-canvas" style="width:100%; min-height:100%; box-sizing:border-box;font-variation-settings: 'wght' 480;"><p style="margin:0 0 12px 0;line-height:1.7">Most AI systems hide their uncertainty. In community resource matching, that is&nbsp;dangerous.</p>
+<p style="margin:0 0 12px 0;line-height:1.7"><strong>What if the AI showed you what it knows, what it doesn't, and&nbsp;why?</strong></p>
+<p style="margin:0 0 12px 0;line-height:1.7">When someone is looking for help, an honest uncertain answer can save a life. A confident wrong answer can destroy one. Uncertainty is not a bug — it is the safety&nbsp;feature.</p></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-editorial_flow" style="top: 2880px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 8% 10%;">
+      <div class="page-ghost">04</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 4 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-4)">THE SOLUTION</h1>
+</div>
+      <div class="grid-item" style="grid-area: 4 / 1 / 13 / 13; align-items: stretch; justify-content: start;">
+<div class="glass-canvas" style="width:100%; min-height:100%; box-sizing:border-box;font-variation-settings: 'wght' 540;"><h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">ClearPath AI</h3>
+<p style="margin:0 0 12px 0;line-height:1.7">A community resource navigator that shows calibrated confidence instead of hiding&nbsp;uncertainty.</p>
+<p style="margin:0 0 12px 0;line-height:1.7"><strong>Six layers of intelligent&nbsp;transparency:</strong></p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>1.</strong> <strong>Free-text input</strong> — Describe your situation in your own words</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>2.</strong> <strong>Crisis safety net</strong> — Hardcoded keyword detection, AI cannot override</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>3.</strong> <strong>Multi-label classification</strong> — Multiple matches with confidence scores, not one answer</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>4.</strong> <strong>Clarification questions</strong> — When confidence is low, ask — don't guess harder</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>5.</strong> <strong>Transparent reasoning</strong> — Every recommendation shows why, what else, and how confident</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>6.</strong> <strong>Human escalation</strong> — When AI is unsure, it backs off and connects to a real person</p></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-split_vertical" style="top: 3840px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 10% 12%;">
+      <div class="page-ghost">05</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 13 / 7; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-3)">HOW IT WORKS</h1>
+</div>
+      <div class="grid-item" style="grid-area: 1 / 7 / 13 / 13; align-items: stretch; justify-content: start;">
+<div class="process-list-container"><ul class="process-list"><li class="process-step"><span class="step-num">1</span><div><div class="step-title">User describes need</div><div class="step-desc">Free-text: 'I can't pay rent anymore'</div></div></li>
+<li class="process-step"><span class="step-num">2</span><div><div class="step-title">Crisis check</div><div class="step-desc">Keyword scan triggers 211 hotline display</div></div></li>
+<li class="process-step"><span class="step-num">3</span><div><div class="step-title">NLP classification</div><div class="step-desc">Zero-shot multi-label: Legal Aid 78%, Emergency Funds 52%, Housing 34%</div></div></li>
+<li class="process-step"><span class="step-num">4</span><div><div class="step-title">Clarification</div><div class="step-desc">'Have you received an eviction notice?' — Yes → Legal Aid 94%</div></div></li>
+<li class="process-step"><span class="step-num">5</span><div><div class="step-title">Transparent output</div><div class="step-desc">3 resources per category with reasoning and confidence</div></div></li>
+<li class="process-step"><span class="step-num">6</span><div><div class="step-title">Human escalation</div><div class="step-desc">Low confidence → connect to navigator at 211</div></div></li>
+</ul></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-data_dashboard" style="top: 4800px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 10% 12%;">
+      <div class="page-ghost">06</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 7 / 7; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-3)">TECH STACK</h1>
+</div>
+      <div class="grid-item" style="grid-area: 1 / 7 / 7 / 13; align-items: start; justify-content: start;">
+<div class="stat-block">
+            <div><span class="stat-num">100</span><span class="stat-unit">%</span></div>
+            <span class="stat-label">FREE / OPEN SOURCE TOOLS</span>
+        </div>
+</div>
+      <div class="grid-item" style="grid-area: 7 / 1 / 13 / 7; align-items: stretch; justify-content: start;">
+<div class="glass-canvas" style="width:100%; min-height:100%; box-sizing:border-box;font-variation-settings: 'wght' 420;"><h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">AI Pipeline</h3>
+<ul style="margin:8px 0;padding-left:20px;list-style-type:disc">
+<li style="margin:4px 0;line-height:1.6"><strong>Hugging Face Transformers</strong> — Zero-shot NLP classification</li>
+<li style="margin:4px 0;line-height:1.6"><strong>Temperature scaling</strong> — Confidence calibration</li>
+<li style="margin:4px 0;line-height:1.6"><strong>Active learning</strong> — Clarification question logic</li>
+</ul>
+<h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">Web Application</h3>
+<ul style="margin:8px 0;padding-left:20px;list-style-type:disc">
+<li style="margin:4px 0;line-height:1.6"><strong>React + TypeScript</strong> — Frontend interface</li>
+<li style="margin:4px 0;line-height:1.6"><strong>Node.js + Express</strong> — Backend API</li>
+<li style="margin:4px 0;line-height:1.6"><strong>MongoDB</strong> — Resource database</li>
+</ul>
+<h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">Safety & Deploy</h3>
+<ul style="margin:8px 0;padding-left:20px;list-style-type:disc">
+<li style="margin:4px 0;line-height:1.6"><strong>Python keyword engine</strong> — Crisis detection layer</li>
+<li style="margin:4px 0;line-height:1.6"><strong>Vercel + AWS</strong> — Free-tier hosting</li>
+<li style="margin:4px 0;line-height:1.6"><strong>No paid APIs required</strong></li>
+</ul></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-editorial_flow" style="top: 5760px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px; inset: 8% 10%;">
+      <div class="page-ghost">07</div>
+      <div class="grid-item" style="grid-area: 1 / 1 / 4 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-thin" style="font-size: var(--text-scale-4)">RESPONSIBLE AI</h1>
+</div>
+      <div class="grid-item" style="grid-area: 4 / 1 / 13 / 13; align-items: stretch; justify-content: start;">
+<div class="glass-canvas" style="width:100%; min-height:100%; box-sizing:border-box; font-size: 15px;font-variation-settings: 'wght' 600;"><h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">Responsibility is the architecture, not a disclaimer.</h3>
+<p style="margin:0 0 12px 0;line-height:1.7"><strong>Three built-in safety&nbsp;mechanisms:</strong></p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>1.</strong> <strong>Crisis safety net</strong> — Hardcoded keyword detection that the AI layer CANNOT override. Crisis resources appear regardless of classification results.</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>2.</strong> <strong>Forced transparency</strong> — Confidence scores are always visible. The system never presents a single answer as certain when it isn't.</p>
+<p style="margin:4px 0 4px 20px;line-height:1.6"><strong>3.</strong> <strong>Automatic human escalation</strong> — When no category exceeds 70% confidence, the system recommends speaking with a trained navigator instead of guessing harder.</p>
+<h3 style="font-size:16px;font-weight:700;margin:20px 0 8px 0;color:var(--c-accent);text-transform:uppercase;letter-spacing:0.05em;">Known limitations</h3>
+<ul style="margin:8px 0;padding-left:20px;list-style-type:disc">
+<li style="margin:4px 0;line-height:1.6">Cannot determine eligibility for programs</li>
+<li style="margin:4px 0;line-height:1.6">Cannot replace professional social workers</li>
+<li style="margin:4px 0;line-height:1.6">May misclassify complex multi-need situations</li>
+<li style="margin:4px 0;line-height:1.6">Requires curated, locally accurate resource data</li>
+</ul></div>
+</div>
+    </div>
+  </div>
+
+  <div class="page-section archetype-cover_hero" style="top: 6720px; height: 960px;">
+    <div class="safe-zone" style="gap: 16px;">
+      <div class="grid-item" style="grid-area: 1 / 1 / 4 / 13; align-items: start; justify-content: start;">
+<div class="floating-meta pos-top-left"><span>USAII GLOBAL AI HACKATHON 2026</span><span>COMMUNITY TRACK</span></div>
+</div>
+      <div class="grid-item" style="grid-area: 4 / 1 / 7 / 13; align-items: start; justify-content: start;">
+<h1 class="hero-type weight-black" style="font-size: var(--text-scale-5)">WHEN IT<br>MATTERS MOST,<br>HONESTY IS<br>THE SAFEST<br>ANSWER.</h1>
+</div>
+      <div class="grid-item" style="grid-area: 8 / 1 / 10 / 13; align-items: start; justify-content: start;">
+<hr class="hairline style-accent">
+</div>
+      <div class="grid-item" style="grid-area: 10 / 1 / 13 / 13; align-items: start; justify-content: start;">
+<div class="floating-meta pos-bottom-right"><span>CLEARPATH AI</span><span>BUILT BY AMINE & HARSHIT</span></div>
+</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

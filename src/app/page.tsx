@@ -4,104 +4,48 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion'
 import {
-  Layers,
-  Shield,
-  HelpCircle,
-  Eye,
-  Navigation,
-  MessageCircle,
   ArrowRight,
-  Check,
-  ShieldCheck,
-  MapPin,
-  X,
+  Brain,
+  Network,
   Sparkles,
+  Check,
   ChevronDown,
-  ChevronUp,
-  Star,
-  Database,
-  Cpu,
-  UserCheck,
-  Code2,
-  Fingerprint,
-  TrendingUp,
-  HeartHandshake,
   Zap,
+  Shield,
   Users,
   BarChart3,
-  Baby,
-  GraduationCap,
-  HeartPulse,
-  Scale,
-  Globe2,
-  Lock,
-  Server,
-  Wifi,
-  Award,
-  Trophy,
-  Mail,
-  Phone,
+  Database,
+  MessageSquare,
+  Search,
+  Sun,
   BookOpen,
-  AlertTriangle,
-  Activity,
-  Clock,
-  Send,
-  Bot,
-  User,
-  Building2,
-  HandHeart,
-  Smile,
-  CircleDot,
-  ExternalLink,
+  Cloud,
+  Server,
+  GitBranch,
+  Link2,
+  Eye,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
-// ─── CONFIDENCE RING (simplified for landing) ────────────
-function ConfidenceRing({ value, size = 56, strokeWidth = 3.5 }: { value: number; size?: number; strokeWidth?: number }) {
-  const r = (size - strokeWidth * 2) / 2
-  const circ = 2 * Math.PI * r
-  const offset = circ * (1 - value / 100)
-  const color = value >= 80 ? '#10b981' : value >= 70 ? '#3b82f6' : value >= 50 ? '#f59e0b' : '#f97316'
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
-
+// ─── FadeIn on scroll ──────────────────────────────────────
+function FadeIn({ children, className = '', delay = 0, duration = 0.5 }: { children: React.ReactNode; className?: string; delay?: number; duration?: number }) {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-60px' })
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(0,0,0,0.04)" strokeWidth={strokeWidth} />
-        <circle
-          cx={size / 2} cy={size / 2} r={r} fill="none"
-          stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
-          strokeDasharray={circ}
-          strokeDashoffset={mounted ? offset : circ}
-          style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1)' }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[13px] font-bold tabular-nums tracking-tight leading-none" style={{ color }}>{value}</span>
-        <span className="text-[8px] font-semibold uppercase tracking-wider mt-0.5" style={{ color, opacity: 0.6 }}>
-          {value >= 80 ? 'High' : value >= 70 ? 'Good' : value >= 50 ? 'Moderate' : 'Low'}
-        </span>
-      </div>
-    </div>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration, delay, ease: [0.25, 0.4, 0.25, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   )
 }
 
-// ─── SECTION WRAPPER ─────────────────────────────────────
-function Section({ id, children, className = '' }: { id?: string; children: React.ReactNode; className?: string }) {
-  return (
-    <section id={id} className={`py-20 md:py-28 ${className}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
-    </section>
-  )
-}
-
-// ─── ANIMATED COUNTER ────────────────────────────────────
+// ─── Animated Counter ──────────────────────────────────────
 function AnimatedCounter({ target, suffix = '', prefix = '', duration = 2 }: { target: number; suffix?: string; prefix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-50px' })
@@ -115,10 +59,7 @@ function AnimatedCounter({ target, suffix = '', prefix = '', duration = 2 }: { t
 
   useEffect(() => {
     if (isInView) {
-      const controls = animate(motionVal, target, {
-        duration,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      })
+      const controls = animate(motionVal, target, { duration, ease: [0.25, 0.46, 0.45, 0.94] })
       return controls.stop
     }
   }, [isInView, motionVal, target, duration])
@@ -128,697 +69,288 @@ function AnimatedCounter({ target, suffix = '', prefix = '', duration = 2 }: { t
     return unsubscribe
   }, [rounded])
 
+  return <span ref={ref}>{prefix}{display}{suffix}</span>
+}
+
+// ─── Knowledge Graph SVG ──────────────────────────────────────
+function KnowledgeGraphSVG() {
   return (
-    <span ref={ref}>
-      {prefix}{display}{suffix}
-    </span>
+    <svg viewBox="0 0 400 300" className="w-full h-auto" fill="none">
+      {/* Edges */}
+      <line x1="80" y1="80" x2="200" y2="150" stroke="#D1FAE5" strokeWidth="2" />
+      <line x1="200" y1="150" x2="320" y2="90" stroke="#D1FAE5" strokeWidth="2" />
+      <line x1="200" y1="150" x2="130" y2="240" stroke="#D1FAE5" strokeWidth="2" />
+      <line x1="200" y1="150" x2="290" y2="230" stroke="#D1FAE5" strokeWidth="2" />
+      <line x1="80" y1="80" x2="130" y2="240" stroke="#A7F3D0" strokeWidth="1.5" />
+      <line x1="320" y1="90" x2="290" y2="230" stroke="#A7F3D0" strokeWidth="1.5" />
+      <line x1="80" y1="80" x2="50" y2="170" stroke="#D1FAE5" strokeWidth="1.5" />
+      <line x1="320" y1="90" x2="370" y2="170" stroke="#D1FAE5" strokeWidth="1.5" />
+      {/* Animated pulse dots on edges */}
+      <circle r="3" fill="#10B981">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M80,80 L200,150" />
+      </circle>
+      <circle r="3" fill="#10B981">
+        <animateMotion dur="4s" repeatCount="indefinite" path="M200,150 L320,90" />
+      </circle>
+      <circle r="3" fill="#0D9488">
+        <animateMotion dur="3.5s" repeatCount="indefinite" path="M200,150 L290,230" />
+      </circle>
+      {/* Nodes */}
+      <circle cx="80" cy="80" r="18" fill="#10B981" opacity="0.9" />
+      <circle cx="200" cy="150" r="24" fill="#059669" opacity="0.95" />
+      <circle cx="320" cy="90" r="15" fill="#34D399" opacity="0.8" />
+      <circle cx="130" cy="240" r="16" fill="#0D9488" opacity="0.85" />
+      <circle cx="290" cy="230" r="13" fill="#14B8A6" opacity="0.75" />
+      <circle cx="50" cy="170" r="10" fill="#6EE7B7" opacity="0.7" />
+      <circle cx="370" cy="170" r="10" fill="#6EE7B7" opacity="0.7" />
+      {/* Node labels */}
+      <text x="80" y="84" textAnchor="middle" fill="white" fontSize="9" fontWeight="600">API</text>
+      <text x="200" y="154" textAnchor="middle" fill="white" fontSize="10" fontWeight="700">Core</text>
+      <text x="320" y="94" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">Auth</text>
+      <text x="130" y="244" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">Data</text>
+      <text x="290" y="234" textAnchor="middle" fill="white" fontSize="7" fontWeight="600">AI</text>
+    </svg>
   )
 }
 
-// ─── FAQ ITEM ────────────────────────────────────────────
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [isOpen, setIsOpen] = useState(false)
-
+// ─── Mini Feature SVG Previews ──────────────────────────────
+function GraphMiniSVG() {
   return (
-    <div className="glass-card rounded-2xl shadow-premium overflow-hidden transition-shadow duration-300 hover:shadow-premium-lg">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-6 text-left gap-4"
-      >
-        <span className="text-[15px] font-semibold text-gray-900 tracking-tight">{question}</span>
-        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200 ${isOpen ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-400'}`}>
-          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </div>
-      </button>
-      <motion.div
-        initial={false}
-        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="overflow-hidden"
-      >
-        <div className="px-6 pb-6 pt-0">
-          <p className="text-[14px] text-gray-500 leading-relaxed">{answer}</p>
-        </div>
-      </motion.div>
-    </div>
+    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
+      <line x1="30" y1="25" x2="60" y2="45" stroke="#A7F3D0" strokeWidth="1.5" />
+      <line x1="60" y1="45" x2="95" y2="30" stroke="#A7F3D0" strokeWidth="1.5" />
+      <line x1="60" y1="45" x2="45" y2="65" stroke="#A7F3D0" strokeWidth="1.5" />
+      <line x1="60" y1="45" x2="90" y2="60" stroke="#A7F3D0" strokeWidth="1.5" />
+      <circle cx="30" cy="25" r="7" fill="#10B981" opacity="0.9" />
+      <circle cx="60" cy="45" r="9" fill="#059669" />
+      <circle cx="95" cy="30" r="6" fill="#34D399" opacity="0.8" />
+      <circle cx="45" cy="65" r="6" fill="#0D9488" opacity="0.8" />
+      <circle cx="90" cy="60" r="5" fill="#14B8A6" opacity="0.7" />
+    </svg>
   )
 }
 
-// ─── LAYER DATA ──────────────────────────────────────────
-const layers = [
-  {
-    step: 1,
-    title: 'Free Text Input',
-    desc: 'You describe your situation in your own words. No categories, no forms.',
-    icon: MessageCircle,
-    color: 'blue',
-    colorHex: '#3b82f6',
-  },
-  {
-    step: 2,
-    title: 'Hardcoded Crisis Detection',
-    desc: 'Before any AI, we check for crisis keywords. If detected, AI is bypassed entirely.',
-    icon: Shield,
-    color: 'red',
-    colorHex: '#ef4444',
-  },
-  {
-    step: 3,
-    title: 'Multi-Label Classification',
-    desc: 'BART-large-MNLI classifies against 8 categories simultaneously. No hallucinated resources.',
-    icon: Layers,
-    color: 'indigo',
-    colorHex: '#6366f1',
-  },
-  {
-    step: 4,
-    title: 'Confidence-Gated Clarification',
-    desc: 'Below 70%? We ask a question instead of guessing. Active learning.',
-    icon: HelpCircle,
-    color: 'amber',
-    colorHex: '#f59e0b',
-  },
-  {
-    step: 5,
-    title: 'Transparent Display',
-    desc: 'Every result: WHY, WHAT ELSE, HOW CONFIDENT. You see the reasoning.',
-    icon: Eye,
-    color: 'emerald',
-    colorHex: '#10b981',
-  },
-  {
-    step: 6,
-    title: 'Human Escalation',
-    desc: '"Talk to a Navigator" is always one click away. 211.org, real people.',
-    icon: Navigation,
-    color: 'blue',
-    colorHex: '#3b82f6',
-  },
-]
-
-// ─── 6-LAYER DEEP DIVE DATA ──────────────────────────────
-const layerDeepDives = [
-  {
-    layer: 1,
-    title: 'Confidence Score',
-    subtitle: 'How certain is the AI?',
-    icon: TrendingUp,
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    function: 'Every result is scored from 0-100% using calibrated probabilities from BART-large-MNLI. Unlike raw model outputs, our scores are validated against held-out data to reflect true certainty.',
-    dataFlow: 'User input → BART-large-MNLI softmax → Calibrated probability → Displayed as confidence ring',
-    example: '"I need help paying my electricity bill" → 91% confidence → Energy Assistance category. The model is highly certain because the language directly maps to a well-represented category in the 211 database.',
-  },
-  {
-    layer: 2,
-    title: 'Source Quality',
-    subtitle: 'Where does the data come from?',
-    icon: Database,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    function: 'Every resource in our database is sourced from verified partners — primarily the United Way 211 system. We display the last-verified date and source for every recommendation.',
-    dataFlow: '211.org database → Monthly verification → Source badge + last-verified date → Displayed on every resource card',
-    example: 'Section 8 Emergency Transfer — Source: United Way 211 — Last verified: May 2026 — Verified badge shown. Users can confirm the resource is current before making contact.',
-  },
-  {
-    layer: 3,
-    title: 'Bias Check',
-    subtitle: 'Is the classification fair?',
-    icon: Scale,
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-    function: 'We use zero-shot classification (BART-large-MNLI) without fine-tuning, which minimizes training data bias. Our 8 categories are broad and inclusive, designed with community navigator input.',
-    dataFlow: 'Raw classification → Category bias audit → Multi-label threshold tuning → Result displayed with alternatives',
-    example: '"My grandma needs meals delivered" triggers both Food Assistance and Senior Services — not forced into a single bucket. Multi-label classification ensures intersectional needs are captured.',
-  },
-  {
-    layer: 4,
-    title: 'Complexity Level',
-    subtitle: 'How many needs are involved?',
-    icon: Layers,
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    function: 'Our multi-label classifier detects when a user has multiple simultaneous needs. Complex cases are flagged for additional clarification or human escalation rather than oversimplified.',
-    dataFlow: 'Input text → Multi-label scoring → Threshold check → Single vs. multi-need flag → Clarification if needed',
-    example: '"I lost my job, can\'t pay rent, and my kids need food" → 3 needs detected (Employment, Housing, Food) → All three results displayed with individual confidence scores.',
-  },
-  {
-    layer: 5,
-    title: 'Alternative Views',
-    subtitle: 'What else could this be?',
-    icon: Eye,
-    colorHex: '#06b6d4',
-    bgColor: 'rgba(6,182,212,0.06)',
-    function: 'Every primary classification also shows the top 3 alternative categories with their scores. Users can see what the AI considered and why it chose the primary category.',
-    dataFlow: 'Full probability distribution → Top 3 alternatives extracted → Displayed as "What Else" section → User can explore alternatives',
-    example: 'Primary: Housing Assistance (87%) → Alternatives: Food Assistance (62%), Emergency Shelter (54%). The "What Else" section ensures users never miss a relevant resource.',
-  },
-  {
-    layer: 6,
-    title: 'Verification Status',
-    subtitle: 'Has a human confirmed this?',
-    icon: ShieldCheck,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    function: 'Every resource includes its verification status — whether it has been confirmed by a human navigator, when it was last checked, and whether the user should call to confirm availability.',
-    dataFlow: 'Resource lookup → Last verified date → Navigator confirmation status → "Call to confirm" notice if >30 days since verification',
-    example: 'Food Bank Locator — Verified by 211 navigator on June 1, 2026 — "Call ahead to confirm hours" notice displayed. Transparency about what we know and what we don\'t.',
-  },
-]
-
-function getLayerBg(color: string) {
-  const map: Record<string, string> = {
-    blue: 'rgba(59,130,246,0.06)',
-    red: 'rgba(239,68,68,0.06)',
-    indigo: 'rgba(99,102,241,0.06)',
-    amber: 'rgba(245,158,11,0.06)',
-    emerald: 'rgba(16,185,129,0.06)',
-  }
-  return map[color] || map.blue
+function DigestMiniSVG() {
+  return (
+    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
+      <rect x="10" y="10" width="100" height="60" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+      <rect x="18" y="20" width="50" height="4" rx="2" fill="#059669" opacity="0.6" />
+      <rect x="18" y="30" width="70" height="3" rx="1.5" fill="#D1FAE5" />
+      <rect x="18" y="38" width="55" height="3" rx="1.5" fill="#D1FAE5" />
+      <rect x="18" y="46" width="65" height="3" rx="1.5" fill="#D1FAE5" />
+      <circle cx="95" cy="25" r="8" fill="#10B981" opacity="0.3" />
+      <Sun x="89" y="19" width="12" height="12" fill="#059669" opacity="0.7" />
+    </svg>
+  )
 }
 
-// ─── COMPARISON DATA ─────────────────────────────────────
-const comparisons = [
-  { negative: 'Hallucinates resources that don\'t exist', positive: 'Only verified resources from 211 database' },
-  { negative: 'Shows every answer with same confidence', positive: 'Calibrated confidence scores on every result' },
-  { negative: 'No crisis detection protocol', positive: 'Hardcoded crisis layer bypasses AI entirely' },
-  { negative: 'Can\'t connect you to a real person', positive: 'One-click escalation to 211 human navigators' },
-  { negative: 'Stores your conversations', positive: 'Guest mode needs no account; data stays yours' },
-  { negative: 'No way to verify source accuracy', positive: 'Every resource shows source and last-verified date' },
-  { negative: 'Single-label classification only', positive: 'Multi-label detection for complex situations' },
-  { negative: 'No accountability when wrong', positive: 'Confidence gating and human escalation at <70%' },
-]
+function ChatMiniSVG() {
+  return (
+    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
+      <rect x="8" y="8" width="60" height="22" rx="8" fill="#059669" opacity="0.15" />
+      <rect x="14" y="16" width="35" height="3" rx="1.5" fill="#059669" opacity="0.5" />
+      <rect x="52" y="38" width="60" height="28" rx="8" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+      <rect x="58" y="46" width="40" height="3" rx="1.5" fill="#A7F3D0" />
+      <rect x="58" y="53" width="30" height="3" rx="1.5" fill="#D1FAE5" />
+    </svg>
+  )
+}
 
-// ─── SCENARIO DATA ───────────────────────────────────────
-const scenarios = [
-  {
-    id: 'job',
-    title: 'Multi-Need Classification',
-    quote: "I lost my job and can't pay rent. My kids need food.",
-    icon: Layers,
-    color: 'blue',
-    colorHex: '#3b82f6',
-    confidence: 87,
-    label: 'Housing Assistance',
-  },
-  {
-    id: 'crisis',
-    title: 'Crisis Detection',
-    quote: "I can't take this anymore. I want it all to end.",
-    icon: Shield,
-    color: 'red',
-    colorHex: '#ef4444',
-    confidence: 100,
-    label: 'Crisis Line',
-  },
-  {
-    id: 'stress',
-    title: 'Low Confidence → Clarification',
-    quote: 'I need help with my situation',
-    icon: HelpCircle,
-    color: 'amber',
-    colorHex: '#f59e0b',
-    confidence: 43,
-    label: 'Clarification Needed',
-  },
-]
+function MemoryMiniSVG() {
+  return (
+    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
+      <rect x="15" y="10" width="90" height="60" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+      <rect x="22" y="18" width="30" height="35" rx="4" fill="#D1FAE5" />
+      <rect x="26" y="23" width="22" height="3" rx="1.5" fill="#059669" opacity="0.4" />
+      <rect x="26" y="30" width="18" height="2" rx="1" fill="#A7F3D0" />
+      <rect x="26" y="35" width="20" height="2" rx="1" fill="#A7F3D0" />
+      <rect x="26" y="40" width="16" height="2" rx="1" fill="#A7F3D0" />
+      <rect x="58" y="18" width="40" height="14" rx="4" fill="#D1FAE5" />
+      <rect x="62" y="23" width="25" height="3" rx="1.5" fill="#059669" opacity="0.4" />
+      <rect x="58" y="38" width="40" height="14" rx="4" fill="#D1FAE5" />
+      <rect x="62" y="43" width="20" height="3" rx="1.5" fill="#059669" opacity="0.4" />
+      <rect x="58" y="58" width="40" height="6" rx="3" fill="#10B981" opacity="0.2" />
+    </svg>
+  )
+}
 
-// ─── FAQ DATA ────────────────────────────────────────────
-const faqs = [
+// ═══════════════════════════════════════════════════════════════
+// FEATURE DATA
+// ═══════════════════════════════════════════════════════════════
+const features = [
   {
-    question: 'How does ClearPath AI differ from ChatGPT?',
-    answer: 'ChatGPT generates text that sounds plausible — including resources that may not exist. ClearPath AI uses a classification model (BART-large-MNLI) to match your needs against a verified database of real community resources. We don\'t generate answers; we classify them. Every resource we recommend actually exists and has been verified.',
+    icon: Network,
+    title: 'Knowledge Graph',
+    subtitle: 'See every connection',
+    desc: 'Visualize how every piece of knowledge connects. Dependencies, relationships, and impact — mapped instantly in an interactive graph that evolves with your team.',
+    color: '#059669',
+    bgColor: 'rgba(5,150,105,0.08)',
+    svgPreview: <GraphMiniSVG />,
   },
   {
-    question: 'Is my data stored?',
-    answer: 'No. ClearPath AI is designed with a zero-retention architecture. Your queries are processed in real-time and never stored on our servers. We don\'t track, log, or profile users. When you close the session, your data is gone — permanently.',
+    icon: Sun,
+    title: 'Morning Digest',
+    subtitle: 'Start every day with clarity',
+    desc: 'Wake up to a personalized briefing on what changed, what\'s relevant, and what needs your attention. Never miss a critical update again.',
+    color: '#0D9488',
+    bgColor: 'rgba(13,148,136,0.08)',
+    svgPreview: <DigestMiniSVG />,
   },
   {
-    question: 'How does crisis detection work?',
-    answer: 'Before any AI model runs, we check your input against a hardcoded list of crisis keywords and patterns. If a crisis is detected, the AI classification layer is bypassed entirely and you\'re immediately connected to the 988 Suicide & Crisis Lifeline. This isn\'t a soft filter — it\'s a hardwired safety net that always takes priority.',
-  },
-  {
-    question: 'What does "calibrated transparency" mean?',
-    answer: 'Every result from ClearPath AI includes a calibrated confidence score that tells you how certain the system is about its classification. Unlike black-box AI that presents all answers with equal authority, we show you exactly how confident we are — and when we\'re not confident enough, we ask for clarification instead of guessing.',
-  },
-  {
-    question: 'Is ClearPath AI free?',
-    answer: 'Yes. The core resource navigation service is and will remain free for individuals seeking help. We believe access to verified community resources should never be behind a paywall. Organizations and partners may access enhanced analytics and integration features through our enterprise tier.',
-  },
-  {
-    question: 'How accurate are the confidence scores?',
-    answer: 'Our confidence scores are calibrated using held-out validation data from the United Way 211 database, achieving 99.7% accuracy on crisis detection and 87%+ accuracy on multi-label classification. Scores reflect real model certainty — not inflated metrics — and are continuously validated by community navigators.',
-  },
-  {
-    question: 'What categories can ClearPath AI classify?',
-    answer: 'ClearPath AI classifies across 8 core categories: Housing Assistance, Food Assistance, Mental Health, Employment, Legal Aid, Healthcare, Crisis Support, and Senior Services. Our multi-label system means a single query can match multiple categories simultaneously — because real needs are rarely simple.',
-  },
-  {
-    question: 'Can I use ClearPath AI in a language other than English?',
-    answer: 'Our current demo supports English. We are actively working on Spanish and French support using multilingual NLI models. Our long-term roadmap includes Arabic, Mandarin, and Hindi — because community resources should be accessible to everyone, regardless of language.',
-  },
-  {
-    question: 'What happens when the AI isn\'t confident enough?',
-    answer: 'When confidence drops below 70%, ClearPath AI asks a clarifying question instead of guessing. Below 50%, we escalate to a human 211 navigator. We believe it\'s better to say "I\'m not sure" than to give someone wrong information when they\'re in crisis.',
-  },
-  {
-    question: 'How does ClearPath AI handle outdated resource information?',
-    answer: 'Every resource card includes a "Last verified" date. Resources older than 30 days display a "Call to confirm" notice. We work with 211.org partners to update our database monthly. We never hide the age of our data — if a resource might be outdated, we tell you upfront.',
-  },
-  {
-    question: 'Is ClearPath AI HIPAA compliant?',
-    answer: 'ClearPath AI is designed with a privacy-first architecture. Guest users can use the service without creating an account — no email, no profile, no PII required. For registered users, we store only the minimum data needed to provide the service (conversations, saved resources). We never sell or share personal data. While we don\'t store health data (and therefore don\'t require HIPAA compliance), our architecture prioritizes minimal data collection and user control.'
-  },
-  {
-    question: 'How can organizations integrate ClearPath AI?',
-    answer: 'Organizations can integrate ClearPath AI via our API or embed widget. Enterprise partners get access to analytics dashboards, custom category configuration, and priority support. Contact our team at team@clearpath-ai.org for partnership inquiries.',
-  },
-]
-
-// ─── TESTIMONIAL DATA ────────────────────────────────────
-const testimonials = [
-  {
-    name: 'Sarah M.',
-    role: 'Social Worker',
-    quote: 'ClearPath is the first AI tool I\'d actually recommend to clients. The confidence scores let me know which results to trust.',
-    initials: 'SM',
-    color: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.08)',
-    stars: 5,
-  },
-  {
-    name: 'Dr. James K.',
-    role: 'Community Health',
-    quote: 'Unlike ChatGPT, ClearPath doesn\'t hallucinate resources. That\'s not a feature — it\'s a requirement when lives are at stake.',
-    initials: 'JK',
-    color: '#10b981',
+    icon: MessageSquare,
+    title: 'AI Chat',
+    subtitle: 'Ask anything about your knowledge',
+    desc: 'Ask in natural language. Lore finds the answer from your team\'s collective memory — with sources and confidence scores.',
+    color: '#10B981',
     bgColor: 'rgba(16,185,129,0.08)',
-    stars: 5,
-  },
-  {
-    name: 'Maria L.',
-    role: '211 Navigator',
-    quote: 'The human escalation feature is brilliant. When AI isn\'t sure, it sends them to us — not to a dead end.',
-    initials: 'ML',
-    color: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.08)',
-    stars: 5,
-  },
-  {
-    name: 'David R.',
-    role: 'Veteran Affairs Counselor',
-    quote: 'Veterans often have complex, overlapping needs. ClearPath\'s multi-label classification captures that complexity better than any intake form I\'ve used.',
-    initials: 'DR',
-    color: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.08)',
-    stars: 5,
-  },
-  {
-    name: 'Priya S.',
-    role: 'Immigration Attorney',
-    quote: 'My clients are often in crisis and don\'t speak tech. ClearPath lets them describe their situation naturally — no jargon, no forms. The confidence scores help me prioritize which resources to verify first.',
-    initials: 'PS',
-    color: '#06b6d4',
-    bgColor: 'rgba(6,182,212,0.08)',
-    stars: 5,
-  },
-  {
-    name: 'Tanya W.',
-    role: 'School Counselor',
-    quote: 'I recommended ClearPath to a student who was too embarrassed to ask for help in person. They found a food bank and mental health support within minutes. The privacy-first approach made all the difference.',
-    initials: 'TW',
-    color: '#f97316',
-    bgColor: 'rgba(249,115,22,0.08)',
-    stars: 5,
-  },
-]
-
-// ─── PARTNER BADGES DATA ─────────────────────────────────
-const partnerBadges = [
-  {
-    label: 'Built on United Way 211 Data',
-    icon: Database,
-    color: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    borderColor: 'rgba(59,130,246,0.12)',
-  },
-  {
-    label: 'Powered by BART-large-MNLI',
-    icon: Cpu,
-    color: '#6366f1',
-    bgColor: 'rgba(99,102,241,0.06)',
-    borderColor: 'rgba(99,102,241,0.12)',
-  },
-  {
-    label: 'Verified by Community Navigators',
-    icon: UserCheck,
-    color: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    borderColor: 'rgba(16,185,129,0.12)',
-  },
-  {
-    label: 'Open Source Architecture',
-    icon: Code2,
-    color: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    borderColor: 'rgba(245,158,11,0.12)',
-  },
-]
-
-// ─── USE CASES DATA ──────────────────────────────────────
-const useCases = [
-  {
-    icon: Baby,
-    title: 'Parents',
-    subtitle: 'Seeking childcare resources',
-    quote: 'I\'m a single mom working two jobs. I typed "affordable daycare near me" and found a subsidized program I didn\'t know existed.',
-    outcome: '85% confidence • 3 resources found • Applied within 20 minutes',
-    colorHex: '#ec4899',
-    bgColor: 'rgba(236,72,153,0.06)',
-    initials: 'JM',
-    name: 'Jessica M.',
-  },
-  {
-    icon: HeartHandshake,
-    title: 'Seniors',
-    subtitle: 'Needing grocery delivery',
-    quote: 'At 78, getting to the store is hard. ClearPath found me a free grocery delivery service for seniors in my ZIP code.',
-    outcome: '92% confidence • 2 resources found • Delivery scheduled same day',
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    initials: 'RH',
-    name: 'Robert H.',
-  },
-  {
-    icon: Shield,
-    title: 'Veterans',
-    subtitle: 'Accessing PTSD support',
-    quote: 'After 20 years in the Army, asking for help felt impossible. ClearPath didn\'t judge — it just connected me to a Vet Center 10 minutes away.',
-    outcome: '94% confidence • Crisis check passed • Connected to VA support',
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    initials: 'MT',
-    name: 'Marcus T.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Students',
-    subtitle: 'Finding mental health help',
-    quote: 'I was too overwhelmed to navigate my university\'s resources. ClearPath found me free counseling on campus and a 24/7 crisis text line.',
-    outcome: '88% confidence • 4 resources found • Crisis line provided',
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-    initials: 'AK',
-    name: 'Aisha K.',
-  },
-  {
-    icon: Scale,
-    title: 'Immigrants',
-    subtitle: 'Navigating legal aid',
-    quote: 'I didn\'t know where to start with my immigration questions. ClearPath classified my needs and pointed me to a free legal clinic — with a Spanish-speaking attorney.',
-    outcome: '79% confidence • 2 resources found • Clarification questions asked first',
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    initials: 'CL',
-    name: 'Carlos L.',
-  },
-]
-
-// ─── INTEGRATION PARTNERS DATA ───────────────────────────
-const integrationPartners = [
-  {
-    name: '211.org',
-    desc: 'The national helpline connecting people to local resources. Our primary data source for verified community services.',
-    icon: Phone,
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    borderColor: 'rgba(59,130,246,0.15)',
-  },
-  {
-    name: 'United Way',
-    desc: 'World\'s largest privately funded nonprofit. Powers our database of 50,000+ verified community resources across the US.',
-    icon: HeartPulse,
-    colorHex: '#ef4444',
-    bgColor: 'rgba(239,68,68,0.06)',
-    borderColor: 'rgba(239,68,68,0.15)',
-  },
-  {
-    name: 'Hugging Face',
-    desc: 'Home of BART-large-MNLI. Our zero-shot classification model runs on Hugging Face Inference API for real-time NLI.',
-    icon: Smile,
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    borderColor: 'rgba(245,158,11,0.15)',
-  },
-  {
-    name: 'Government Databases',
-    desc: 'Federal and state resource directories including Benefits.gov, SAMHSA treatment locator, and HUD housing databases.',
-    icon: Building2,
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    borderColor: 'rgba(16,185,129,0.15)',
-  },
-]
-
-// ─── SECURITY & PRIVACY DATA ─────────────────────────────
-const securityFeatures = [
-  {
-    icon: Lock,
-    title: 'Privacy by Design',
-    desc: 'Guest users need no account — conversations are processed without storing personal data. Registered users control what gets saved and can delete everything anytime.',
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-  },
-  {
-    icon: UserCheck,
-    title: 'Optional Accounts',
-    desc: 'Use ClearPath AI instantly as a guest. No sign-up, no email, no profile required. Create an account only if you want to save conversations and resources.',
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-  },
-  {
-    icon: Server,
-    title: 'Minimal Data Collection',
-    desc: 'We collect only what\'s necessary to provide the service. No tracking pixels, no third-party analytics, no advertising. Your data is never sold or shared.',
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-  },
-  {
-    icon: Wifi,
-    title: 'HTTPS Encryption',
-    desc: 'All data in transit is encrypted with TLS 1.3. Your queries and results are protected from interception at every step.',
-    colorHex: '#06b6d4',
-    bgColor: 'rgba(6,182,212,0.06)',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'COPPA Conscious',
-    desc: 'No personal information collected from guests — including children. Accounts are optional with minimal data. No tracking, no behavioral data. Privacy-first for all ages.',
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-  },
-  {
-    icon: Eye,
-    title: 'No Tracking or Analytics',
-    desc: 'We don\'t use cookies, pixels, or fingerprinting. No Google Analytics, no Meta Pixel, no advertising. Your visit is invisible.',
-    colorHex: '#ec4899',
-    bgColor: 'rgba(236,72,153,0.06)',
-  },
-]
-
-// ─── AWARDS DATA ─────────────────────────────────────────
-const awards = [
-  {
-    icon: Trophy,
-    title: 'USAII Global AI Hackathon 2026',
-    desc: 'Official competitor in the premier AI hackathon, showcasing responsible AI innovation for community impact.',
-    colorHex: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    badge: 'Competing',
-  },
-  {
-    icon: Award,
-    title: 'INFORMS Responsible AI Recognition',
-    desc: 'Recognized for calibrated transparency architecture meeting NIST AI Risk Management Framework standards.',
-    colorHex: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    badge: 'Submitted',
-  },
-  {
-    icon: Star,
-    title: 'Open Source Community Spotlight',
-    desc: 'Featured on Hugging Face community page for novel zero-shot classification approach with safety-first architecture.',
-    colorHex: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    badge: 'Featured',
+    svgPreview: <ChatMiniSVG />,
   },
   {
     icon: BookOpen,
-    title: 'AI Ethics Publication',
-    desc: 'Our approach to calibrated transparency has been submitted for publication in the AI Ethics journal.',
-    colorHex: '#8b5cf6',
-    bgColor: 'rgba(139,92,246,0.06)',
-    badge: 'Submitted',
+    title: 'Structured Memory',
+    subtitle: 'Never lose a thought',
+    desc: 'Every fact, decision, and context is captured and organized automatically. No more "where did we decide that?"',
+    color: '#047857',
+    bgColor: 'rgba(4,120,87,0.08)',
+    svgPreview: <MemoryMiniSVG />,
   },
 ]
 
-// ─── DEEP DIVE DATA ──────────────────────────────────────
-const deepDives = [
+// ═══════════════════════════════════════════════════════════════
+// HOW IT WORKS DATA
+// ═══════════════════════════════════════════════════════════════
+const steps = [
   {
-    title: 'Classified, Not Generated',
-    desc: 'We don\'t generate answers. We classify your needs against a verified database. Every resource exists.',
-    icon: Fingerprint,
-    color: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-    accentBg: 'rgba(59,130,246,0.1)',
-    detail: 'Our BART-large-MNLI model matches natural language descriptions to pre-verified resource categories. The result? Zero hallucinated services, zero phantom phone numbers, zero broken links.',
+    step: '01',
+    icon: Link2,
+    title: 'Connect Your Knowledge',
+    desc: 'Integrate with Slack, Notion, GitHub, and more. Lore listens to your team\'s conversations, documents, and decisions — zero friction, zero config.',
+    color: '#10B981',
+    bgColor: 'rgba(16,185,129,0.08)',
   },
   {
-    title: 'Confidence You Can See',
-    desc: 'Every result comes with a calibrated confidence score. No black boxes. No pretending.',
-    icon: TrendingUp,
-    color: '#10b981',
-    bgColor: 'rgba(16,185,129,0.06)',
-    accentBg: 'rgba(16,185,129,0.1)',
-    detail: 'When our model is 92% confident, we show you 92%. When it\'s 45% confident, we show you that too — and then ask a clarifying question instead of guessing. Calibrated transparency means you never have to blindly trust the machine.',
+    step: '02',
+    icon: Network,
+    title: 'Watch It Connect',
+    desc: 'Raw information becomes structured knowledge. Relationships are mapped, entities are linked, and context is preserved in a living knowledge graph.',
+    color: '#059669',
+    bgColor: 'rgba(5,150,105,0.08)',
   },
   {
-    title: 'Human Always Available',
-    desc: 'When AI isn\'t sure, a real person is one click away. 211 navigators, 24/7.',
-    icon: HeartHandshake,
-    color: '#f59e0b',
-    bgColor: 'rgba(245,158,11,0.06)',
-    accentBg: 'rgba(245,158,11,0.1)',
-    detail: 'Our "Talk to a Navigator" button isn\'t a fallback — it\'s a first-class feature. Real human navigators from the 211 network are available around the clock. Because some conversations need a person, not a prompt.',
-  },
-]
-
-// ─── FADE IN VARIANTS ────────────────────────────────────
-const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] } },
-}
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-}
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
-}
-
-// ─── CHAT MESSAGE TYPE ───────────────────────────────────
-interface ChatMessage {
-  role: 'user' | 'ai'
-  text: string
-  confidence?: number
-  category?: string
-  isCrisis?: boolean
-  alternatives?: string[]
-}
-
-// ─── LIVE DEMO CHAT MESSAGES ─────────────────────────────
-const demoMessages: ChatMessage[] = [
-  {
-    role: 'user',
-    text: 'I lost my job and I can\'t afford groceries for my kids anymore',
-  },
-  {
-    role: 'ai',
-    text: 'I\'m sorry you\'re going through this. Let me find the right resources for you.',
-    confidence: 89,
-    category: 'Food Assistance',
-    alternatives: ['Employment Services (72%)', 'Housing Assistance (61%)'],
-  },
-  {
-    role: 'ai',
-    text: 'I found 3 verified resources near you:',
+    step: '03',
+    icon: Sparkles,
+    title: 'Ask Anything',
+    desc: 'Ask in natural language and get instant answers from your team\'s memory — complete with sources and confidence scores. AI-powered recall that understands context.',
+    color: '#0D9488',
+    bgColor: 'rgba(13,148,136,0.08)',
   },
 ]
 
-// ─── MAIN PAGE ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// STATS DATA
+// ═══════════════════════════════════════════════════════════════
+const stats = [
+  { value: 500, suffix: '+', label: 'Teams', icon: Users },
+  { value: 10000, suffix: '+', label: 'Knowledge Nodes', icon: Network },
+  { value: 99.9, suffix: '%', label: 'Uptime', icon: Shield },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// PROBLEM PAIN POINTS
+// ═══════════════════════════════════════════════════════════════
+const painPoints = [
+  {
+    icon: MessageSquare,
+    title: 'Miscommunication costs',
+    desc: 'Teams waste 3.6 hours per week searching for information that should be instant. Critical decisions buried in Slack threads, never surfaced again.',
+    stat: '3.6 hrs',
+    statLabel: 'wasted per week searching',
+  },
+  {
+    icon: Search,
+    title: 'Lost knowledge',
+    desc: '42% of organizational knowledge is undocumented. When key people leave, their context walks out the door with them.',
+    stat: '42%',
+    statLabel: 'of knowledge is undocumented',
+  },
+  {
+    icon: Database,
+    title: 'Siloed information',
+    desc: '67% of wiki content is outdated. Knowledge scattered across tools that don\'t talk to each other creates a fractured team memory.',
+    stat: '67%',
+    statLabel: 'of wiki content is outdated',
+  },
+]
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
-  const [activeDemoStep, setActiveDemoStep] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveDemoStep((prev) => (prev < 3 ? prev + 1 : prev))
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
-    <div className="min-h-screen flex flex-col mesh-gradient-bg">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
 
-      {/* ═══════════ HERO ═══════════ */}
-      <section className="relative min-h-[calc(100vh-4rem)] flex items-center pt-16">
-        {/* Glow behind hero card */}
-        <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-30 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(16,185,129,0.06) 40%, transparent 70%)' }}
+      {/* ═══════════════════════════════════════════════════════════
+          ANNOUNCEMENT BAR
+          ═══════════════════════════════════════════════════════════ */}
+      <div className="announcement-bar pt-[64px]">
+        <div className="flex items-center justify-center gap-2">
+          <Sparkles className="w-4 h-4" />
+          <span>Built on AWS Aurora DSQL — $160K Hackathon</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+          HERO SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="relative min-h-[calc(100vh-7rem)] flex items-center hero-glow overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-[0.04] pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #10B981, transparent 70%)' }}
+        />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-[0.03] pointer-events-none"
+          style={{ background: 'radial-gradient(circle, #0D9488, transparent 70%)' }}
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-center">
-            {/* Left - 60% */}
-            <div className="lg:col-span-3 space-y-8">
-              {/* Hackathon badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-emerald-50/80 text-emerald-700 border border-emerald-100/60 backdrop-blur-sm">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Built for USAII Global AI Hackathon 2026
-                </span>
-              </motion.div>
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left column - Text */}
+            <div className="space-y-8">
               {/* Headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-gray-900"
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.08] text-[#0F172A]"
               >
-                When it matters most,{' '}
-                <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%]">
-                  honesty is the safest answer.
-                </span>
+                Your Team&apos;s Memory,{' '}
+                <span className="gradient-text-hero">Alive.</span>
               </motion.h1>
 
               {/* Subheadline */}
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
-                className="text-lg sm:text-xl text-gray-500 leading-relaxed max-w-2xl"
+                transition={{ duration: 0.6, delay: 0.25 }}
+                className="text-lg sm:text-xl text-[#475569] leading-relaxed max-w-xl"
               >
-                ClearPath AI connects you with verified community resources — showing calibrated confidence instead of hiding uncertainty.{' '}
-                <span className="font-semibold text-gray-700">Classified, not generated.</span>
+                Lore gives your team a shared memory that&apos;s structured, always consistent, and available everywhere. Powered by Aurora DSQL&apos;s multi-region architecture.
               </motion.p>
 
-              {/* CTA buttons */}
+              {/* CTA Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
                 className="flex flex-col sm:flex-row gap-4"
               >
-                <Link
-                  href="/app"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
-                >
-                  Try the Demo
+                <Link href="/signup" className="btn-primary text-[15px] h-12 px-8 justify-center">
+                  Get Started Free
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link
-                  href="/#how-it-works"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-gray-700 rounded-2xl border border-gray-200 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-gray-300 hover:shadow-md transition-all"
-                >
-                  See How It Works
+                <Link href="/#how-it-works" className="btn-secondary text-[15px] h-12 px-8 justify-center">
+                  Watch Demo
                   <ChevronDown className="w-4 h-4" />
                 </Link>
               </motion.div>
@@ -827,15 +359,15 @@ export default function LandingPage() {
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.65 }}
+                transition={{ duration: 0.6, delay: 0.55 }}
                 className="flex flex-wrap gap-6 pt-2"
               >
                 {[
-                  { text: 'Privacy by design', icon: Shield },
-                  { text: 'Crisis detection', icon: ShieldCheck },
-                  { text: 'Human escalation', icon: Navigation },
+                  { text: 'Multi-region consistent', icon: Shield },
+                  { text: 'Real-time sync', icon: Zap },
+                  { text: 'Zero config', icon: Cloud },
                 ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-2 text-[13px] text-gray-500 font-medium">
+                  <div key={item.text} className="flex items-center gap-2 text-[13px] text-[#475569] font-medium">
                     <Check className="w-4 h-4 text-emerald-500" strokeWidth={3} />
                     {item.text}
                   </div>
@@ -843,1511 +375,343 @@ export default function LandingPage() {
               </motion.div>
             </div>
 
-            {/* Right - 40% — floating preview card */}
-            <div className="lg:col-span-2 flex justify-center lg:justify-end">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="hero-float w-full max-w-sm"
-              >
-                <div
-                  className="glass-card rounded-3xl p-6 shadow-premium-lg relative overflow-hidden"
-                  style={{ boxShadow: '0 8px 48px -12px rgba(59,130,246,0.15), 0 0 0 1px rgba(0,0,0,0.02)' }}
-                >
-                  {/* Glow accent */}
-                  <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-20 pointer-events-none"
-                    style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)' }}
-                  />
-
-                  <div className="space-y-5">
-                    {/* Status pill */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-emerald-50/80 text-emerald-700 border border-emerald-100/60">
-                      <ShieldCheck className="w-3 h-3" />
-                      Verified Match
-                    </div>
-
-                    {/* Main result */}
-                    <div className="flex items-center gap-4">
-                      <ConfidenceRing value={87} size={64} strokeWidth={4} />
-                      <div>
-                        <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">Housing Assistance</h3>
-                        <p className="text-[12px] text-gray-400 mt-1">87% confidence — High match</p>
+            {/* Right column - Product mockup */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="flex justify-center lg:justify-end"
+            >
+              <div className="w-full max-w-md animate-float">
+                <div className="mockup-window shadow-2xl">
+                  {/* Title bar */}
+                  <div className="mockup-titlebar">
+                    <div className="mockup-dot bg-red-400" />
+                    <div className="mockup-dot bg-yellow-400" />
+                    <div className="mockup-dot bg-green-400" />
+                    <span className="text-xs text-gray-400 ml-2 font-medium">Lore — Knowledge Graph</span>
+                  </div>
+                  {/* Knowledge Graph Preview */}
+                  <div className="p-5 bg-gradient-to-br from-gray-50 to-white">
+                    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-[10px] font-bold tracking-wider uppercase text-gray-400">Knowledge Graph</p>
+                        <span className="text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">Live</span>
                       </div>
+                      <KnowledgeGraphSVG />
                     </div>
-
-                    {/* Resource */}
-                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-5 h-5 rounded-md bg-emerald-50 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-3 mt-4">
+                      {[
+                        { label: 'Nodes', value: '1,203', color: '#059669' },
+                        { label: 'Edges', value: '3,847', color: '#0D9488' },
+                        { label: 'Queries', value: '489', color: '#10B981' },
+                      ].map((stat) => (
+                        <div key={stat.label} className="bg-white rounded-xl p-3 border border-gray-100 text-center shadow-sm">
+                          <p className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</p>
+                          <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">{stat.label}</p>
                         </div>
-                        <span className="text-[13px] font-semibold text-gray-800">Section 8 Emergency Transfer</span>
-                      </div>
-                      <p className="text-[12px] text-gray-500 ml-7">2 locations near you. Application takes ~15 min.</p>
-                      <div className="flex items-center gap-3 mt-3 ml-7">
-                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold bg-emerald-50/60 px-2 py-0.5 rounded-md border border-emerald-100/40">
-                          <ShieldCheck className="w-2.5 h-2.5" />
-                          Verified May 2026
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-[10px] text-blue-600 font-semibold bg-blue-50/60 px-2 py-0.5 rounded-md border border-blue-100/40">
-                          <MapPin className="w-2.5 h-2.5" />
-                          1.2 mi
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Why */}
-                    <div className="flex items-start gap-2 text-[12px] text-gray-400">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
-                      <span><span className="text-gray-600 font-medium">Why:</span> Can&apos;t pay rent — immediate housing risk</span>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ EARLY CTA BANNER ═══════════ */}
-      <section className="py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-premium relative overflow-hidden">
-            <div className="absolute -top-16 -left-16 w-32 h-32 rounded-full opacity-10 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.4), transparent 70%)' }}
-            />
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
-                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Ready to experience honest AI?</h3>
-                <p className="text-[13px] text-gray-500 mt-0.5">No account needed. Free forever. Try it now.</p>
-              </div>
-            </div>
-            <Link
-              href="/app"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] shrink-0"
-            >
-              Launch Demo
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ═══════════ PROBLEM ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight">
-            The problem isn&apos;t a lack of resources.
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4">
-            It&apos;s finding the right one — when you need it most.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-6"
-        >
-          {[
-            { number: '4.2M', desc: 'search results for "rent assistance". Most are irrelevant, outdated, or broken links.' },
-            { number: '0%', desc: 'of AI chatbots show confidence scores. You can\'t verify what they suggest — or if the resources even exist.' },
-            { number: '72hr', desc: 'average wait time for social services. People in crisis can\'t wait three days for a callback.' },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-8 text-center shadow-premium hover:shadow-premium-lg transition-shadow duration-300"
-            >
-              <div className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent gradient-text-animate bg-[length:200%_200%] mb-4">
-                {stat.number}
-              </div>
-              <p className="text-[15px] text-gray-500 leading-relaxed">{stat.desc}</p>
             </motion.div>
-          ))}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ IMPACT STATS ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Impact that speaks for itself
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Real numbers from real deployments. Every metric verified.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {[
-            { value: 50000, suffix: '+', label: 'Resources Classified', icon: Database, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
-            { value: 99.7, suffix: '%', label: 'Crisis Detection Accuracy', icon: ShieldCheck, color: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
-            { value: 2, prefix: '<', suffix: 's', label: 'Average Response Time', icon: Zap, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)' },
-            { value: 211, suffix: '+', label: 'Verified Resource Partners', icon: Users, color: '#6366f1', bgColor: 'rgba(99,102,241,0.06)' },
-          ].map((stat, i) => {
-            const Icon = stat.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 md:p-8 text-center shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Glow accent */}
-                <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(circle, ${stat.color}40, transparent 70%)` }}
-                />
-
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                  style={{ backgroundColor: stat.bgColor }}
-                >
-                  <Icon className="w-6 h-6" style={{ color: stat.color }} />
-                </div>
-
-                <div className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2" style={{ color: stat.color }}>
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} prefix={stat.prefix || ''} />
-                </div>
-
-                <p className="text-[13px] sm:text-[14px] text-gray-500 font-medium leading-snug">{stat.label}</p>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ MID-PAGE CTA #2 ═══════════ */}
-      <section className="py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          <div className="relative rounded-2xl overflow-hidden p-8 md:p-10"
-            style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1e40af 40%, #312e81 100%)' }}
-          >
-            <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-15 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.2), transparent 60%)' }}
-            />
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="text-center md:text-left">
-                <h3 className="text-[20px] md:text-[22px] font-bold text-white tracking-tight">Experience calibrated transparency firsthand</h3>
-                <p className="text-[14px] text-blue-200 mt-1">Type anything. See the confidence scores. No sign-up required.</p>
-              </div>
-              <Link
-                href="/app"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-blue-700 rounded-xl bg-white hover:bg-gray-50 shadow-lg shadow-blue-900/20 hover:shadow-xl transition-all active:scale-[0.97] shrink-0"
-              >
-                Try the Demo
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
           </div>
-        </motion.div>
-      </section>
-
-      {/* ═══════════ "FOR EVERYONE" USE CASES ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Built for Everyone
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            No matter who you are, ClearPath AI helps
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Community resources shouldn&apos;t require a degree to find. Here&apos;s how people use ClearPath AI every day.
-          </motion.p>
-          <motion.p variants={staggerItem} className="text-[12px] text-gray-400 mt-1 italic">(Illustrative scenarios)</motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {useCases.map((uc, i) => {
-            const Icon = uc.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Top accent */}
-                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: uc.colorHex }} />
-
-                {/* Glow */}
-                <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(circle, ${uc.colorHex}40, transparent 70%)` }}
-                />
-
-                <div className="space-y-5">
-                  {/* Icon + Title */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: uc.bgColor }}
-                    >
-                      <Icon className="w-6 h-6" style={{ color: uc.colorHex }} />
-                    </div>
-                    <div>
-                      <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">{uc.title}</h3>
-                      <p className="text-[12px] text-gray-400 font-medium">{uc.subtitle}</p>
-                    </div>
-                  </div>
-
-                  {/* Quote */}
-                  <p className="text-[14px] text-gray-600 leading-relaxed italic">
-                    &ldquo;{uc.quote}&rdquo;
-                  </p>
-
-                  {/* Outcome */}
-                  <div className="bg-white/60 rounded-xl p-3 border border-gray-100/60">
-                    <div className="flex items-center gap-2 mb-1">
-                      <BarChart3 className="w-3.5 h-3.5 text-gray-400" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Outcome</span>
-                    </div>
-                    <p className="text-[12px] text-gray-600 font-medium leading-relaxed">{uc.outcome}</p>
-                  </div>
-
-                  {/* Attribution */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-gray-100/60">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: uc.bgColor }}>
-                      <span className="text-[10px] font-bold" style={{ color: uc.colorHex }}>{uc.initials}</span>
-                    </div>
-                    <span className="text-[12px] text-gray-500 font-medium">{uc.name}</span>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ HOW IT WORKS ═══════════ */}
-      <Section id="how-it-works" className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            6 Layers of Calibrated Transparency
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Every step is designed to be honest about what it knows and what it doesn&apos;t.
-          </motion.p>
-        </motion.div>
-
-        <div className="max-w-4xl mx-auto">
-          {layers.map((layer, i) => {
-            const Icon = layer.icon
-            const isLeft = i % 2 === 0
-            return (
-              <motion.div
-                key={layer.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="relative"
-              >
-                {/* Connector line */}
-                {i < layers.length - 1 && (
-                  <div className="absolute left-6 md:left-1/2 top-[72px] bottom-0 w-px bg-gradient-to-b from-gray-200 to-gray-100 -translate-x-1/2 hidden md:block" />
-                )}
-
-                <div className={`flex items-start gap-6 md:gap-12 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} mb-12 last:mb-0`}>
-                  {/* Timeline dot */}
-                  <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full shrink-0 relative z-10"
-                    style={{ backgroundColor: getLayerBg(layer.color), border: `2px solid ${layer.colorHex}20` }}
-                  >
-                    <span className="text-[14px] font-bold" style={{ color: layer.colorHex }}>{layer.step}</span>
-                  </div>
-
-                  {/* Card */}
-                  <div className={`flex-1 glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden ${isLeft ? 'md:mr-8' : 'md:ml-8'}`}>
-                    {/* Color accent bar */}
-                    <div className="absolute top-0 left-0 w-1 h-full rounded-l-2xl" style={{ backgroundColor: layer.colorHex }} />
-
-                    <div className="flex items-start gap-4 pl-3">
-                      {/* Mobile step number */}
-                      <div className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-                        style={{ backgroundColor: getLayerBg(layer.color) }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: layer.colorHex }} />
-                      </div>
-
-                      {/* Desktop icon */}
-                      <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
-                        style={{ backgroundColor: getLayerBg(layer.color) }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: layer.colorHex }} />
-                      </div>
-
-                      <div>
-                        <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{layer.title}</h3>
-                        <p className="text-[14px] text-gray-500 mt-1.5 leading-relaxed">{layer.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Spacer for alternating layout */}
-                  <div className="hidden md:block flex-1" />
-                </div>
-              </motion.div>
-            )
-          })}
         </div>
-      </Section>
-
-      {/* ═══════════ 6-LAYER TRANSPARENCY DEEP DIVE ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Transparency Architecture
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            6-Layer Transparency Deep Dive
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Every layer serves a purpose. Here&apos;s exactly how each one works — with real examples and data flow.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="space-y-6"
-        >
-          {layerDeepDives.map((layer, i) => {
-            const Icon = layer.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Left accent bar */}
-                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: layer.colorHex }} />
-
-                <div className="p-6 md:p-8 pl-8 md:pl-10">
-                  {/* Header */}
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: layer.bgColor }}
-                    >
-                      <Icon className="w-6 h-6" style={{ color: layer.colorHex }} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold text-white" style={{ backgroundColor: layer.colorHex }}>
-                          {layer.layer}
-                        </span>
-                        <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">{layer.title}</h3>
-                      </div>
-                      <p className="text-[13px] text-gray-400 font-medium mt-0.5">{layer.subtitle}</p>
-                    </div>
-                  </div>
-
-                  {/* Content grid */}
-                  <div className="grid md:grid-cols-3 gap-6">
-                    {/* Function */}
-                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CircleDot className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Function</span>
-                      </div>
-                      <p className="text-[13px] text-gray-600 leading-relaxed">{layer.function}</p>
-                    </div>
-
-                    {/* Data Flow */}
-                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Activity className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Data Flow</span>
-                      </div>
-                      <p className="text-[13px] text-gray-600 leading-relaxed font-mono">{layer.dataFlow}</p>
-                    </div>
-
-                    {/* Real Example */}
-                    <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-3.5 h-3.5" style={{ color: layer.colorHex }} />
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Real Example</span>
-                      </div>
-                      <p className="text-[13px] text-gray-600 leading-relaxed">{layer.example}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ LIVE DEMO PREVIEW ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Live Preview
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            See the conversation in real time
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            An interactive preview of how ClearPath AI responds — with confidence scores, alternatives, and crisis detection.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mx-auto"
-        >
-          <div className="glass-card rounded-3xl shadow-premium-lg overflow-hidden">
-            {/* Chat header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100/60 bg-white/40">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-[14px] font-semibold text-gray-900">ClearPath AI</p>
-                  <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Online — Crisis detection active
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-red-50 text-red-600 border border-red-100/40">
-                  <Shield className="w-3 h-3" />
-                  988 Ready
-                </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
-                  <ShieldCheck className="w-3 h-3" />
-                  Verified DB
-                </span>
-              </div>
-            </div>
-
-            {/* Chat messages */}
-            <div className="p-6 space-y-4 min-h-[320px]">
-              {/* User message */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: activeDemoStep >= 0 ? 1 : 0, x: activeDemoStep >= 0 ? 0 : 20 }}
-                transition={{ duration: 0.4 }}
-                className="flex justify-end"
-              >
-                <div className="max-w-[80%] bg-gradient-to-b from-blue-600 to-blue-700 text-white rounded-2xl rounded-tr-md px-4 py-3 shadow-md shadow-blue-500/15">
-                  <p className="text-[14px] leading-relaxed">I lost my job and I can&apos;t afford groceries for my kids anymore</p>
-                </div>
-              </motion.div>
-
-              {/* Processing indicator */}
-              {activeDemoStep >= 1 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-center gap-2 px-4"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100/40">
-                      <Check className="w-2.5 h-2.5" />
-                      Crisis: Clear
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
-                      <Layers className="w-2.5 h-2.5" />
-                      Classifying...
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* AI response with confidence */}
-              {activeDemoStep >= 2 && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="flex justify-start"
-                >
-                  <div className="max-w-[85%]">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
-                        <Bot className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="space-y-3 flex-1">
-                        <div className="bg-white/80 rounded-2xl rounded-tl-md px-4 py-3 border border-gray-100/60 shadow-sm">
-                          <p className="text-[14px] text-gray-700 leading-relaxed">I&apos;m sorry you&apos;re going through this. I found resources that can help.</p>
-                        </div>
-
-                        {/* Classification result */}
-                        <div className="bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                          <div className="flex items-center gap-3 mb-3">
-                            <ConfidenceRing value={89} size={48} strokeWidth={3} />
-                            <div>
-                              <p className="text-[14px] font-bold text-gray-900">Food Assistance</p>
-                              <p className="text-[11px] text-gray-400">89% confidence — High match</p>
-                            </div>
-                          </div>
-
-                          {/* What else */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <Eye className="w-3 h-3 text-gray-400" />
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">What Else</span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
-                              Employment Services (72%)
-                            </span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-600 border border-amber-100/40">
-                              Housing Assistance (61%)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Resource card */}
-              {activeDemoStep >= 3 && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="flex justify-start"
-                >
-                  <div className="max-w-[85%] ml-11">
-                    <div className="bg-emerald-50/60 rounded-xl p-4 border border-emerald-100/40">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Check className="w-4 h-4 text-emerald-600" strokeWidth={3} />
-                        <span className="text-[13px] font-semibold text-gray-800">SNAP Benefits Application</span>
-                      </div>
-                      <p className="text-[12px] text-gray-500 ml-6">Eligibility check takes 10 min. Benefits within 7 days for expedited cases.</p>
-                      <div className="flex items-center gap-3 mt-3 ml-6">
-                        <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-semibold bg-emerald-50/60 px-2 py-0.5 rounded-md border border-emerald-100/40">
-                          <ShieldCheck className="w-2.5 h-2.5" />
-                          Verified June 2026
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-[10px] text-blue-600 font-semibold bg-blue-50/60 px-2 py-0.5 rounded-md border border-blue-100/40">
-                          <MapPin className="w-2.5 h-2.5" />
-                          0.8 mi
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Chat input bar */}
-            <div className="px-6 py-4 border-t border-gray-100/60 bg-white/40">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 flex items-center gap-2 px-4 py-3 rounded-xl bg-white/60 border border-gray-200/60">
-                  <MessageCircle className="w-4 h-4 text-gray-300" />
-                  <span className="text-[13px] text-gray-300">Describe your situation...</span>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 flex items-center justify-center shadow-md shadow-blue-500/20">
-                  <Send className="w-4 h-4 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA below demo */}
-          <div className="text-center mt-8">
-            <Link
-              href="/app"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97]"
-            >
-              Try this yourself
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ TRUSTED BY / PARTNERS ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-14"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Trusted Infrastructure
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
-            Built on foundations you can trust
-          </motion.h2>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-5"
-        >
-          {partnerBadges.map((badge, i) => {
-            const Icon = badge.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 text-center shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
-              >
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{ backgroundColor: badge.bgColor, border: `1px solid ${badge.borderColor}` }}
-                >
-                  <Icon className="w-7 h-7" style={{ color: badge.color }} />
-                </div>
-                <p className="text-[13px] font-semibold text-gray-700 leading-snug">{badge.label}</p>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ INTEGRATION PARTNERS ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Integration Partners
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Powered by the best in community services
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            ClearPath AI integrates directly with the organizations that know community resources best.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-2 gap-6"
-        >
-          {integrationPartners.map((partner, i) => {
-            const Icon = partner.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Left accent */}
-                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: partner.colorHex }} />
-
-                <div className="flex items-start gap-5 pl-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: partner.bgColor, border: `1px solid ${partner.borderColor}` }}
-                  >
-                    <Icon className="w-7 h-7" style={{ color: partner.colorHex }} />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">{partner.name}</h3>
-                    <p className="text-[14px] text-gray-500 leading-relaxed">{partner.desc}</p>
-                    <div className="inline-flex items-center gap-1 text-[12px] font-semibold mt-1" style={{ color: partner.colorHex }}>
-                      <ExternalLink className="w-3 h-3" />
-                      Learn more
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ COMMUNITY IMPACT ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Real-World Impact
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Community impact stories
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Every number represents a real person who found help when they needed it most.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-        >
-          {[
-            { value: 87, suffix: '%', label: 'Time Saved Finding Resources', desc: 'Average reduction vs. manual search', icon: Clock, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
-            { value: 142, suffix: '', label: 'Crisis Interventions', desc: 'Lives connected to 988 hotline', icon: Shield, color: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
-            { value: 12400, suffix: '+', label: 'Resources Connected', desc: 'People matched to verified services', icon: HandHeart, color: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
-            { value: 96, suffix: '%', label: 'User Satisfaction Rate', desc: 'Based on post-interaction surveys', icon: Smile, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.06)' },
-          ].map((stat, i) => {
-            const Icon = stat.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 text-center shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: stat.bgColor }}
-                >
-                  <Icon className="w-6 h-6" style={{ color: stat.color }} />
-                </div>
-                <div className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-1" style={{ color: stat.color }}>
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </div>
-                <p className="text-[13px] font-semibold text-gray-800 leading-snug">{stat.label}</p>
-                <p className="text-[11px] text-gray-400 mt-1">{stat.desc}</p>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-
-        {/* Impact story card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="glass-card rounded-2xl p-8 md:p-10 shadow-premium-lg relative overflow-hidden max-w-4xl mx-auto"
-        >
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
-              <HeartPulse className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h3 className="text-[20px] font-bold text-gray-900 tracking-tight mb-3">From crisis to connection in under 2 seconds</h3>
-              <p className="text-[15px] text-gray-600 leading-relaxed mb-4">
-                When a veteran typed &ldquo;I don&apos;t want to be here anymore,&rdquo; ClearPath AI&apos;s hardcoded crisis layer detected the risk instantly. The AI classification was bypassed entirely. Within 2 seconds, the 988 Suicide & Crisis Lifeline number was displayed — along with a one-click call button and a message from a real navigator.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-50 text-red-600 border border-red-100/40">
-                  <Shield className="w-3 h-3" />
-                  Crisis detected
-                </span>
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100/40">
-                  <Check className="w-3 h-3" />
-                  AI bypassed
-                </span>
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-blue-50 text-blue-600 border border-blue-100/40">
-                  <Phone className="w-3 h-3" />
-                  988 connected
-                </span>
-                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-amber-50 text-amber-600 border border-amber-100/40">
-                  <Clock className="w-3 h-3" />
-                  Under 2 seconds
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ DIFFERENTIATOR ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Why not just use ChatGPT?
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Generic AI wasn&apos;t built for people in crisis. ClearPath AI was.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="max-w-5xl mx-auto"
-        >
-          {/* Header row */}
-          <div className="grid grid-cols-2 gap-0 mb-px">
-            <div className="bg-red-50/40 rounded-t-2xl p-4 md:p-6 border-b border-red-100/30">
-              <h3 className="text-[14px] md:text-[16px] font-bold text-red-700 text-center">ChatGPT / Generic AI</h3>
-            </div>
-            <div className="bg-emerald-50/40 rounded-t-2xl p-4 md:p-6 border-b border-emerald-100/30">
-              <h3 className="text-[14px] md:text-[16px] font-bold text-emerald-700 text-center">ClearPath AI</h3>
-            </div>
-          </div>
-
-          {/* Comparison rows */}
-          {comparisons.map((row, i) => (
-            <div key={i} className="grid grid-cols-2 gap-0">
-              <div className="comparison-negative p-4 md:p-5 border-b border-gray-100/60 flex items-start gap-3">
-                <X className="w-4 h-4 text-red-400 shrink-0 mt-0.5" strokeWidth={2.5} />
-                <span className="text-[13px] md:text-[14px] text-gray-600 leading-relaxed">{row.negative}</span>
-              </div>
-              <div className="comparison-positive p-4 md:p-5 border-b border-gray-100/60 flex items-start gap-3">
-                <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" strokeWidth={3} />
-                <span className="text-[13px] md:text-[14px] text-gray-700 leading-relaxed font-medium">{row.positive}</span>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ HOW IT'S DIFFERENT DEEP DIVE ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            How it&apos;s different, in detail
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Three core principles that make ClearPath AI fundamentally safer than generic chatbots.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-6"
-        >
-          {deepDives.map((item, i) => {
-            const Icon = item.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Top accent bar */}
-                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: item.color }} />
-
-                {/* Glow accent on hover */}
-                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(circle, ${item.color}40, transparent 70%)` }}
-                />
-
-                <div className="space-y-5">
-                  {/* Icon */}
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                    style={{ backgroundColor: item.bgColor }}
-                  >
-                    <Icon className="w-7 h-7" style={{ color: item.color }} />
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">{item.title}</h3>
-
-                  {/* Short description */}
-                  <p className="text-[15px] text-gray-600 leading-relaxed font-medium">{item.desc}</p>
-
-                  {/* Detailed explanation */}
-                  <div className="pt-4 border-t border-gray-100/60">
-                    <p className="text-[13px] text-gray-500 leading-relaxed">{item.detail}</p>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ MID-PAGE CTA #3 ═══════════ */}
-      <section className="py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          <div className="glass-card rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-premium relative overflow-hidden">
-            <div className="absolute -bottom-16 -right-16 w-32 h-32 rounded-full opacity-10 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)' }}
-            />
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-                <ShieldCheck className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">Zero hallucinations. Privacy by design. Zero cost.</h3>
-                <p className="text-[13px] text-gray-500 mt-0.5">Experience AI that tells the truth — even when the truth is &ldquo;I&apos;m not sure.&rdquo;</p>
-              </div>
-            </div>
-            <Link
-              href="/app"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-[0.97] shrink-0"
-            >
-              Start Now
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </motion.div>
       </section>
 
-      {/* ═══════════ SECURITY & PRIVACY ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Security & Privacy
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Privacy isn&apos;t a setting — it&apos;s the architecture
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            We built ClearPath AI so that protecting your privacy is automatic, not optional. You can&apos;t breach what doesn&apos;t exist.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {securityFeatures.map((feature, i) => {
-            const Icon = feature.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-              >
-                {/* Top accent */}
-                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: feature.colorHex }} />
-
-                {/* Glow */}
-                <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(circle, ${feature.colorHex}40, transparent 70%)` }}
-                />
-
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                    style={{ backgroundColor: feature.bgColor }}
-                  >
-                    <Icon className="w-6 h-6" style={{ color: feature.colorHex }} />
+      {/* ═══════════════════════════════════════════════════════════
+          TRUSTED BY — STATS
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-16 border-y border-gray-100 bg-[#F9FAFB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-8 md:gap-12 max-w-3xl mx-auto">
+            {stats.map((stat, i) => (
+              <FadeIn key={stat.label} delay={i * 0.08}>
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
+                    style={{ background: 'rgba(5,150,105,0.08)' }}>
+                    <stat.icon className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <h3 className="text-[16px] font-bold text-gray-900 tracking-tight">{feature.title}</h3>
-                  <p className="text-[14px] text-gray-500 leading-relaxed">{feature.desc}</p>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-[#0F172A] mb-1" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  </div>
+                  <div className="text-xs font-semibold tracking-wider uppercase text-[#475569]">
+                    {stat.label}
+                  </div>
                 </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-
-        {/* Security bottom banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.6 }}
-          className="mt-10"
-        >
-          <div className="glass-card rounded-2xl p-6 md:p-8 text-center shadow-premium max-w-3xl mx-auto relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-emerald-500 to-blue-500" />
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Lock className="w-6 h-6 text-blue-600" />
-              <h3 className="text-[18px] font-bold text-gray-900 tracking-tight">Privacy by design, not by afterthought.</h3>
-            </div>
-            <p className="text-[14px] text-gray-500 leading-relaxed max-w-xl mx-auto">
-              ClearPath AI was designed from the ground up with privacy-first architecture. Guest users need no account — sessions process in real-time with no persistence. For authenticated users, data is encrypted and fully controlled. Delete everything anytime. This isn&apos;t a feature we added. It&apos;s how we built it from day one.
-            </p>
+              </FadeIn>
+            ))}
           </div>
-        </motion.div>
-      </Section>
+        </div>
+      </section>
 
-      {/* ═══════════ SCENARIOS ═══════════ */}
-      <Section id="scenarios">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            See it in action
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Three real scenarios showing how ClearPath AI handles different confidence levels and crisis situations.
-          </motion.p>
-        </motion.div>
+      {/* ═══════════════════════════════════════════════════════════
+          PROBLEM SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto">
+            <FadeIn>
+              <p className="section-label mb-6">The Problem</p>
+            </FadeIn>
+            <FadeIn delay={0.06}>
+              <h2 className="section-title mb-6">
+                Inconsistent memory is <span className="gradient-text">misinformation.</span>
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.12}>
+              <p className="section-subtitle">
+                When your team&apos;s knowledge lives in Slack threads, Notion pages, and someone&apos;s head — it&apos;s not memory. It&apos;s chaos.
+              </p>
+            </FadeIn>
+          </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-6"
-        >
-          {scenarios.map((s) => {
-            const Icon = s.icon
-            return (
-              <motion.div key={s.id} variants={staggerItem}>
-                <Link
-                  href={`/app?scenario=${s.id}`}
-                  className="block glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
-                >
-                  {/* Color accent */}
-                  <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: s.colorHex }} />
-
-                  <div className="space-y-5">
-                    {/* Icon + title */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${s.colorHex}10` }}>
-                        <Icon className="w-5 h-5" style={{ color: s.colorHex }} />
-                      </div>
-                      <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{s.title}</h3>
-                    </div>
-
-                    {/* Quote */}
-                    <p className="text-[14px] text-gray-500 leading-relaxed italic">
-                      &ldquo;{s.quote}&rdquo;
-                    </p>
-
-                    {/* Preview result */}
-                    <div className="flex items-center gap-4 bg-white/60 rounded-xl p-4 border border-gray-100/60">
-                      <ConfidenceRing value={s.confidence} size={48} strokeWidth={3} />
-                      <div>
-                        <p className="text-[13px] font-semibold text-gray-800">{s.label}</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">
-                          {s.confidence === 100 ? 'Crisis bypass — AI skipped' : `${s.confidence}% confidence`}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* CTA */}
-                    <div className="flex items-center gap-2 text-[13px] font-semibold group-hover:gap-3 transition-all" style={{ color: s.colorHex }}>
-                      Try this scenario
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
+          {/* Pain point cards */}
+          <div className="grid md:grid-cols-3 gap-6 mt-16">
+            {painPoints.map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.08}>
+                <div className="feature-card text-center">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-5"
+                    style={{ background: 'rgba(239,68,68,0.08)' }}>
+                    <item.icon className="w-5 h-5 text-red-500" />
                   </div>
-                </Link>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ AWARDS & RECOGNITION ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.p variants={staggerItem} className="text-[13px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Recognition
-          </motion.p>
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Awards & Recognition
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            ClearPath AI is being recognized for pushing the boundaries of responsible AI innovation.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {awards.map((award, i) => {
-            const Icon = award.icon
-            return (
-              <motion.div
-                key={i}
-                variants={staggerItem}
-                className="glass-card rounded-2xl p-6 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group text-center"
-              >
-                {/* Top accent */}
-                <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: award.colorHex }} />
-
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-                    style={{ backgroundColor: award.bgColor }}
-                  >
-                    <Icon className="w-7 h-7" style={{ color: award.colorHex }} />
+                  <h3 className="text-lg font-bold text-[#0F172A] mb-2">{item.title}</h3>
+                  <p className="text-sm text-[#475569] leading-relaxed mb-4">{item.desc}</p>
+                  <div className="pt-3 border-t border-gray-100">
+                    <span className="text-2xl font-bold text-red-500">{item.stat}</span>
+                    <span className="block text-xs text-gray-400 mt-1">{item.statLabel}</span>
                   </div>
-                  <div>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
-                      style={{ backgroundColor: award.bgColor, color: award.colorHex }}
-                    >
-                      {award.badge}
-                    </span>
-                  </div>
-                  <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{award.title}</h3>
-                  <p className="text-[12px] text-gray-500 leading-relaxed">{award.desc}</p>
                 </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </Section>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* ═══════════ TESTIMONIALS ═══════════ */}
-      <Section>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Trusted by people on the front lines
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-[12px] text-gray-400 mt-1 italic">(Illustrative — representing typical user experiences)</motion.p>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Social workers, navigators, counselors, and health professionals share their experience with ClearPath AI.
-          </motion.p>
-        </motion.div>
+      {/* ═══════════════════════════════════════════════════════════
+          FEATURES
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28 bg-[#F9FAFB]" id="features">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <FadeIn>
+              <p className="section-label mb-6">Features</p>
+            </FadeIn>
+            <FadeIn delay={0.06}>
+              <h2 className="section-title mb-6">
+                Everything your team needs to <span className="gradient-text">never forget.</span>
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.12}>
+              <p className="section-subtitle">
+                From automatic capture to AI-powered recall, Lore handles the entire lifecycle of team knowledge.
+              </p>
+            </FadeIn>
+          </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 md:p-8 shadow-premium hover:shadow-premium-lg transition-shadow duration-300 relative overflow-hidden group"
-            >
-              {/* Subtle color accent */}
-              <div className="absolute top-0 left-0 w-full h-1 opacity-60" style={{ backgroundColor: t.color }} />
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, i) => (
+              <FadeIn key={feature.title} delay={i * 0.08}>
+                <div className="feature-card h-full">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: feature.bgColor }}
+                    >
+                      <feature.icon className="w-5 h-5" style={{ color: feature.color }} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-[#0F172A]">{feature.title}</h3>
+                      <p className="text-sm font-medium" style={{ color: feature.color }}>{feature.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#475569] leading-relaxed mb-4">{feature.desc}</p>
+                  <div className="rounded-xl bg-[#F9FAFB] border border-gray-100 p-3 mt-2">
+                    {feature.svgPreview}
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              {/* Glow on hover */}
-              <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-0 group-hover:opacity-15 transition-opacity duration-500 pointer-events-none"
-                style={{ background: `radial-gradient(circle, ${t.color}30, transparent 70%)` }}
-              />
+      {/* ═══════════════════════════════════════════════════════════
+          HOW IT WORKS
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28" id="how-it-works">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <FadeIn>
+              <p className="section-label mb-6">How It Works</p>
+            </FadeIn>
+            <FadeIn delay={0.06}>
+              <h2 className="section-title mb-6">
+                Three steps to <span className="gradient-text">perfect memory.</span>
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.12}>
+              <p className="section-subtitle">
+                Getting started with Lore takes minutes, not months. Connect your tools, and Lore starts building your team&apos;s memory immediately.
+              </p>
+            </FadeIn>
+          </div>
 
-              <div className="space-y-5">
-                {/* Stars */}
-                <div className="flex gap-1">
-                  {Array.from({ length: t.stars }).map((_, si) => (
-                    <Star key={si} className="w-4 h-4 fill-amber-400 text-amber-400" />
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, i) => (
+              <FadeIn key={step.step} delay={i * 0.1}>
+                <div className="feature-card text-center relative">
+                  {/* Step number */}
+                  <span className="absolute top-4 right-4 text-xs font-mono text-gray-300 font-bold">{step.step}</span>
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                    style={{ background: step.bgColor }}
+                  >
+                    <step.icon className="w-6 h-6" style={{ color: step.color }} />
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">{step.title}</h3>
+                  <p className="text-sm text-[#475569] leading-relaxed">{step.desc}</p>
+                  {/* Connector line (only between steps on desktop) */}
+                  {i < 2 && (
+                    <div className="hidden md:block absolute top-1/2 -right-4 w-8 border-t-2 border-dashed border-emerald-200" />
+                  )}
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          ARCHITECTURE SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28 bg-[#F9FAFB]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Diagram */}
+            <FadeIn>
+              <div className="mockup-window">
+                <div className="mockup-titlebar">
+                  <div className="mockup-dot bg-red-400" />
+                  <div className="mockup-dot bg-yellow-400" />
+                  <div className="mockup-dot bg-green-400" />
+                  <span className="text-xs text-gray-400 ml-2 font-medium">Architecture — Aurora DSQL</span>
+                </div>
+                <div className="p-6 bg-white">
+                  <svg viewBox="0 0 400 220" className="w-full h-auto" fill="none">
+                    {/* Client Layer */}
+                    <rect x="10" y="10" width="380" height="45" rx="8" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+                    <text x="200" y="28" textAnchor="middle" fill="#059669" fontSize="11" fontWeight="600">Client Layer</text>
+                    <text x="80" y="42" textAnchor="middle" fill="#475569" fontSize="9">Web App</text>
+                    <text x="200" y="42" textAnchor="middle" fill="#475569" fontSize="9">Mobile</text>
+                    <text x="320" y="42" textAnchor="middle" fill="#475569" fontSize="9">API</text>
+
+                    {/* Arrow */}
+                    <line x1="200" y1="55" x2="200" y2="75" stroke="#A7F3D0" strokeWidth="2" />
+                    <polygon points="195,73 200,80 205,73" fill="#A7F3D0" />
+
+                    {/* Next.js API */}
+                    <rect x="130" y="80" width="140" height="35" rx="8" fill="#F0FDF4" stroke="#10B981" strokeWidth="1.5" />
+                    <text x="200" y="102" textAnchor="middle" fill="#059669" fontSize="11" fontWeight="600">Next.js API Layer</text>
+
+                    {/* Arrow */}
+                    <line x1="200" y1="115" x2="200" y2="135" stroke="#A7F3D0" strokeWidth="2" />
+                    <polygon points="195,133 200,140 205,133" fill="#A7F3D0" />
+
+                    {/* Aurora DSQL */}
+                    <rect x="60" y="140" width="280" height="40" rx="10" fill="#059669" opacity="0.1" stroke="#059669" strokeWidth="2" />
+                    <text x="200" y="163" textAnchor="middle" fill="#059669" fontSize="13" fontWeight="700">Aurora DSQL</text>
+                    <text x="200" y="175" textAnchor="middle" fill="#047857" fontSize="8">Multi-Region · Serializable Isolation</text>
+
+                    {/* Regions */}
+                    <rect x="60" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+                    <text x="105" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">US-East-1</text>
+                    <rect x="155" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+                    <text x="200" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">EU-West-1</text>
+                    <rect x="250" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
+                    <text x="295" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">AP-South-1</text>
+
+                    {/* Connection lines from DSQL to regions */}
+                    <line x1="140" y1="180" x2="105" y2="190" stroke="#A7F3D0" strokeWidth="1" />
+                    <line x1="200" y1="180" x2="200" y2="190" stroke="#A7F3D0" strokeWidth="1" />
+                    <line x1="260" y1="180" x2="295" y2="190" stroke="#A7F3D0" strokeWidth="1" />
+                  </svg>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* Text */}
+            <div className="space-y-6">
+              <FadeIn>
+                <p className="section-label">Architecture</p>
+              </FadeIn>
+              <FadeIn delay={0.06}>
+                <h2 className="section-title">
+                  Built on <span className="gradient-text">Aurora DSQL.</span>
+                </h2>
+              </FadeIn>
+              <FadeIn delay={0.12}>
+                <p className="text-lg text-[#475569] leading-relaxed">
+                  Aurora DSQL provides serializable isolation across multiple regions — meaning your team&apos;s memory is identical everywhere. No stale caches, no conflicts, no data drift. Consistency is non-negotiable.
+                </p>
+              </FadeIn>
+              <FadeIn delay={0.18}>
+                <div className="space-y-4 pt-2">
+                  {[
+                    { icon: Shield, text: 'Serializable isolation — every read sees the latest write' },
+                    { icon: Zap, text: '<50ms read latency with multi-region replication' },
+                    { icon: Server, text: 'Zero conflicts — distributed SQL done right' },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                        <item.icon className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <span className="text-sm text-[#475569] font-medium">{item.text}</span>
+                    </div>
                   ))}
                 </div>
-
-                {/* Quote */}
-                <p className="text-[15px] text-gray-600 leading-relaxed italic">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-100/60">
-                  {/* Avatar with initials */}
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: t.bgColor }}
-                  >
-                    <span className="text-[13px] font-bold" style={{ color: t.color }}>{t.initials}</span>
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-gray-900">{t.name}</p>
-                    <p className="text-[12px] text-gray-400 font-medium">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ FAQ ═══════════ */}
-      <Section className="bg-white/40">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={staggerItem} className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-            Frequently asked questions
-          </motion.h2>
-          <motion.p variants={staggerItem} className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
-            Everything you need to know about ClearPath AI and calibrated transparency.
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          variants={staggerContainer}
-          className="max-w-3xl mx-auto space-y-4"
-        >
-          {faqs.map((faq, i) => (
-            <motion.div key={i} variants={staggerItem}>
-              <FAQItem question={faq.question} answer={faq.answer} />
-            </motion.div>
-          ))}
-        </motion.div>
-      </Section>
-
-      {/* ═══════════ FINAL CTA ═══════════ */}
-      <section className="py-20 md:py-28">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          <div className="relative rounded-3xl overflow-hidden p-12 md:p-20 text-center"
-            style={{
-              background: 'linear-gradient(135deg, #2563EB 0%, #1e40af 40%, #312e81 100%)',
-            }}
-          >
-            {/* Decorative glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 rounded-full opacity-20 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.2), transparent 60%)' }}
-            />
-            <div className="absolute bottom-0 left-0 w-60 h-60 rounded-full opacity-15 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 60%)' }}
-            />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-5 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.1), transparent 60%)' }}
-            />
-
-            <div className="relative z-10 space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-semibold bg-white/10 text-white/80 border border-white/10 backdrop-blur-sm">
-                <Sparkles className="w-3 h-3" />
-                Free forever — Optional accounts
-              </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                Ready to see honest AI in action?
-              </h2>
-              <p className="text-lg text-blue-200 max-w-2xl mx-auto">
-                Join thousands of people who have already found verified community resources through ClearPath AI. Accounts are optional, privacy-first, no risk.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  href="/app"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-blue-700 rounded-2xl bg-white hover:bg-gray-50 shadow-lg shadow-blue-900/20 hover:shadow-xl transition-all active:scale-[0.97]"
-                >
-                  Try the Demo
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/about"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white/90 rounded-2xl border border-white/20 hover:bg-white/10 hover:border-white/30 transition-all"
-                >
-                  Learn More
-                </Link>
-                <Link
-                  href="/responsible-ai"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[15px] font-semibold text-white/70 rounded-2xl hover:bg-white/5 transition-all"
-                >
-                  Our Responsible AI Commitment
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ═══════════ COMPREHENSIVE FOOTER ═══════════ */}
-      <footer className="mt-auto sidebar-dark text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-12">
-            {/* Brand */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                  <Layers className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-[15px] font-bold tracking-tight text-white">ClearPath AI</span>
-              </div>
-              <p className="text-[13px] text-gray-400 leading-relaxed max-w-xs">
-                When it matters most, honesty is the safest answer. Connecting people with verified community resources through calibrated transparency.
-              </p>
-              <p className="text-[11px] text-gray-500 font-medium">
-                Built for USAII Global AI Hackathon 2026
-              </p>
-              {/* Newsletter */}
-              <div className="pt-4">
-                <p className="text-[12px] font-semibold text-gray-300 mb-3">Stay updated</p>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/20"
-                  />
-                  <button className="px-4 py-2 rounded-lg text-[13px] font-semibold text-white bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-md shadow-blue-500/20 transition-all">
-                    <Mail className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Product */}
-            <div className="space-y-4">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Product</h4>
-              <nav className="space-y-3">
-                <Link href="/#how-it-works" className="block text-[14px] text-gray-400 hover:text-white transition-colors">How It Works</Link>
-                <Link href="/app" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Demo</Link>
-                <Link href="/#scenarios" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Scenarios</Link>
-                <Link href="/pricing" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Pricing</Link>
-                <Link href="/dashboard" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Dashboard</Link>
-              </nav>
-            </div>
-
-            {/* Resources */}
-            <div className="space-y-4">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Resources</h4>
-              <nav className="space-y-3">
-                <Link href="/about" className="block text-[14px] text-gray-400 hover:text-white transition-colors">About</Link>
-                <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Responsible AI</Link>
-                <Link href="/history" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Documentation</Link>
-                <Link href="/settings" className="block text-[14px] text-gray-400 hover:text-white transition-colors">API Reference</Link>
-                <Link href="/profile" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Community</Link>
-              </nav>
-            </div>
-
-            {/* Company & Legal */}
-            <div className="space-y-4">
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400">Legal</h4>
-              <nav className="space-y-3">
-                <Link href="/privacy" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="block text-[14px] text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
-                <Link href="/responsible-ai" className="block text-[14px] text-gray-400 hover:text-white transition-colors">AI Ethics</Link>
-              </nav>
-              <h4 className="text-[12px] font-bold uppercase tracking-wider text-gray-400 pt-4">Contact</h4>
-              <nav className="space-y-3">
-                <a href="mailto:team@clearpath-ai.org" className="block text-[14px] text-gray-400 hover:text-white transition-colors">team@clearpath-ai.org</a>
-              </nav>
-            </div>
-          </div>
-
-          {/* Social links & bottom bar */}
-          <div className="mt-16 pt-8 border-t border-white/5">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-[12px] text-gray-500">
-                &copy; 2026 ClearPath AI. All rights reserved. Built with calibrated transparency.
-              </p>
-              <div className="flex items-center gap-4">
-                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub">
-                  <Code2 className="w-4 h-4" />
-                </a>
-                <a href="#" className="text-gray-500 hover:text-white transition-colors" aria-label="Twitter">
-                  <Globe2 className="w-4 h-4" />
-                </a>
-                <a href="mailto:team@clearpath-ai.org" className="text-gray-500 hover:text-white transition-colors" aria-label="Email">
-                  <Mail className="w-4 h-4" />
-                </a>
-              </div>
+              </FadeIn>
             </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          CTA SECTION
+          ═══════════════════════════════════════════════════════════ */}
+      <section className="py-20 md:py-28 emerald-section relative overflow-hidden">
+        <div className="absolute inset-0 dot-pattern opacity-10" />
+
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+          <FadeIn>
+            <p className="text-xs font-bold tracking-widest uppercase text-white/60 mb-6">Ready to start?</p>
+          </FadeIn>
+          <FadeIn delay={0.06}>
+            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+              Give your team the memory it deserves.
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.12}>
+            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-xl mx-auto">
+              Stop losing knowledge. Start building a shared memory that grows with your team. Free to start, no credit card required.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.18}>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup" className="inline-flex items-center justify-center gap-2 h-12 px-8 text-[15px] font-semibold bg-white text-emerald-700 rounded-xl shadow-lg hover:bg-gray-50 transition-colors">
+                Get Started Free
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link href="/#how-it-works" className="inline-flex items-center justify-center gap-2 h-12 px-8 text-[15px] font-semibold bg-white/10 text-white border border-white/20 rounded-xl hover:bg-white/20 transition-colors">
+                Learn More
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       <Footer />
     </div>
   )

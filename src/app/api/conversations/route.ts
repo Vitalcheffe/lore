@@ -2,43 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
-// GET /api/conversations — list conversations, optionally filtered
-// Query params: userId, search, category, skip, take
-// Graceful auth: if authenticated, use session userId; if not, return empty (guest mode)
+// GET /api/conversations — list conversations
 export async function GET(request: NextRequest) {
   try {
     const sessionUserId = await getAuthenticatedUserId(request);
 
-    // If not authenticated, return empty list for guest mode
     if (!sessionUserId) {
-      return NextResponse.json({
-        conversations: [],
-        total: 0,
-      });
+      return NextResponse.json({ conversations: [], total: 0 });
     }
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
-    const category = searchParams.get("category");
     const skip = parseInt(searchParams.get("skip") || "0", 10);
     const take = parseInt(searchParams.get("take") || "0", 10);
 
-    // Always use the authenticated session userId (ignore query param)
     const where: Record<string, unknown> = { userId: sessionUserId };
-    if (category && category !== "all") {
-      where.category = category;
-    }
     if (search) {
       where.OR = [
         { title: { contains: search } },
         { preview: { contains: search } },
-        { category: { contains: search } },
       ];
     }
 
-    const conversations = await db.conversation.findMany({
+    const conversations = await db.chatConversation.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { updatedAt: "desc" },
       skip: skip > 0 ? skip : undefined,
       take: take > 0 ? take : undefined,
       include: {
@@ -49,21 +37,21 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Also get total count for pagination
-    const total = await db.conversation.count({ where });
+    const total = await db.chatConversation.count({ where });
 
     const mapped = conversations.map((c) => {
-      // Try to extract top resource from the first AI message's resources field
       let topResource: string | null = null;
       for (const msg of c.messages) {
-        if (msg.role === "ai" && msg.resources) {
+        if (msg.role === "assistant" && msg.resources) {
           try {
             const resources = JSON.parse(msg.resources);
             if (Array.isArray(resources) && resources.length > 0) {
-              topResource = typeof resources[0] === "string" ? resources[0] : resources[0]?.title || resources[0]?.name || null;
+              topResource =
+                typeof resources[0] === "string"
+                  ? resources[0]
+                  : resources[0]?.title || resources[0]?.name || null;
             }
           } catch {
-            // not JSON, try as plain string
             if (msg.resources.trim()) {
               topResource = msg.resources.split("\n")[0] || null;
             }
@@ -76,6 +64,7 @@ export async function GET(request: NextRequest) {
         id: c.id,
         title: c.title,
         preview: c.preview,
+        pinned: c.pinned,
         category: c.category,
         categoryColor: c.categoryColor,
         confidence: c.confidence,
@@ -86,10 +75,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      conversations: mapped,
-      total,
-    });
+    return NextResponse.json({ conversations: mapped, total });
   } catch (error) {
     console.error("Error fetching conversations:", error);
     return NextResponse.json(
@@ -100,12 +86,11 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/conversations — create a new conversation
-// Graceful auth: if authenticated, use session userId; if not, allow guest creation
 export async function POST(request: NextRequest) {
   try {
     const sessionUserId = await getAuthenticatedUserId(request);
     const body = await request.json();
-    const { title, preview, category, categoryColor, confidence, isCrisis, userId } = body;
+    const { title, preview, pinned } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -114,17 +99,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If authenticated, always use session userId (ignore the one from body)
-    const effectiveUserId = sessionUserId || userId || null;
+    const effectiveUserId = sessionUserId || null;
 
-    const conversation = await db.conversation.create({
+    const conversation = await db.chatConversation.create({
       data: {
         title,
         preview: preview || title,
-        category: category || null,
-        categoryColor: categoryColor || null,
-        confidence: confidence || 0,
-        isCrisis: isCrisis || false,
+        pinned: pinned || false,
         isGuest: !effectiveUserId,
         userId: effectiveUserId,
       },
@@ -134,11 +115,13 @@ export async function POST(request: NextRequest) {
       id: conversation.id,
       title: conversation.title,
       preview: conversation.preview,
+      pinned: conversation.pinned,
       category: conversation.category,
       categoryColor: conversation.categoryColor,
       confidence: conversation.confidence,
       isCrisis: conversation.isCrisis,
       createdAt: conversation.createdAt.toISOString(),
+      updatedAt: conversation.updatedAt.toISOString(),
     });
   } catch (error) {
     console.error("Error creating conversation:", error);

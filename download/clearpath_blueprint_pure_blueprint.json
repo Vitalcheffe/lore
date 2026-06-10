@@ -1,0 +1,248 @@
+{
+  "document_meta": {
+    "title": "ClearPath AI - Project Showcase",
+    "total_pages": 8
+  },
+  "art_direction": {
+    "palette_mode": "dark",
+    "color_harmony": "split_complementary",
+    "background_svg": "continuous_flow",
+    "design_rationale": "Dark tech aesthetic with warm terracotta accent conveys AI sophistication + human warmth. Continuous flow SVG unifies the multi-page narrative. Split-complementary harmony balances cold tech with warm humanity."
+  },
+  "pages": [
+    {
+      "page_index": 1,
+      "narrative_role": "Burst",
+      "archetype": "cover_hero",
+      "components": [
+        {
+          "type": "Floating_Meta",
+          "position": "top-left",
+          "items": ["USAII GLOBAL AI HACKATHON 2026", "COMMUNITY TRACK"]
+        },
+        {
+          "type": "Page_Ghost_Number",
+          "number": "01"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "black",
+          "variant": "standard",
+          "scale": 6,
+          "content": "CLEARPATH<br>AI"
+        },
+        {
+          "type": "Hairline_Divider",
+          "style": "accent"
+        },
+        {
+          "type": "Floating_Meta",
+          "position": "bottom-right",
+          "items": ["WE DON'T JUST FIND HELP.", "WE SHOW YOU WHY."]
+        }
+      ]
+    },
+    {
+      "page_index": 2,
+      "narrative_role": "Expand",
+      "archetype": "editorial_flow",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "02"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 4,
+          "content": "THE PROBLEM"
+        },
+        {
+          "type": "Glass_Canvas",
+          "tension_score": 0.8,
+          "markdown_content": "**When someone needs help, a confident wrong answer is more dangerous than no answer at all.**\n\nSomeone types 'I can't pay rent.' A search engine gives rental assistance programs. An AI confidently recommends a 3-month waitlist. But what they actually needed was legal aid for an emergency eviction defense — help available within 24 hours.\n\nThe confident match just cost them their home."
+        },
+        {
+          "type": "Stat_Block",
+          "number": "73",
+          "unit": "%",
+          "label": "OF COMMUNITY RESOURCE SEARCHES LEAD TO DEAD ENDS"
+        }
+      ]
+    },
+    {
+      "page_index": 3,
+      "narrative_role": "Expand",
+      "archetype": "editorial_flow",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "03"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 4,
+          "content": "THE INSIGHT"
+        },
+        {
+          "type": "Glass_Canvas",
+          "tension_score": 0.3,
+          "markdown_content": "Most AI systems hide their uncertainty. In community resource matching, that is dangerous.\n\n**What if the AI showed you what it knows, what it doesn't, and why?**\n\nWhen someone is looking for help, an honest uncertain answer can save a life. A confident wrong answer can destroy one. Uncertainty is not a bug — it is the safety feature."
+        }
+      ]
+    },
+    {
+      "page_index": 4,
+      "narrative_role": "Expand",
+      "archetype": "editorial_flow",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "04"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 4,
+          "content": "THE SOLUTION"
+        },
+        {
+          "type": "Glass_Canvas",
+          "tension_score": 0.4,
+          "markdown_content": "### ClearPath AI\nA community resource navigator that shows calibrated confidence instead of hiding uncertainty.\n\n**Six layers of intelligent transparency:**\n\n1. **Free-text input** — Describe your situation in your own words\n2. **Crisis safety net** — Hardcoded keyword detection, AI cannot override\n3. **Multi-label classification** — Multiple matches with confidence scores, not one answer\n4. **Clarification questions** — When confidence is low, ask — don't guess harder\n5. **Transparent reasoning** — Every recommendation shows why, what else, and how confident\n6. **Human escalation** — When AI is unsure, it backs off and connects to a real person"
+        }
+      ]
+    },
+    {
+      "page_index": 5,
+      "narrative_role": "Expand",
+      "archetype": "split_vertical",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "05"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 3,
+          "content": "HOW IT WORKS"
+        },
+        {
+          "type": "Process_List",
+          "steps": [
+            {
+              "title": "User describes need",
+              "description": "Free-text: 'I can't pay rent anymore'"
+            },
+            {
+              "title": "Crisis check",
+              "description": "Keyword scan triggers 211 hotline display"
+            },
+            {
+              "title": "NLP classification",
+              "description": "Zero-shot multi-label: Legal Aid 78%, Emergency Funds 52%, Housing 34%"
+            },
+            {
+              "title": "Clarification",
+              "description": "'Have you received an eviction notice?' — Yes → Legal Aid 94%"
+            },
+            {
+              "title": "Transparent output",
+              "description": "3 resources per category with reasoning and confidence"
+            },
+            {
+              "title": "Human escalation",
+              "description": "Low confidence → connect to navigator at 211"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page_index": 6,
+      "narrative_role": "Expand",
+      "archetype": "data_dashboard",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "06"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 3,
+          "content": "TECH STACK"
+        },
+        {
+          "type": "Stat_Block",
+          "number": "100",
+          "unit": "%",
+          "label": "FREE / OPEN SOURCE TOOLS"
+        },
+        {
+          "type": "Glass_Canvas",
+          "tension_score": 0.2,
+          "markdown_content": "### AI Pipeline\n- **Hugging Face Transformers** — Zero-shot NLP classification\n- **Temperature scaling** — Confidence calibration\n- **Active learning** — Clarification question logic\n\n### Web Application\n- **React + TypeScript** — Frontend interface\n- **Node.js + Express** — Backend API\n- **MongoDB** — Resource database\n\n### Safety & Deploy\n- **Python keyword engine** — Crisis detection layer\n- **Vercel + AWS** — Free-tier hosting\n- **No paid APIs required**"
+        }
+      ]
+    },
+    {
+      "page_index": 7,
+      "narrative_role": "Expand",
+      "archetype": "editorial_flow",
+      "components": [
+        {
+          "type": "Page_Ghost_Number",
+          "number": "07"
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "thin",
+          "variant": "standard",
+          "scale": 4,
+          "content": "RESPONSIBLE AI"
+        },
+        {
+          "type": "Glass_Canvas",
+          "tension_score": 0.5,
+          "markdown_content": "### Responsibility is the architecture, not a disclaimer.\n\n**Three built-in safety mechanisms:**\n\n1. **Crisis safety net** — Hardcoded keyword detection that the AI layer CANNOT override. Crisis resources appear regardless of classification results.\n\n2. **Forced transparency** — Confidence scores are always visible. The system never presents a single answer as certain when it isn't.\n\n3. **Automatic human escalation** — When no category exceeds 70% confidence, the system recommends speaking with a trained navigator instead of guessing harder.\n\n### Known limitations\n- Cannot determine eligibility for programs\n- Cannot replace professional social workers\n- May misclassify complex multi-need situations\n- Requires curated, locally accurate resource data"
+        }
+      ]
+    },
+    {
+      "page_index": 8,
+      "narrative_role": "Echo",
+      "archetype": "cover_hero",
+      "components": [
+        {
+          "type": "Floating_Meta",
+          "position": "top-left",
+          "items": ["USAII GLOBAL AI HACKATHON 2026", "COMMUNITY TRACK"]
+        },
+        {
+          "type": "Hero_Typography",
+          "weight": "black",
+          "variant": "standard",
+          "scale": 5,
+          "content": "WHEN IT<br>MATTERS MOST,<br>HONESTY IS<br>THE SAFEST<br>ANSWER."
+        },
+        {
+          "type": "Hairline_Divider",
+          "style": "accent"
+        },
+        {
+          "type": "Floating_Meta",
+          "position": "bottom-right",
+          "items": ["CLEARPATH AI", "BUILT BY AMINE & HARSHIT"]
+        }
+      ]
+    }
+  ]
+}

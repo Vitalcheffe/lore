@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ClearPath AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F7F7F8;
+    --surface-hover: #EFEFEF;
+    --border: #E5E5E5;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --text-tertiary: #999999;
+    --accent: #000000;
+    --user-bubble: #F0F0F0;
+    --crisis-red: #DC2626;
+    --crisis-bg: #FEF2F2;
+    --confidence-high: #16A34A;
+    --confidence-mid: #EAB308;
+    --confidence-low: #F97316;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+    --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    background: var(--bg);
+  }
+
+  /* ─── Header ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-menu {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition);
+  }
+
+  .header-menu:hover { background: var(--surface); }
+
+  .header-menu span {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    background: var(--text-primary);
+    border-radius: 1px;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .header-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-logo svg {
+    width: 14px;
+    height: 14px;
+    fill: white;
+  }
+
+  .header-new {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition);
+  }
+
+  .header-new:hover { background: var(--surface); }
+
+  .header-new svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--text-primary);
+    stroke-width: 2;
+    fill: none;
+  }
+
+  /* ─── Chat Area ─── */
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 0 8px;
+  }
+
+  .chat::-webkit-scrollbar { width: 0; }
+
+  /* ─── Welcome Screen ─── */
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px 32px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .welcome-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+
+  .welcome-icon svg { width: 28px; height: 28px; fill: white; }
+
+  .welcome h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .welcome p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 280px;
+  }
+
+  /* ─── Suggestions ─── */
+  .suggestions {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: slideUp 0.4s ease 0.2s both;
+  }
+
+  .suggestion {
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .suggestion::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .suggestion:hover { border-color: #CCC; transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .suggestion:active { transform: scale(0.98); }
+
+  .suggestion-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .suggestion-text {
+    font-weight: 500;
+    letter-spacing: -0.1px;
+  }
+
+  /* ─── Messages ─── */
+  .messages { padding: 8px 16px 8px; }
+
+  .message {
+    margin-bottom: 20px;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .message-user {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .message-user .bubble {
+    background: var(--user-bubble);
+    border-radius: var(--radius-lg) var(--radius-lg) 6px var(--radius-lg);
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 85%;
+    letter-spacing: -0.1px;
+  }
+
+  .message-ai {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .ai-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .ai-avatar svg { width: 14px; height: 14px; fill: white; }
+
+  .ai-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ai-text {
+    font-size: 14px;
+    line-height: 1.6;
+    letter-spacing: -0.1px;
+    color: var(--text-primary);
+  }
+
+  .ai-text p { margin-bottom: 10px; }
+  .ai-text p:last-child { margin-bottom: 0; }
+
+  /* ─── Classification Cards ─── */
+  .classification {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .class-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    transition: all var(--transition);
+  }
+
+  .class-card:hover { box-shadow: var(--shadow-sm); border-color: #CCC; }
+
+  .class-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .class-label {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .class-score {
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.3px;
+  }
+
+  .score-high { color: var(--confidence-high); }
+  .score-mid { color: var(--confidence-mid); }
+  .score-low { color: var(--confidence-low); }
+
+  .class-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .class-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+  }
+
+  .bar-high { background: var(--confidence-high); }
+  .bar-mid { background: var(--confidence-mid); }
+  .bar-low { background: var(--confidence-low); }
+
+  .class-detail {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .class-detail strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  /* ─── Crisis Card ─── */
+  .crisis-card {
+    background: var(--crisis-bg);
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  .crisis-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .crisis-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--crisis-red);
+    animation: pulse 1.5s infinite;
+  }
+
+  .crisis-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--crisis-red);
+    letter-spacing: -0.2px;
+  }
+
+  .crisis-body {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #7F1D1D;
+  }
+
+  .crisis-numbers {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .crisis-number {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: white;
+    border-radius: var(--radius-sm);
+    border: 1px solid #FECACA;
+  }
+
+  .crisis-number-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--crisis-red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .crisis-number-icon svg { width: 16px; height: 16px; fill: white; }
+
+  .crisis-number-info { flex: 1; }
+
+  .crisis-number-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .crisis-number-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--crisis-red);
+    letter-spacing: -0.5px;
+  }
+
+  /* ─── Clarification Card ─── */
+  .clarify-card {
+    margin-top: 12px;
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 16px;
+  }
+
+  .clarify-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .clarify-question {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .clarify-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .clarify-option {
+    padding: 11px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: -0.1px;
+  }
+
+  .clarify-option:hover { border-color: #CCC; background: var(--bg); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .clarify-option:active { transform: scale(0.98); }
+
+  /* ─── Transparency Section ─── */
+  .transparency {
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+
+  .transparency-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color var(--transition);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .transparency-toggle:hover { color: var(--text-secondary); }
+
+  .transparency-toggle svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: transform var(--transition);
+  }
+
+  .transparency-toggle.open svg { transform: rotate(180deg); }
+
+  .transparency-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transparency-content.open { max-height: 400px; }
+
+  .transparency-items {
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .transparency-item {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding: 6px 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .transparency-item-icon {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* ─── Typing Indicator ─── */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+    align-items: center;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    animation: typingBounce 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ─── Input Bar ─── */
+  .input-bar {
+    padding: 8px 12px 12px;
+    background: var(--bg);
+    border-top: 0.5px solid var(--border);
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 8px 8px 8px 16px;
+    min-height: 44px;
+    border: 1px solid transparent;
+    transition: all var(--transition);
+  }
+
+  .input-wrap:focus-within { border-color: var(--border); background: var(--bg); }
+
+  .input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text-primary);
+    resize: none;
+    max-height: 100px;
+    line-height: 1.45;
+    padding: 4px 0;
+  }
+
+  .input-field::placeholder { color: var(--text-tertiary); }
+
+  .input-send {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition);
+    opacity: 0.4;
+  }
+
+  .input-send.active { opacity: 1; }
+  .input-send:hover { transform: scale(1.05); }
+  .input-send:active { transform: scale(0.95); }
+
+  .input-send svg { width: 14px; height: 14px; fill: white; }
+
+  .input-disclaimer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+    letter-spacing: 0;
+  }
+
+  /* ─── Separator ─── */
+  .separator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 16px 8px;
+  }
+
+  .separator-line {
+    flex: 1;
+    height: 0.5px;
+    background: var(--border);
+  }
+
+  .separator-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+  }
+
+  /* ─── Follow-up Suggestions ─── */
+  .followups {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .followup {
+    padding: 8px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: -0.1px;
+    white-space: nowrap;
+  }
+
+  .followup:hover { border-color: #CCC; background: var(--surface); }
+
+  /* ─── Animations ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes typingBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes barGrow {
+    from { width: 0; }
+  }
+
+  /* ─── Desktop Enhancement ─── */
+  @media (min-width: 481px) {
+    .app {
+      border-left: 0.5px solid var(--border);
+      border-right: 0.5px solid var(--border);
+      box-shadow: 0 0 60px rgba(0,0,0,0.04);
+    }
+  }
+
+  /* ─── Reset Button ─── */
+  .reset-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    transition: all var(--transition);
+  }
+
+  .reset-btn.visible { display: flex; }
+  .reset-btn:hover { transform: scale(1.1); }
+  .reset-btn:active { transform: scale(0.95); }
+  .reset-btn svg { width: 18px; height: 18px; stroke: white; stroke-width: 2; fill: none; }
+
+  /* ─── Confidence Upgrade Animation ─── */
+  .score-upgrade {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .score-upgrade .arrow {
+    font-size: 11px;
+    color: var(--confidence-high);
+  }
+
+  .score-old {
+    text-decoration: line-through;
+    opacity: 0.4;
+    font-size: 12px;
+  }
+
+  .score-new { }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .status-badge-crisis {
+    background: var(--crisis-bg);
+    color: var(--crisis-red);
+    border: 1px solid #FECACA;
+  }
+
+  .status-badge-clarify {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+  }
+
+  .status-badge-verified {
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-menu" onclick="resetDemo()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="header-title">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      ClearPath AI
+    </div>
+    <div class="header-new" onclick="resetDemo()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat" id="chat">
+    <!-- Welcome -->
+    <div class="welcome" id="welcome">
+      <div class="welcome-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h1>How can I help?</h1>
+      <p>I connect you with verified community resources. Tell me what you need.</p>
+    </div>
+
+    <!-- Initial Suggestions -->
+    <div class="suggestions" id="suggestions">
+      <div class="suggestion" onclick="startScenario('maria')">
+        <div class="suggestion-label">Multi-Need</div>
+        <div class="suggestion-text">"I lost my job and can't pay rent. My kids need food."</div>
+      </div>
+      <div class="suggestion" onclick="startScenario('crisis')">
+        <div class="suggestion-label">Crisis</div>
+        <div class="suggestion-text">"I can't take this anymore. I want it all to end."</div>
+      </div>
+      <div class="suggestion" onclick="startScenario('clarify')">
+        <div class="suggestion-label">Low Confidence</div>
+        <div class="suggestion-text">"I need help with my situation"</div>
+      </div>
+      <div class="suggestion" onclick="startScenario('dorothy')">
+        <div class="suggestion-label">Senior</div>
+        <div class="suggestion-text">"I'm 78 and need help getting groceries delivered"</div>
+      </div>
+      <div class="suggestion" onclick="startScenario('veteran')">
+        <div class="suggestion-label">Complex</div>
+        <div class="suggestion-text">"I'm a veteran dealing with PTSD and housing issues"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Bar -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <input class="input-field" id="inputField" placeholder="Describe what you need..." onfocus="this.blur()" readonly>
+      <button class="input-send" id="sendBtn">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="input-disclaimer">ClearPath AI — Verified resources, calibrated confidence</div>
+  </div>
+</div>
+
+<button class="reset-btn" id="resetBtn" onclick="resetDemo()">
+  <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+</button>
+
+<script>
+const chat = document.getElementById('chat');
+const welcome = document.getElementById('welcome');
+const suggestionsEl = document.getElementById('suggestions');
+const resetBtn = document.getElementById('resetBtn');
+
+const logoSVG = `<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`;
+const phoneSVG = `<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+
+let scenarioActive = false;
+
+function scrollToBottom() {
+  setTimeout(() => {
+    chat.scrollTop = chat.scrollHeight;
+  }, 50);
+}
+
+function hideWelcome() {
+  welcome.style.display = 'none';
+  suggestionsEl.style.display = 'none';
+}
+
+function addUserMessage(text) {
+  const div = document.createElement('div');
+  div.className = 'message message-user';
+  div.innerHTML = `<div class="bubble">${text}</div>`;
+  chat.appendChild(div);
+  scrollToBottom();
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'message message-ai';
+  div.id = 'typing';
+  div.innerHTML = `
+    <div class="ai-avatar">${logoSVG}</div>
+    <div class="ai-content">
+      <div class="typing">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  `;
+  chat.appendChild(div);
+  scrollToBottom();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+function addAIMessage(html) {
+  removeTyping();
+  const div = document.createElement('div');
+  div.className = 'message message-ai';
+  div.innerHTML = `
+    <div class="ai-avatar">${logoSVG}</div>
+    <div class="ai-content">${html}</div>
+  `;
+  chat.appendChild(div);
+  scrollToBottom();
+  // Animate confidence bars
+  setTimeout(() => {
+    div.querySelectorAll('.class-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 100);
+}
+
+function addSeparator(text) {
+  const div = document.createElement('div');
+  div.className = 'separator';
+  div.innerHTML = `<div class="separator-line"></div><div class="separator-text">${text}</div><div class="separator-line"></div>`;
+  chat.appendChild(div);
+  scrollToBottom();
+}
+
+function addFollowups(items) {
+  const div = document.createElement('div');
+  div.className = 'followups';
+  items.forEach(text => {
+    const btn = document.createElement('div');
+    btn.className = 'followup';
+    btn.textContent = text;
+    btn.onclick = () => btn.remove();
+    div.appendChild(btn);
+  });
+  chat.appendChild(div);
+  scrollToBottom();
+}
+
+function toggleTransparency(el) {
+  const content = el.nextElementSibling;
+  el.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function startScenario(name) {
+  if (scenarioActive) return;
+  scenarioActive = true;
+  hideWelcome();
+  resetBtn.classList.add('visible');
+
+  switch(name) {
+    case 'maria': await scenarioMaria(); break;
+    case 'crisis': await scenarioCrisis(); break;
+    case 'clarify': await scenarioClarify(); break;
+    case 'dorothy': await scenarioDorothy(); break;
+    case 'veteran': await scenarioVeteran(); break;
+  }
+}
+
+// ─── SCENARIO 1: Maria - Multi-Need Classification ───
+async function scenarioMaria() {
+  addUserMessage("I lost my job and can't pay rent. My kids need food.");
+  await delay(800);
+  addTyping();
+  await delay(1200);
+
+  addAIMessage(`
+    <div class="ai-text">
+      <p>I found <strong>3 verified resources</strong> that match your needs. Here's what I identified:</p>
+    </div>
+    <div class="classification">
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Housing Assistance</span>
+          <span class="class-score score-high">87%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="87%"></div></div>
+        <div class="class-detail"><strong>Section 8 Emergency Transfer</strong> — 2 locations near you. Application takes ~15 min.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Food Assistance</span>
+          <span class="class-score score-high">82%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="82%"></div></div>
+        <div class="class-detail"><strong>Community Food Bank</strong> — Next distribution: Thursday 9AM. No ID required.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Employment Services</span>
+          <span class="class-score score-mid">64%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-mid" data-width="64%"></div></div>
+        <div class="class-detail"><strong>Workforce Center</strong> — Job placement + training. Walk-ins welcome Mon-Fri.</div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Why these results?
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Classified by BART-large-MNLI zero-shot model against 8 service categories</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Resources sourced from United Way 211 verified database</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Employment at 64% — below 70% threshold, consider clarifying your work background for better matches</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(600);
+  addSeparator('Next');
+  addFollowups(['Tell me more about housing', 'Food bank directions', 'Job training options', 'Start over']);
+}
+
+// ─── SCENARIO 2: Crisis Detection ───
+async function scenarioCrisis() {
+  addUserMessage("I can't take this anymore. I want it all to end.");
+  await delay(400);
+
+  // Crisis detected immediately — skip AI classification
+  addAIMessage(`
+    <div class="status-badge status-badge-crisis" style="margin-bottom: 10px;">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--crisis-red);display:inline-block;animation:pulse 1.5s infinite;"></span>
+      Crisis detected — AI classification bypassed
+    </div>
+    <div class="ai-text">
+      <p>I hear you, and I want to make sure you're safe right now. You don't have to go through this alone.</p>
+    </div>
+    <div class="crisis-card">
+      <div class="crisis-header">
+        <div class="crisis-dot"></div>
+        <div class="crisis-title">Immediate help is available 24/7</div>
+      </div>
+      <div class="crisis-body">These are real people trained to help. Free. Confidential. Available right now.</div>
+      <div class="crisis-numbers">
+        <div class="crisis-number">
+          <div class="crisis-number-icon">${phoneSVG}</div>
+          <div class="crisis-number-info">
+            <div class="crisis-number-label">Suicide & Crisis Lifeline</div>
+            <div class="crisis-number-value">988</div>
+          </div>
+        </div>
+        <div class="crisis-number">
+          <div class="crisis-number-icon">${phoneSVG}</div>
+          <div class="crisis-number-info">
+            <div class="crisis-number-label">Crisis Text Line</div>
+            <div class="crisis-number-value">Text HOME to 741741</div>
+          </div>
+        </div>
+        <div class="crisis-number">
+          <div class="crisis-number-icon">${phoneSVG}</div>
+          <div class="crisis-number-info">
+            <div class="crisis-number-label">Local Crisis Center</div>
+            <div class="crisis-number-value">211</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Why no AI classification?
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Crisis keywords detected by hardcoded safety layer — not AI</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>AI models can misclassify crisis situations, so this check runs first and bypasses all AI processing</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Your safety is always prioritized over resource matching</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(600);
+  addSeparator('Next');
+  addFollowups(['I want to talk to someone', 'Show me other resources', 'Start over']);
+}
+
+// ─── SCENARIO 3: Clarification Flow ───
+async function scenarioClarify() {
+  addUserMessage("I need help with my situation");
+  await delay(800);
+  addTyping();
+  await delay(1200);
+
+  addAIMessage(`
+    <div class="status-badge status-badge-clarify" style="margin-bottom: 10px;">
+      Confidence too low — clarification needed
+    </div>
+    <div class="ai-text">
+      <p>I want to help, but I need to understand your situation better to find the right resources.</p>
+    </div>
+    <div class="clarify-card">
+      <div class="clarify-label">AI Confidence: 43%</div>
+      <div class="clarify-question">Which of these best describes what you need?</div>
+      <div class="clarify-options">
+        <div class="clarify-option" onclick="clarifyStep2('housing')">Housing or shelter</div>
+        <div class="clarify-option" onclick="clarifyStep2('food')">Food or basic necessities</div>
+        <div class="clarify-option" onclick="clarifyStep2('health')">Health or mental health support</div>
+        <div class="clarify-option" onclick="clarifyStep2('legal')">Legal assistance or immigration</div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Why am I being asked this?
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Your request scored below 50% across all categories — too ambiguous for reliable matching</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>One clarification question can boost confidence by 30-40%, ensuring you get accurate resources</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>This is active learning — the model uses your answer to refine its classification</div>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+async function clarifyStep2(category) {
+  const categoryMap = {
+    housing: { label: 'Housing Assistance', score: '83%', detail: '<strong>Emergency Shelter Network</strong> — 4 locations with availability. Walk-ins accepted until 8 PM.' },
+    food: { label: 'Food Assistance', score: '79%', detail: '<strong>SNAP Benefits Enrollment</strong> — You may qualify for $250/month. Apply online in 10 min.' },
+    health: { label: 'Mental Health Services', score: '76%', detail: '<strong>Community Health Center</strong> — Sliding scale fees ($0-$30). Same-day appointments available.' },
+    legal: { label: 'Legal Aid', score: '81%', detail: '<strong>Legal Aid Society</strong> — Free consultations for housing, immigration, and benefits cases.' }
+  };
+
+  const c = categoryMap[category];
+  addUserMessage(`I need ${category} help`);
+  await delay(800);
+  addTyping();
+  await delay(1200);
+
+  addAIMessage(`
+    <div class="status-badge status-badge-verified" style="margin-bottom: 10px;">
+      Confidence upgraded: 43% → ${c.score}
+    </div>
+    <div class="ai-text">
+      <p>Much better. Here's what I found:</p>
+    </div>
+    <div class="classification">
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">${c.label}</span>
+          <span class="class-score score-high">
+            <span class="score-upgrade">
+              <span class="score-old">43%</span>
+              <span class="arrow">→</span>
+              <span class="score-new">${c.score}</span>
+            </span>
+          </span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="${c.score}"></div></div>
+        <div class="class-detail">${c.detail}</div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        How confidence improved
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Your clarification narrowed the classification from 8 categories to 1 primary match</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>The model combined your original text + clarification to re-score all categories</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Resources now come from a verified database specific to ${c.label.toLowerCase()}</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(600);
+  addSeparator('Next');
+  addFollowups(['Show me directions', 'Are there other options?', 'Start over']);
+}
+
+// ─── SCENARIO 4: Dorothy - Single Need, Senior ───
+async function scenarioDorothy() {
+  addUserMessage("I'm 78 and need help getting groceries delivered");
+  await delay(800);
+  addTyping();
+  await delay(1200);
+
+  addAIMessage(`
+    <div class="ai-text">
+      <p>I found <strong>2 verified resources</strong> for grocery delivery assistance:</p>
+    </div>
+    <div class="classification">
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Senior Grocery Delivery</span>
+          <span class="class-score score-high">94%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="94%"></div></div>
+        <div class="class-detail"><strong>Meals on Wheels</strong> — Free grocery delivery for seniors 60+. Call <strong>(555) 234-5678</strong> to enroll. No internet needed.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">SNAP Online Purchasing</span>
+          <span class="class-score score-high">78%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="78%"></div></div>
+        <div class="class-detail"><strong>EBT Online</strong> — Use SNAP benefits on Amazon, Walmart, and Instacart for home delivery.</div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Why these results?
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>94% confidence — your age (78) and specific need (grocery delivery) made this a clear match</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Meals on Wheels prioritized because it requires zero technology — just a phone call</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>SNAP Online included as secondary option since it requires internet access and EBT card</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(600);
+  addSeparator('Next');
+  addFollowups(['Call Meals on Wheels', 'How to apply for SNAP', 'Other senior services', 'Start over']);
+}
+
+// ─── SCENARIO 5: Veteran - Complex Needs ───
+async function scenarioVeteran() {
+  addUserMessage("I'm a veteran dealing with PTSD and housing issues");
+  await delay(800);
+  addTyping();
+  await delay(1200);
+
+  addAIMessage(`
+    <div class="ai-text">
+      <p>I found <strong>4 verified resources</strong> across your needs. Veteran-specific programs are prioritized:</p>
+    </div>
+    <div class="classification">
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Veteran Housing (VASH)</span>
+          <span class="class-score score-high">91%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="91%"></div></div>
+        <div class="class-detail"><strong>VA Supportive Housing</strong> — HUD-VASH vouchers for veterans. Case manager assigned. Call VA at <strong>1-877-424-3838</strong>.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">PTSD Treatment</span>
+          <span class="class-score score-high">89%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="89%"></div></div>
+        <div class="class-detail"><strong>VA PTSD Program</strong> — Evidence-based therapy. No copay for combat veterans. Telehealth available.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Veteran Crisis Line</span>
+          <span class="class-score score-high">85%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-high" data-width="85%"></div></div>
+        <div class="class-detail"><strong>988, Press 1</strong> — Veterans Crisis Line. Text <strong>838255</strong>. Chat at veteranscrisisline.net.</div>
+      </div>
+      <div class="class-card">
+        <div class="class-header">
+          <span class="class-label">Veteran Employment</span>
+          <span class="class-score score-mid">62%</span>
+        </div>
+        <div class="class-bar"><div class="class-bar-fill bar-mid" data-width="62%"></div></div>
+        <div class="class-detail"><strong>Vocational Rehabilitation</strong> — Job training + placement for veterans with service-connected disabilities.</div>
+      </div>
+    </div>
+    <div class="transparency">
+      <div class="transparency-toggle" onclick="toggleTransparency(this)">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        Why these results?
+      </div>
+      <div class="transparency-content">
+        <div class="transparency-items">
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Veteran status detected — VA-specific programs are prioritized over general community resources</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>PTSD + housing combination triggered the VASH voucher recommendation (specialized for this exact scenario)</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Crisis Line included proactively — PTSD + housing instability are risk factors, even without explicit crisis language</div>
+          <div class="transparency-item"><div class="transparency-item-icon"></div>Employment at 62% — you didn't mention work needs, but VR services are available if relevant</div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  await delay(600);
+  addSeparator('Next');
+  addFollowups(['VASH application help', 'PTSD telehealth info', 'Talk to someone now', 'Start over']);
+}
+
+function resetDemo() {
+  chat.innerHTML = '';
+  welcome.style.display = '';
+  suggestionsEl.style.display = '';
+  chat.appendChild(welcome);
+  chat.appendChild(suggestionsEl);
+  resetBtn.classList.remove('visible');
+  scenarioActive = false;
+  chat.scrollTop = 0;
+}
+</script>
+</body>
+</html>

@@ -26,8 +26,11 @@ export async function GET(request: NextRequest) {
         userSettings: true,
         _count: {
           select: {
-            conversations: true,
-            savedResources: true,
+            knowledgeNodes: true,
+            notes: true,
+            chatConversations: true,
+            digests: true,
+            knowledgeEdges: true,
           },
         },
       },
@@ -40,17 +43,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Calculate stats
-    const conversations = await db.conversation.findMany({
-      where: { userId },
-      select: { confidence: true, isCrisis: true, category: true },
+    // Calculate stats for LORE context
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayChatMessages = await db.chatMessage.count({
+      where: {
+        conversation: { userId },
+        role: "user",
+        createdAt: { gte: todayStart },
+      },
     });
-
-    const avgConfidence = conversations.length > 0
-      ? Math.round(conversations.reduce((sum, c) => sum + c.confidence, 0) / conversations.length)
-      : 0;
-
-    const crisisCount = conversations.filter(c => c.isCrisis).length;
 
     return NextResponse.json({
       id: user.id,
@@ -58,20 +61,18 @@ export async function GET(request: NextRequest) {
       email: user.email,
       username: user.username,
       image: user.image,
-      phone: user.phone,
-      location: user.location,
-      language: user.language,
       plan: user.plan,
-      hearAbout: user.hearAbout,
-      interests: user.interests,
+      onboardingComplete: user.onboardingComplete,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       settings: user.userSettings,
       stats: {
-        totalConversations: user._count.conversations,
-        totalResources: user._count.savedResources,
-        avgConfidence,
-        crisisCount,
+        totalNodes: user._count.knowledgeNodes,
+        totalNotes: user._count.notes,
+        totalChatConversations: user._count.chatConversations,
+        totalDigests: user._count.digests,
+        totalEdges: user._count.knowledgeEdges,
+        aiQueriesToday: todayChatMessages,
       },
     });
   } catch (error) {
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, name, email, username, location, language, phone, image, plan, hearAbout, interests, currentPassword, newPassword } = body;
+    const { userId, name, email, username, image, plan, currentPassword, newPassword, bio } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -136,26 +137,19 @@ export async function PUT(request: NextRequest) {
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) updateData.email = email;
     if (username !== undefined) updateData.username = username;
-    if (location !== undefined) updateData.location = location;
-    if (language !== undefined) updateData.language = language;
     if (image !== undefined) updateData.image = image;
     if (plan !== undefined) updateData.plan = plan;
-    if (hearAbout !== undefined) updateData.hearAbout = hearAbout;
-    if (interests !== undefined) updateData.interests = interests;
-
-    if (phone !== undefined) updateData.phone = phone;
-    if (image !== undefined) updateData.image = image;
 
     // Handle password change
     if (currentPassword && newPassword) {
       const existingUserData = await db.user.findUnique({ where: { id: userId } });
-      if (!existingUserData?.password) {
+      if (!existingUserData?.passwordHash) {
         return NextResponse.json(
           { error: "No password set for this account. Use OAuth instead." },
           { status: 400 }
         );
       }
-      const passwordMatch = await bcrypt.compare(currentPassword, existingUserData.password);
+      const passwordMatch = await bcrypt.compare(currentPassword, existingUserData.passwordHash);
       if (!passwordMatch) {
         return NextResponse.json(
           { error: "Current password is incorrect" },
@@ -168,7 +162,7 @@ export async function PUT(request: NextRequest) {
           { status: 400 }
         );
       }
-      updateData.password = await bcrypt.hash(newPassword, 12);
+      updateData.passwordHash = await bcrypt.hash(newPassword, 12);
     }
 
     const updatedUser = await db.user.update({
@@ -182,12 +176,7 @@ export async function PUT(request: NextRequest) {
       email: updatedUser.email,
       username: updatedUser.username,
       image: updatedUser.image,
-      phone: updatedUser.phone,
-      location: updatedUser.location,
-      language: updatedUser.language,
       plan: updatedUser.plan,
-      hearAbout: updatedUser.hearAbout,
-      interests: updatedUser.interests,
       updatedAt: updatedUser.updatedAt,
     });
   } catch (error) {

@@ -2,25 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireSameUser } from "@/lib/auth-helpers";
 
-// GET /api/user/stats — Get user stats
+// GET /api/user/stats — Get user stats for LORE
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      // Return empty/guest stats
       return NextResponse.json({
-        conversations: 0,
-        resourcesFound: 0,
-        avgConfidence: 0,
-        streak: 0,
-        totalConversations: 0,
-        totalResources: 0,
-        crisisCount: 0,
-        categoryBreakdown: [],
-        weeklyActivity: [],
-        monthlyTrend: [],
+        totalNodes: 0,
+        totalNotes: 0,
+        totalChatConversations: 0,
+        totalDigests: 0,
+        totalEdges: 0,
+        aiQueriesToday: 0,
+        nodesLimit: 50,
+        aiQueriesLimit: 10,
+        storageUsedMB: 0,
+        storageLimitMB: 100,
       });
     }
 
@@ -37,129 +36,70 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Total conversations
-    const totalConversations = await db.conversation.count({
+    const plan = (user.plan || "free").toLowerCase();
+
+    // Count knowledge nodes
+    const totalNodes = await db.knowledgeNode.count({
       where: { userId },
     });
 
-    // Total saved resources
-    const totalResources = await db.savedResource.count({
+    // Count notes
+    const totalNotes = await db.note.count({
       where: { userId },
     });
 
-    // Average confidence across conversations
-    const conversations = await db.conversation.findMany({
+    // Count chat conversations
+    const totalChatConversations = await db.chatConversation.count({
       where: { userId },
-      select: { confidence: true, category: true, isCrisis: true, createdAt: true },
     });
 
-    const avgConfidence = conversations.length > 0
-      ? Math.round(conversations.reduce((sum, c) => sum + c.confidence, 0) / conversations.length)
-      : 0;
+    // Count digests
+    const totalDigests = await db.digest.count({
+      where: { userId },
+    });
 
-    // Crisis count
-    const crisisCount = conversations.filter(c => c.isCrisis).length;
+    // Count edges
+    const totalEdges = await db.knowledgeEdge.count({
+      where: { userId },
+    });
 
-    // Calculate streak: count consecutive days with at least one conversation, ending today or yesterday
-    const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    let streak = 0;
-    let checkDate = new Date(todayStart);
+    // Count AI queries today (user messages in chat)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
-    // Check if there's a conversation today; if not, start from yesterday
-    const hasToday = conversations.some(c => new Date(c.createdAt) >= todayStart);
-    if (!hasToday) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
+    const aiQueriesToday = await db.chatMessage.count({
+      where: {
+        conversation: { userId },
+        role: "user",
+        createdAt: { gte: todayStart },
+      },
+    });
 
-    for (let i = 0; i < 365; i++) {
-      const dayStart = new Date(checkDate);
-      dayStart.setDate(dayStart.getDate() - i);
-      const dayStartNorm = new Date(dayStart.getFullYear(), dayStart.getMonth(), dayStart.getDate());
-      const dayEndNorm = new Date(dayStart.getFullYear(), dayStart.getMonth(), dayStart.getDate() + 1);
+    // Plan limits
+    const limits = {
+      free: { nodesLimit: 50, aiQueriesLimit: 10, storageLimitMB: 100 },
+      pro: { nodesLimit: -1, aiQueriesLimit: -1, storageLimitMB: 10240 },
+      enterprise: { nodesLimit: -1, aiQueriesLimit: -1, storageLimitMB: -1 },
+    };
 
-      const hasConversation = conversations.some(c => {
-        const created = new Date(c.createdAt);
-        return created >= dayStartNorm && created < dayEndNorm;
-      });
+    const planLimits = limits[plan as keyof typeof limits] || limits.free;
 
-      if (hasConversation) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    // Category breakdown (top 5 with percentages)
-    const categoryMap = new Map<string, number>();
-    for (const conv of conversations) {
-      if (conv.category) {
-        categoryMap.set(conv.category, (categoryMap.get(conv.category) || 0) + 1);
-      }
-    }
-    const sortedCategories = [...categoryMap.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-    const categoryBreakdown = sortedCategories.map(([category, count]) => ({
-      category,
-      count,
-      percentage: conversations.length > 0 ? Math.round((count / conversations.length) * 100) : 0,
-    }));
-
-    // Weekly activity (last 7 days)
-    const now = new Date();
-    const weeklyActivity = [];
-    for (let i = 6; i >= 0; i--) {
-      const day = new Date(now);
-      day.setDate(day.getDate() - i);
-      const dayStart2 = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-      const dayEnd2 = new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1);
-
-      const count = conversations.filter(c => {
-        const created = new Date(c.createdAt);
-        return created >= dayStart2 && created < dayEnd2;
-      }).length;
-
-      weeklyActivity.push({
-        date: dayStart2.toISOString().split("T")[0],
-        day: dayStart2.toLocaleDateString("en-US", { weekday: "short" }),
-        count,
-      });
-    }
-
-    // Monthly trend (last 4 weeks)
-    const monthlyTrend = [];
-    for (let i = 3; i >= 0; i--) {
-      const weekStart = new Date(now);
-      weekStart.setDate(weekStart.getDate() - (i * 7));
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekEnd.getDate() + 7);
-
-      const count = conversations.filter(c => {
-        const created = new Date(c.createdAt);
-        return created >= weekStart && created < weekEnd;
-      }).length;
-
-      monthlyTrend.push({
-        week: `Week ${4 - i}`,
-        startDate: weekStart.toISOString().split("T")[0],
-        count,
-      });
-    }
+    // Estimate storage: rough estimate based on content length
+    // Each node ~2KB, each note ~2KB, each message ~1KB
+    const estimatedStorageKB = (totalNodes * 2) + (totalNotes * 2) + (totalChatConversations * 1);
+    const storageUsedMB = Math.max(1, Math.round(estimatedStorageKB / 1024 * 10) / 10);
 
     return NextResponse.json({
-      // Simple format for quick access
-      conversations: totalConversations,
-      resourcesFound: totalResources,
-      avgConfidence,
-      streak,
-      // Extended format for dashboard charts
-      totalConversations,
-      totalResources,
-      crisisCount,
-      categoryBreakdown,
-      weeklyActivity,
-      monthlyTrend,
+      totalNodes,
+      totalNotes,
+      totalChatConversations,
+      totalDigests,
+      totalEdges,
+      aiQueriesToday,
+      nodesLimit: planLimits.nodesLimit,
+      aiQueriesLimit: planLimits.aiQueriesLimit,
+      storageUsedMB,
+      storageLimitMB: planLimits.storageLimitMB,
     });
   } catch (error) {
     console.error("Get user stats error:", error);

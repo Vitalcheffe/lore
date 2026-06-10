@@ -863,141 +863,23 @@ function Playground() {
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<string | null>(null)
 
-  const mockResponses: Record<string, object> = {
-    default: {
-      success: true,
-      data: {
-        query_id: 'qry_demo_' + Math.random().toString(36).substring(2, 8),
-        classifications: [
-          {
-            category: 'Housing Assistance',
-            confidence: 0.91,
-            calibrated: true,
-            reasoning: 'Query mentions difficulty paying utility bills — utility/rental assistance identified',
-            alternatives: [
-              { category: 'General Financial Aid', confidence: 0.54 },
-              { category: 'Food Assistance', confidence: 0.23 },
-            ],
-            resources: [
-              {
-                id: 'res_demo_1',
-                name: 'LIHEAP (Low Income Home Energy Assistance)',
-                provider: 'US Department of Health & Human Services',
-                description: 'Federal assistance for home energy bills',
-                eligibility: 'Income below 150% of federal poverty level',
-                contact: '1-866-674-6327',
-                last_verified: '2026-05-28',
-                verification_status: 'verified',
-              },
-              {
-                id: 'res_demo_2',
-                name: 'Local Utility Hardship Program',
-                provider: 'Georgia Power / Local Utility',
-                description: 'Payment arrangements and hardship assistance for utility customers',
-                eligibility: 'Active account with documented financial hardship',
-                contact: '1-888-660-1361',
-                last_verified: '2026-06-02',
-                verification_status: 'verified',
-              },
-            ],
-          },
-        ],
-        crisis_detected: false,
-        clarification_needed: false,
-        processing_time_ms: 892,
-        model: 'BART-large-MNLI',
-        model_version: 'v2.4.1',
-      },
-      meta: {
-        request_id: 'req_demo_' + Math.random().toString(36).substring(2, 8),
-        timestamp: new Date().toISOString(),
-        api_version: 'v1',
-      },
-    },
-    crisis: {
-      success: true,
-      data: {
-        query_id: 'qry_crisis_' + Math.random().toString(36).substring(2, 8),
-        crisis_detected: true,
-        crisis_response: {
-          type: 'suicidal_ideation',
-          message: 'We detected that you may be in crisis. You are not alone — help is available right now.',
-          resources: [
-            {
-              name: '988 Suicide & Crisis Lifeline',
-              contact: 'Call or text 988 — available 24/7',
-              description: 'Free, confidential support for people in distress',
-            },
-            {
-              name: 'Crisis Text Line',
-              contact: 'Text HOME to 741741',
-              description: 'Text with a trained crisis counselor',
-            },
-          ],
-        },
-        classifications: [],
-        clarification_needed: false,
-        processing_time_ms: 12,
-        note: 'AI classification was bypassed due to crisis detection. This is a hardcoded safety feature.',
-      },
-      meta: {
-        request_id: 'req_crisis_' + Math.random().toString(36).substring(2, 8),
-        timestamp: new Date().toISOString(),
-        api_version: 'v1',
-      },
-    },
-    low_confidence: {
-      success: true,
-      data: {
-        query_id: 'qry_low_' + Math.random().toString(36).substring(2, 8),
-        classifications: [
-          {
-            category: 'General Assistance',
-            confidence: 0.43,
-            calibrated: true,
-            reasoning: 'Query is vague — multiple categories possible but none strongly indicated',
-            alternatives: [
-              { category: 'Mental Health', confidence: 0.38 },
-              { category: 'Employment Services', confidence: 0.31 },
-            ],
-            resources: [],
-          },
-        ],
-        crisis_detected: false,
-        clarification_needed: true,
-        clarification: {
-          question: 'Could you tell us more about what kind of help you\'re looking for? For example, are you looking for help with housing, food, employment, or something else?',
-          suggested_responses: ['Housing or rent help', 'Food assistance', 'Job or employment help', 'Mental health support', 'Something else'],
-        },
-        processing_time_ms: 1156,
-        model: 'BART-large-MNLI',
-        model_version: 'v2.4.1',
-      },
-      meta: {
-        request_id: 'req_low_' + Math.random().toString(36).substring(2, 8),
-        timestamp: new Date().toISOString(),
-        api_version: 'v1',
-      },
-    },
-  }
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true)
     setResponse(null)
 
-    setTimeout(() => {
-      const q = query.toLowerCase()
-      let result = mockResponses.default
-
-      if (q.includes('end it') || q.includes('suicide') || q.includes('kill myself') || q.includes('don\'t want to live') || q.includes('can\'t take this') || q.includes('want to die')) {
-        result = mockResponses.crisis
-      } else if (q.length < 20 || q.includes('help with my situation') || q.includes('i need help but')) {
-        result = mockResponses.low_confidence
-      }
-
-      setResponse(JSON.stringify(result, null, 2))
+    try {
+      const res = await fetch('/api/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, location }),
+      })
+      const data = await res.json()
+      setResponse(JSON.stringify(data, null, 2))
+    } catch (err) {
+      setResponse(JSON.stringify({ error: 'Failed to call API', message: err instanceof Error ? err.message : 'Unknown error' }, null, 2))
+    } finally {
       setLoading(false)
-    }, 1200)
+    }
   }
 
   return (
@@ -1096,7 +978,7 @@ function Playground() {
               <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
                 <Play className="w-8 h-8 text-gray-300" />
               </div>
-              <p className="text-[14px] font-medium text-gray-400 text-center">Enter a query and click &ldquo;Send Request&rdquo; to see a mock API response</p>
+              <p className="text-[14px] font-medium text-gray-400 text-center">Enter a query and click &ldquo;Send Request&rdquo; to see a real API response</p>
               <p className="text-[12px] text-gray-300 mt-2 text-center">Try crisis keywords like &ldquo;end it all&rdquo; to see crisis detection</p>
             </div>
           )}
@@ -1953,15 +1835,15 @@ curl -X GET http://localhost:3000/api/conversations?userId=user_456 \\
                     </div>
                     <div>
                       <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">API Playground</h2>
-                      <p className="text-[14px] text-gray-500">Test the API with mock responses</p>
+                      <p className="text-[14px] text-gray-500">Test the API with real responses</p>
                     </div>
                   </motion.div>
 
                   <motion.div variants={staggerItem}>
                     <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
-                      Try the classification API right in your browser. Enter a query to see a mock API response.
+                      Try the classification API right in your browser. Enter a query to see a real API response.
                       Try different query types: specific needs, vague requests, or crisis-related keywords.
-                      This playground uses mock data — responses match the real API format but don&apos;t consume rate limits.
+                      This playground calls the live classification API — responses reflect real AI model output.
                     </p>
                     <Playground />
                   </motion.div>

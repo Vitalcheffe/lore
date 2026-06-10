@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import AuthProvider from "@/components/providers/AuthProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,30 +11,23 @@ const inter = Inter({
   display: "swap",
 });
 
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://clearpath-ai.vercel.app"),
-  title: "ClearPath AI — Community Resource Navigator",
-  description: "Verified community resources with calibrated transparency. Classified, not generated. Every result shows confidence, reasoning, and alternatives.",
-  keywords: ["ClearPath AI", "community resources", "211", "social services", "crisis support", "calibrated transparency", "zero-shot classification", "BART-large-MNLI", "responsible AI"],
-  authors: [{ name: "ClearPath AI Team" }, { name: "Amine Harch El Korane" }],
+  title: "LORE — Your Team's Memory, Alive",
+  description: "Lore gives your team a shared memory that's structured, always consistent, and available everywhere. Powered by Aurora DSQL's multi-region architecture.",
+  keywords: ["Lore", "team memory", "knowledge management", "Aurora DSQL", "AWS", "knowledge graph", "AI", "multi-region"],
+  authors: [{ name: "Lore Team" }],
   icons: {
-    icon: [
-      { url: "/logo.svg", type: "image/svg+xml" },
-      { url: "/clearpath-logo.png", type: "image/png", sizes: "1024x1024" },
-    ],
-    apple: "/clearpath-logo.png",
+    icon: "/logo.svg",
   },
   openGraph: {
-    title: "ClearPath AI — Community Resource Navigator",
-    description: "Verified community resources with calibrated transparency. Classified, not generated.",
+    title: "LORE — Your Team's Memory, Alive",
+    description: "Inconsistent memory is misinformation. Lore gives your team a memory that's always consistent, everywhere.",
     type: "website",
-    images: [{ url: "/clearpath-logo.png", width: 1024, height: 1024, alt: "ClearPath AI Logo" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ClearPath AI — Community Resource Navigator",
-    description: "Verified community resources with calibrated transparency. Classified, not generated.",
-    images: ["/clearpath-logo.png"],
   },
 };
 
@@ -46,8 +39,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased bg-background text-foreground`}
-        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif" }}
+        className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" }}
       >
         <AuthProvider>
           {children}
