@@ -376,7 +376,7 @@ function FunTransparencyElement() {
             <p className="text-[12px] text-gray-500 leading-relaxed">
               This page doesn&apos;t exist — and we&apos;re not going to pretend it does. That&apos;s the ClearPath way.
             </p>
-            {/* Fake confidence bar */}
+            {/* Humorous confidence indicator */}
             <div className="pt-1">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">

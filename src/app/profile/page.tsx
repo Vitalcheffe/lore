@@ -88,30 +88,14 @@ const resourceFilterTabs = [
   { label: 'Legal', value: 'Legal' },
 ]
 
-const connectedAccounts = [
-  {
-    id: 'google',
-    name: 'Google',
-    icon: Globe2,
-    connected: false,
-    email: '',
-    color: '#3b82f6',
-    bgColor: 'rgba(59,130,246,0.06)',
-  },
-  {
-    id: 'github',
-    name: 'GitHub',
-    icon: FileText,
-    connected: false,
-    email: '',
-    color: '#6b7280',
-    bgColor: 'rgba(107,114,128,0.06)',
-  },
-]
+// Supported OAuth provider display config (not mock data — just display metadata)
+const oauthProviderConfig: Record<string, { name: string; icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }> = {
+  google: { name: 'Google', icon: Globe2, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
+  github: { name: 'GitHub', icon: FileText, color: '#6b7280', bgColor: 'rgba(107,114,128,0.06)' },
+}
 
-const activeSessions = [
-  { id: '1', device: 'Current browser', location: '', time: 'Active now', current: true },
-]
+// Supported providers that can be connected (static config, not data)
+const supportedProviders = ['google', 'github']
 
 const planFeatures = [
   { feature: 'Conversations per day', free: '5', pro: 'Unlimited' },
@@ -300,7 +284,9 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<{
     id: string; name: string; email: string; image: string | null; username: string | null;
     phone: string | null; location: string | null; language: string | null; plan: string; createdAt: string;
-    stats: { totalConversations: number; totalResources: number; avgConfidence: number };
+    connectedProviders?: string[];
+    sessions?: Array<{ id: string; expires: string }>;
+    stats: { totalNodes: number; totalNotes: number; totalChatConversations: number; totalDigests: number; totalEdges: number; aiQueriesToday: number };
   } | null>(null)
   const [apiSavedResources, setApiSavedResources] = useState<Array<{
     id: string; title: string; category: string; confidence: number; verifiedDate: string | null;
@@ -533,10 +519,10 @@ export default function ProfilePage() {
 
   // Privacy score — computed from actual settings
   const privacyScore = Math.round(
-    (emailNotifications ? 0 : 15) +
-    (pushNotifications ? 0 : 10) +
-    (dataSharing ? 0 : 25) +
-    (accessLargeText || accessHighContrast ? 10 : 0) +
+    (emailNotifs ? 0 : 15) +
+    (browserPush ? 0 : 10) +
+    (smsNotifs ? 0 : 25) +
+    (fontSize !== 'normal' || highContrast ? 10 : 0) +
     (twoFactor ? 20 : 0) +
     20 // base score for having an account
   )
@@ -549,19 +535,47 @@ export default function ProfilePage() {
     ? Math.max(1, Math.floor((Date.now() - new Date(profileData.createdAt).getTime()) / (1000 * 60 * 60 * 24)))
     : 1
   const userPlan = profileData?.plan ?? 'free'
-  const stats = profileData?.stats ?? { totalConversations: 0, totalResources: 0, avgConfidence: 0 }
+  const stats = profileData?.stats ?? { totalNodes: 0, totalNotes: 0, totalChatConversations: 0, totalDigests: 0, totalEdges: 0, aiQueriesToday: 0 }
+
+  // Connected accounts — derived from profile API response
+  const connectedProviders = profileData?.connectedProviders ?? []
+  const connectedAccounts = supportedProviders.map((provider) => {
+    const config = oauthProviderConfig[provider]
+    const isConnected = connectedProviders.includes(provider)
+    return {
+      id: provider,
+      name: config?.name ?? provider,
+      icon: config?.icon ?? Globe2,
+      connected: isConnected,
+      email: isConnected ? email : '',
+      color: config?.color ?? '#6b7280',
+      bgColor: config?.bgColor ?? 'rgba(107,114,128,0.06)',
+    }
+  })
+
+  // Active sessions — derived from profile API response
+  const apiSessions = profileData?.sessions ?? []
+  const activeSessions = apiSessions.length > 0
+    ? apiSessions.map((s, i) => ({
+        id: s.id,
+        device: i === 0 ? 'Current browser' : 'Browser session',
+        location: '',
+        time: new Date(s.expires) > new Date() ? 'Active now' : 'Expired',
+        current: i === 0,
+      }))
+    : [{ id: 'current', device: 'Current browser', location: '', time: 'Active now', current: true }]
 
   const accountStats = [
     {
       label: 'Conversations',
-      value: String(stats.totalConversations),
+      value: String(stats.totalChatConversations),
       icon: Layers,
       colorHex: '#3b82f6',
       bgColor: 'rgba(59,130,246,0.06)',
     },
     {
-      label: 'Resources found',
-      value: String(stats.totalResources),
+      label: 'Knowledge nodes',
+      value: String(stats.totalNodes),
       icon: Shield,
       colorHex: '#10b981',
       bgColor: 'rgba(16,185,129,0.06)',
@@ -1061,16 +1075,16 @@ export default function ProfilePage() {
                 </div>
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
                   <div className="rounded-xl bg-blue-50/40 border border-blue-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-blue-600">{stats.totalConversations}</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-blue-600">{stats.totalChatConversations}</p>
                     <p className="text-[10px] sm:text-[11px] font-medium text-blue-500/70 mt-0.5">Conversations</p>
                   </div>
                   <div className="rounded-xl bg-emerald-50/40 border border-emerald-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-emerald-600">{stats.totalResources}</p>
-                    <p className="text-[10px] sm:text-[11px] font-medium text-emerald-500/70 mt-0.5">Resources found</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-emerald-600">{stats.totalNodes}</p>
+                    <p className="text-[10px] sm:text-[11px] font-medium text-emerald-500/70 mt-0.5">Knowledge nodes</p>
                   </div>
                   <div className="rounded-xl bg-violet-50/40 border border-violet-100/40 p-3 sm:p-4 text-center">
-                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-violet-600">{stats.avgConfidence}%</p>
-                    <p className="text-[10px] sm:text-[11px] font-medium text-violet-500/70 mt-0.5">Avg confidence</p>
+                    <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-violet-600">{stats.aiQueriesToday}</p>
+                    <p className="text-[10px] sm:text-[11px] font-medium text-violet-500/70 mt-0.5">AI queries today</p>
                   </div>
                 </div>
                 <div className="rounded-xl bg-white/50 border border-gray-100/60 p-4 sm:p-5">

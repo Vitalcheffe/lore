@@ -27,7 +27,6 @@ import {
   Tag,
   Search,
   Flame,
-  CloudSun,
   Trophy,
   Lock,
   Users,
@@ -35,22 +34,14 @@ import {
   Zap,
   Target,
   Star,
-  Globe,
   Award,
   BookOpen,
   RefreshCw,
   FileCheck,
-  FileClock,
   ClipboardList,
-  Megaphone,
-  Phone,
   Mail,
-  ExternalLink,
   ChevronDown,
-  CircleDot,
   CircleCheck,
-  Circle,
-  ArrowUpRight,
   Timer,
   Info,
   Loader2,
@@ -98,46 +89,10 @@ function getCategoryIcon(category: string): typeof HomeIcon {
 // Computed dynamically inside the component from statsData and conversationsData
 
 // ─── RECENT RESOURCE UPDATES DATA ───────────────────────
-// Static informational content — not derived from user data
-const recentResourceUpdates = [
-  {
-    id: '1',
-    title: 'SNAP eligibility requirements changed',
-    description: 'Income thresholds updated for 2026. Check if you now qualify for additional benefits.',
-    category: 'Food Assistance',
-    categoryColorHex: '#f59e0b',
-    timeAgo: '2 hours ago',
-    icon: Sparkles,
-  },
-  {
-    id: '2',
-    title: 'New housing program available in your area',
-    description: 'Rapid Re-Housing Initiative now covers your ZIP code. Apply before July 15.',
-    category: 'Housing',
-    categoryColorHex: '#3b82f6',
-    timeAgo: '1 day ago',
-    icon: HomeIcon,
-  },
-  {
-    id: '3',
-    title: 'Crisis hotline hours updated',
-    description: '988 Suicide & Crisis Lifeline now offers 24/7 chat support in Spanish.',
-    category: 'Mental Health',
-    categoryColorHex: '#8b5cf6',
-    timeAgo: '3 days ago',
-    icon: Phone,
-  },
-]
+// Now computed dynamically from savedResourcesData inside the component
 
 // ─── COMMUNITY FEED DATA ────────────────────────────────
-// Static informational content — not derived from user data
-const communityFeed = [
-  { id: '1', text: '47 people found housing help this week', icon: HomeIcon, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
-  { id: '2', text: '12 crisis interventions successfully connected', icon: Shield, colorHex: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
-  { id: '3', text: 'New resource: Youth Employment Program added', icon: Sparkles, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
-  { id: '4', text: '89 resources verified and updated this month', icon: CircleCheck, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)' },
-  { id: '5', text: '23 people connected with legal aid this week', icon: BookOpen, colorHex: '#06b6d4', bgColor: 'rgba(6,182,212,0.06)' },
-]
+// Now computed dynamically from statsData inside the component
 
 // ─── PRO TIPS DATA (EXPANDED) ───────────────────────────
 const proTips = [
@@ -198,53 +153,7 @@ const proTips = [
 ]
 
 // ─── UPCOMING EVENTS DATA ───────────────────────────────
-// Static informational content — not derived from user data
-const upcomingEvents = [
-  {
-    id: '1',
-    title: 'Navigating Housing Resources Webinar',
-    date: 'June 28, 2026',
-    time: '2:00 PM EST',
-    description: 'Learn how to find and apply for housing assistance programs in your area. Live Q&A with community navigators.',
-    type: 'Webinar',
-    typeColorHex: '#3b82f6',
-    typeBgColor: 'rgba(59,130,246,0.08)',
-    icon: Globe,
-  },
-  {
-    id: '2',
-    title: 'Community Navigator Office Hours',
-    date: 'July 2, 2026',
-    time: '10:00 AM – 12:00 PM EST',
-    description: 'Drop-in session to get personalized help from trained 211 navigators. First come, first served.',
-    type: 'Office Hours',
-    typeColorHex: '#10b981',
-    typeBgColor: 'rgba(16,185,129,0.08)',
-    icon: Users,
-  },
-  {
-    id: '3',
-    title: 'USAII Hackathon Demo Session',
-    date: 'July 5, 2026',
-    time: '3:00 PM EST',
-    description: 'See ClearPath AI in action! Live demo of calibrated transparency and crisis detection features.',
-    type: 'Demo',
-    typeColorHex: '#8b5cf6',
-    typeBgColor: 'rgba(139,92,246,0.08)',
-    icon: Zap,
-  },
-  {
-    id: '4',
-    title: 'Mental Health Resource Workshop',
-    date: 'July 10, 2026',
-    time: '1:00 PM EST',
-    description: 'Understanding crisis support options and how AI assists with mental health resource navigation.',
-    type: 'Workshop',
-    typeColorHex: '#f59e0b',
-    typeBgColor: 'rgba(245,158,11,0.08)',
-    icon: Heart,
-  },
-]
+// No events API — section shows empty state
 
 // ─── QUICK TIPS DATA (LEGACY — kept for section below pro tips) ─
 const quickTips = [
@@ -299,12 +208,6 @@ function getGreeting(): string {
   if (hour < 12) return 'Good morning'
   if (hour < 18) return 'Good afternoon'
   return 'Good evening'
-}
-
-function getWeatherIcon(): { icon: typeof CloudSun; label: string } {
-  const hour = new Date().getHours()
-  if (hour >= 6 && hour < 18) return { icon: CloudSun, label: 'Partly cloudy, 72°F' }
-  return { icon: CloudSun, label: 'Clear night, 65°F' }
 }
 
 // ─── TIME AGO HELPER ────────────────────────────────────
@@ -518,7 +421,6 @@ function CardGridSkeleton({ count = 3 }: { count?: number }) {
 export default function DashboardPage() {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth()
   const greeting = useMemo(() => getGreeting(), [])
-  const weatherInfo = useMemo(() => getWeatherIcon(), [])
   const [archOpen, setArchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [emailInput, setEmailInput] = useState('')
@@ -760,7 +662,6 @@ export default function DashboardPage() {
     return Math.round(avg)
   }, [transparencyMetrics])
 
-  const WeatherIcon = weatherInfo.icon
   const userName = user?.name || 'there'
   const userInitial = userName.charAt(0).toUpperCase()
 
@@ -843,17 +744,13 @@ export default function DashboardPage() {
 
                 {/* Welcome context row */}
                 <div className="flex flex-wrap items-center gap-3 ml-14">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50/80 border border-amber-100/60">
-                    <WeatherIcon className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-[12px] font-medium text-amber-700">{weatherInfo.label}</span>
-                  </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50/80 border border-orange-100/60">
                     <Flame className="w-3.5 h-3.5 text-orange-500" />
                     <span className="text-[12px] font-medium text-orange-700">{statsData ? `${statsData.streak || 0}-day streak` : '0-day streak'}</span>
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100/60">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                    <span className="text-[12px] font-medium text-emerald-700">{statsData ? `${statsData.totalResources} resources` : '3 resources'} found this week</span>
+                    <span className="text-[12px] font-medium text-emerald-700">{statsData ? `${statsData.totalResources} resources` : '0 resources'} found</span>
                   </div>
                 </div>
               </div>
@@ -1662,134 +1559,147 @@ export default function DashboardPage() {
             </div>
           </motion.section>
 
-          {/* ═══════════ RECENT RESOURCE UPDATES ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="flex items-center gap-3 mb-5"
+          {/* ═══════════ RECENT SAVED RESOURCES ═══════════ */}
+          {!dataLoading && (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
             >
-              <div className="w-11 h-11 rounded-xl bg-orange-500/8 flex items-center justify-center">
-                <Megaphone className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent Resource Updates</h2>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
-                </div>
-                <p className="text-[13px] text-gray-500 mt-0.5">General resource updates — not personalized</p>
-              </div>
-            </motion.div>
-
-            <div className="space-y-4">
-              {recentResourceUpdates.map((update, i) => {
-                const Icon = update.icon
-                return (
-                  <motion.div
-                    key={update.id}
-                    variants={staggerItem}
-                    className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: `rgba(${update.categoryColorHex === '#3b82f6' ? '59,130,246' : update.categoryColorHex === '#f59e0b' ? '245,158,11' : '139,92,246'},0.08)` }}
-                      >
-                        <Icon className="w-5 h-5" style={{ color: update.categoryColorHex }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{update.title}</h3>
-                            <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">{update.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 mt-3">
-                          <span
-                            className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
-                            style={{
-                              backgroundColor: `rgba(${update.categoryColorHex === '#3b82f6' ? '59,130,246' : update.categoryColorHex === '#f59e0b' ? '245,158,11' : '139,92,246'},0.08)`,
-                              color: update.categoryColorHex,
-                            }}
-                          >
-                            {update.category}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-[12px] text-gray-400">
-                            <Clock className="w-3.5 h-3.5" />
-                            {update.timeAgo}
-                          </span>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </motion.section>
-
-          {/* ═══════════ COMMUNITY FEED ═══════════ */}
-          <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mb-10"
-          >
-            <motion.div
-              variants={staggerItem}
-              className="glass-card rounded-2xl p-6 shadow-premium"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-xl bg-rose-500/8 flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-rose-600" />
+              <motion.div
+                variants={staggerItem}
+                className="flex items-center gap-3 mb-5"
+              >
+                <div className="w-11 h-11 rounded-xl bg-orange-500/8 flex items-center justify-center">
+                  <Bookmark className="w-5 h-5 text-orange-600" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Community Impact</h2>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
+                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Recent Saved Resources</h2>
+                  <p className="text-[13px] text-gray-500 mt-0.5">Your most recently saved resources</p>
+                </div>
+              </motion.div>
+
+              {savedResourcesData.length === 0 ? (
+                <div className="glass-card rounded-2xl p-8 shadow-premium text-center">
+                  <div className="w-12 h-12 rounded-xl bg-gray-100/80 flex items-center justify-center mx-auto mb-3">
+                    <Bookmark className="w-6 h-6 text-gray-400" />
                   </div>
-                  <p className="text-[13px] text-gray-500 mt-0.5">Example community activity — not live data</p>
+                  <h3 className="text-[15px] font-bold text-gray-900 mb-1">No saved resources yet</h3>
+                  <p className="text-[13px] text-gray-500">Resources you save during conversations will appear here.</p>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                {communityFeed.map((item, i) => {
-                  const Icon = item.icon
-                  return (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-colors group"
-                    >
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: item.bgColor }}
+              ) : (
+                <div className="space-y-4">
+                  {savedResourcesData.slice(0, 3).map((resource, i) => {
+                    const catColors = getCategoryColors(resource.category)
+                    const Icon = getCategoryIcon(resource.category)
+                    return (
+                      <motion.div
+                        key={resource.id}
+                        variants={staggerItem}
+                        className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group"
                       >
-                        <Icon className="w-5 h-5" style={{ color: item.colorHex }} />
-                      </div>
-                      <p className="text-[14px] font-medium text-gray-700 flex-1">{item.text}</p>
-                      <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
-                    </motion.div>
-                  )
-                })}
-              </div>
-
-              <div className="mt-5 pt-4 border-t border-gray-100/60">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  <p className="text-[12px] text-gray-500">
-                    All data is anonymized. No personal information is shared or stored.
-                  </p>
+                        <div className="flex items-start gap-4">
+                          <div
+                            className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: catColors.bgColor }}
+                          >
+                            <Icon className="w-5 h-5" style={{ color: catColors.colorHex }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <h3 className="text-[15px] font-bold text-gray-900 tracking-tight">{resource.title}</h3>
+                                <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">{resource.action || resource.detail || 'Saved resource'}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 mt-3">
+                              <span
+                                className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
+                                style={{
+                                  backgroundColor: catColors.bgColor,
+                                  color: catColors.colorHex,
+                                }}
+                              >
+                                {resource.category}
+                              </span>
+                              <span className="flex items-center gap-1.5 text-[12px] text-gray-400">
+                                <Clock className="w-3.5 h-3.5" />
+                                {timeAgo(resource.createdAt)}
+                              </span>
+                            </div>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                        </div>
+                      </motion.div>
+                    )
+                  })}
                 </div>
-              </div>
-            </motion.div>
-          </motion.section>
+              )}
+            </motion.section>
+          )}
+
+          {/* ═══════════ YOUR ACTIVITY SUMMARY ═══════════ */}
+          {!dataLoading && statsData && (
+            <motion.section
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="mb-10"
+            >
+              <motion.div
+                variants={staggerItem}
+                className="glass-card rounded-2xl p-6 shadow-premium"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-11 h-11 rounded-xl bg-rose-500/8 flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-rose-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Your Activity</h2>
+                    <p className="text-[13px] text-gray-500 mt-0.5">Summary of your engagement with Lore</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    { text: `${statsData.totalConversations} conversation${statsData.totalConversations !== 1 ? 's' : ''} started`, icon: MessageCircle, colorHex: '#3b82f6', bgColor: 'rgba(59,130,246,0.06)' },
+                    { text: `${statsData.totalResources} resource${statsData.totalResources !== 1 ? 's' : ''} found`, icon: Sparkles, colorHex: '#10b981', bgColor: 'rgba(16,185,129,0.06)' },
+                    { text: `${statsData.crisisCount} crisis ${statsData.crisisCount !== 1 ? 'situations' : 'situation'} detected`, icon: Shield, colorHex: '#ef4444', bgColor: 'rgba(239,68,68,0.06)' },
+                    { text: `${conversationsData.length} conversation${conversationsData.length !== 1 ? 's' : ''} this session`, icon: Activity, colorHex: '#8b5cf6', bgColor: 'rgba(139,92,246,0.06)' },
+                  ].map((item, i) => {
+                    const Icon = item.icon
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] }}
+                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/60 transition-colors group"
+                      >
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: item.bgColor }}
+                        >
+                          <Icon className="w-5 h-5" style={{ color: item.colorHex }} />
+                        </div>
+                        <p className="text-[14px] font-medium text-gray-700 flex-1">{item.text}</p>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-5 pt-4 border-t border-gray-100/60">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <p className="text-[12px] text-gray-500">
+                      Activity data is derived from your own usage.
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.section>
+          )}
 
           {/* ═══════════ YOUR TRANSPARENCY SCORE ═══════════ */}
           {!dataLoading && transparencyMetrics.length > 0 && (
@@ -2064,73 +1974,27 @@ export default function DashboardPage() {
 
           {/* ═══════════ UPCOMING EVENTS ═══════════ */}
           <motion.section
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
             className="mb-10"
           >
-            <motion.div
-              variants={staggerItem}
-              className="flex items-center gap-3 mb-5"
-            >
+            <div className="flex items-center gap-3 mb-5">
               <div className="w-11 h-11 rounded-xl bg-violet-500/8 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-violet-600" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Upcoming Events</h2>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-500 border border-gray-200/60">Informational</span>
-                </div>
-                <p className="text-[13px] text-gray-500 mt-0.5">Sample community sessions and webinars</p>
+                <h2 className="text-[18px] font-bold tracking-tight text-gray-900">Upcoming Events</h2>
+                <p className="text-[13px] text-gray-500 mt-0.5">Community sessions and webinars</p>
               </div>
-            </motion.div>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {upcomingEvents.map((event) => {
-                const TypeIcon = event.icon
-                return (
-                  <motion.div
-                    key={event.id}
-                    variants={staggerItem}
-                    className="glass-card glass-card-hover rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 group relative overflow-hidden"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div
-                          className="w-11 h-11 rounded-xl flex items-center justify-center"
-                          style={{ backgroundColor: event.typeBgColor }}
-                        >
-                          <TypeIcon className="w-5 h-5" style={{ color: event.typeColorHex }} />
-                        </div>
-                        <span
-                          className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider"
-                          style={{ backgroundColor: event.typeBgColor, color: event.typeColorHex }}
-                        >
-                          {event.type}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-[15px] font-bold text-gray-900 tracking-tight leading-snug">{event.title}</h3>
-                        <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">{event.description}</p>
-                      </div>
-                      <div className="flex items-center gap-4 text-[12px] text-gray-400">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {event.date}
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          {event.time}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-400 group-hover:text-gray-700 transition-colors">
-                        Learn more
-                        <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
+            <div className="glass-card rounded-2xl p-8 shadow-premium text-center">
+              <div className="w-12 h-12 rounded-xl bg-violet-100/80 flex items-center justify-center mx-auto mb-3">
+                <Calendar className="w-6 h-6 text-violet-400" />
+              </div>
+              <h3 className="text-[15px] font-bold text-gray-900 mb-1">No upcoming events</h3>
+              <p className="text-[13px] text-gray-500">When events are scheduled, they will appear here.</p>
             </div>
           </motion.section>
 

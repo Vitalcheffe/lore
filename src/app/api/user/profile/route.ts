@@ -24,6 +24,13 @@ export async function GET(request: NextRequest) {
       where: { id: userId },
       include: {
         userSettings: true,
+        accounts: {
+          select: { id: true, provider: true }
+        },
+        sessions: {
+          select: { id: true, sessionToken: true, expires: true },
+          orderBy: { expires: 'desc' },
+        },
         _count: {
           select: {
             knowledgeNodes: true,
@@ -66,6 +73,11 @@ export async function GET(request: NextRequest) {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       settings: user.userSettings,
+      connectedProviders: user.accounts.map((a) => a.provider),
+      sessions: user.sessions.map((s) => ({
+        id: s.id,
+        expires: s.expires,
+      })),
       stats: {
         totalNodes: user._count.knowledgeNodes,
         totalNotes: user._count.notes,

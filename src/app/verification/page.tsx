@@ -63,6 +63,7 @@ import {
   Brain,
   Gavel,
   GraduationCap,
+  Briefcase,
 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -330,76 +331,107 @@ const dashboardStats = [
 ]
 
 // ═══════════════════════════════════════════════════════════
-// EXAMPLE RESOURCE CARDS DATA
+// CATEGORY → ICON MAPPING
 // ═══════════════════════════════════════════════════════════
-const exampleResources = [
-  {
-    name: 'Sunrise Emergency Shelter',
-    category: 'Housing Assistance',
-    tier: 4,
-    confidence: 94,
-    phone: '(555) 234-5678',
-    address: '1247 Oak Street, Houston, TX',
-    lastVerified: 'June 8, 2026',
-    source: 'United Way 211',
-    distance: '1.2 mi',
-    notes: '24/7 emergency intake. Walk-ins accepted.',
-    icon: Home,
-  },
-  {
-    name: 'Community Food Bank of Greater Dallas',
-    category: 'Food Assistance',
-    tier: 3,
-    confidence: 87,
-    phone: '(555) 345-6789',
-    address: '892 Elm Avenue, Dallas, TX',
-    lastVerified: 'May 22, 2026',
-    source: '211.org Partner',
-    distance: '2.8 mi',
-    notes: 'No ID required. Bilingual services available.',
-    icon: Utensils,
-  },
-  {
-    name: 'Metro Crisis Counseling Center',
-    category: 'Mental Health',
-    tier: 2,
-    confidence: 72,
-    phone: '(555) 456-7890',
-    address: '456 Pine Blvd, Austin, TX',
-    lastVerified: 'April 15, 2026',
-    source: 'SAMHSA Database',
-    distance: '4.1 mi',
-    notes: 'Sliding scale fees. Call to confirm availability.',
-    icon: Brain,
-  },
-  {
-    name: 'Veterans Legal Aid Clinic',
-    category: 'Legal Aid',
-    tier: 1,
-    confidence: 58,
-    phone: '(555) 567-8901',
-    address: '321 Cedar Lane, San Antonio, TX',
-    lastVerified: 'March 3, 2026',
-    source: 'AI Classified',
-    distance: '6.5 mi',
-    notes: 'AI classified — call to confirm services and hours.',
-    icon: Gavel,
-  },
-]
+const categoryIconMap: Record<string, React.ElementType> = {
+  'Housing': Home,
+  'Housing Assistance': Home,
+  'Shelter': Home,
+  'Food': Utensils,
+  'Food Assistance': Utensils,
+  'Food Bank': Utensils,
+  'Mental Health': Brain,
+  'Counseling': Brain,
+  'Substance Abuse': Brain,
+  'Legal': Gavel,
+  'Legal Aid': Gavel,
+  'Healthcare': Stethoscope,
+  'Medical': Stethoscope,
+  'Education': GraduationCap,
+  'Employment': Briefcase,
+  'Finance': BarChart3,
+  'Veterans': Award,
+  'Crisis': AlertTriangle,
+  'Youth': Users,
+  'Senior': Users,
+  'Disability': HeartHandshake,
+  'Immigration': Globe,
+  'Domestic Violence': Shield,
+  'Utility Assistance': Zap,
+  'Childcare': Users,
+  'Transportation': Navigation,
+}
+
+function getCategoryIcon(category: string): React.ElementType {
+  // Check for exact match first, then partial match
+  if (categoryIconMap[category]) return categoryIconMap[category]
+  const lower = category.toLowerCase()
+  for (const [key, icon] of Object.entries(categoryIconMap)) {
+    if (lower.includes(key.toLowerCase())) return icon
+  }
+  return Database // default icon
+}
 
 // ═══════════════════════════════════════════════════════════
-// AUDIT LOG DATA
+// FETCHED DATA TYPES
 // ═══════════════════════════════════════════════════════════
-const auditLogs = [
-  { id: 'AUD-20260609-001', timestamp: 'Jun 9, 2026 14:32:18', action: 'Navigator Confirmed', resource: 'Sunrise Emergency Shelter', navigator: 'Maria L.', tier: '3 → 4', icon: UserCheck, color: '#10b981' },
-  { id: 'AUD-20260609-002', timestamp: 'Jun 9, 2026 13:15:44', action: 'Database Verified', resource: 'Metro Food Pantry Network', navigator: 'System', tier: '1 → 2', icon: Database, color: '#3b82f6' },
-  { id: 'AUD-20260609-003', timestamp: 'Jun 9, 2026 11:47:02', action: 'User Report Resolved', resource: 'Hope Community Health Center', navigator: 'James K.', tier: '2 → 3', icon: MessageSquare, color: '#f59e0b' },
-  { id: 'AUD-20260609-004', timestamp: 'Jun 9, 2026 10:22:37', action: 'Stale Resource Flagged', resource: 'Eastside Job Corps Center', navigator: 'System', tier: '4 → Flagged', icon: AlertTriangle, color: '#ef4444' },
-  { id: 'AUD-20260608-005', timestamp: 'Jun 8, 2026 16:58:11', action: 'Automated Check Passed', resource: 'VA PTSD Support Line', navigator: 'System', tier: '4 (Renewed)', icon: RefreshCw, color: '#8b5cf6' },
-  { id: 'AUD-20260608-006', timestamp: 'Jun 8, 2026 15:33:29', action: 'Navigator Confirmed', resource: 'Harbor House Domestic Violence Shelter', navigator: 'Sarah M.', tier: '3 → 4', icon: UserCheck, color: '#10b981' },
-  { id: 'AUD-20260608-007', timestamp: 'Jun 8, 2026 12:09:55', action: 'New Resource Added', resource: 'Southside Youth Empowerment Program', navigator: '211 Feed', tier: '0 → 1', icon: Sparkles, color: '#f59e0b' },
-  { id: 'AUD-20260608-008', timestamp: 'Jun 8, 2026 09:44:18', action: 'Critical Report Escalated', resource: 'Crisis Hotline — Houston', navigator: 'Priority Queue', tier: 'Flagged → Review', icon: Shield, color: '#dc2626' },
-]
+interface ExampleResource {
+  name: string
+  category: string
+  tier: number
+  confidence: number
+  lastVerified: string | null
+  source: string
+  distance: string | null
+  services: string | null
+  icon: React.ElementType
+}
+
+interface AuditLogEntry {
+  id: string
+  timestamp: string
+  action: string
+  resource: string
+  navigator: string
+  tier: string
+  iconType: string
+  color: string
+}
+
+// Map icon type string from API to actual component
+function getAuditIcon(iconType: string): React.ElementType {
+  const iconMap: Record<string, React.ElementType> = {
+    UserCheck,
+    Database,
+    MessageSquare,
+    AlertTriangle,
+    RefreshCw,
+    CheckCircle2,
+    Sparkles,
+    Shield,
+  }
+  return iconMap[iconType] || Database
+}
+
+// Compute tier and confidence from resource data
+function computeResourceTier(resource: { lastVerified?: string | null; services?: string | null }): { tier: number; confidence: number } {
+  if (resource.lastVerified) {
+    const verifiedDate = new Date(resource.lastVerified)
+    const daysSinceVerified = (Date.now() - verifiedDate.getTime()) / (1000 * 60 * 60 * 24)
+    if (daysSinceVerified <= 30) return { tier: 4, confidence: 94 }
+    if (resource.services) return { tier: 3, confidence: 87 }
+    return { tier: 2, confidence: 72 }
+  }
+  if (resource.services) return { tier: 2, confidence: 72 }
+  return { tier: 1, confidence: 58 }
+}
+
+function computeSource(tier: number): string {
+  if (tier >= 4) return 'Navigator Verified'
+  if (tier === 3) return 'Human Confirmed'
+  if (tier === 2) return 'Database Verified'
+  return 'AI Classified'
+}
 
 // ═══════════════════════════════════════════════════════════
 // TRUST BADGES DATA
@@ -677,6 +709,51 @@ export default function VerificationPage() {
   const [verifComplete, setVerifComplete] = useState(false)
   const [verifResult, setVerifResult] = useState<{ tier: number; name: string; confidence: number; phone?: string; address?: string; category?: string; lastVerified?: string; source?: string; description?: string } | null>(null)
   const [verifNotFound, setVerifNotFound] = useState(false)
+
+  // Fetched Resource Cards & Audit Log State
+  const [exampleResources, setExampleResources] = useState<ExampleResource[]>([])
+  const [resourcesLoading, setResourcesLoading] = useState(true)
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
+  const [auditLogsLoading, setAuditLogsLoading] = useState(true)
+
+  // Fetch example resources and audit logs on mount
+  useEffect(() => {
+    // Fetch community resources for the example cards
+    fetch('/api/community-resources?category=All')
+      .then(res => res.json())
+      .then(data => {
+        if (data.resources && data.resources.length > 0) {
+          const mapped: ExampleResource[] = data.resources.slice(0, 8).map((r: Record<string, unknown>) => {
+            const { tier, confidence } = computeResourceTier({ lastVerified: r.verified as string | null | undefined, services: r.services as string | null | undefined })
+            return {
+              name: r.name as string,
+              category: r.category as string,
+              tier,
+              confidence,
+              lastVerified: (r.verified as string) || null,
+              source: computeSource(tier),
+              distance: (r.distance as string) || null,
+              services: (r.services as string) || null,
+              icon: getCategoryIcon(r.category as string),
+            }
+          })
+          setExampleResources(mapped)
+        }
+      })
+      .catch(err => console.error('Error fetching community resources:', err))
+      .finally(() => setResourcesLoading(false))
+
+    // Fetch audit log entries
+    fetch('/api/audit-logs')
+      .then(res => res.json())
+      .then(data => {
+        if (data.logs && data.logs.length > 0) {
+          setAuditLogs(data.logs)
+        }
+      })
+      .catch(err => console.error('Error fetching audit logs:', err))
+      .finally(() => setAuditLogsLoading(false))
+  }, [])
 
   // Report Issue Form State
   const [reportForm, setReportForm] = useState({
@@ -1537,21 +1614,33 @@ export default function VerificationPage() {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-amber-50/80 text-amber-600 border border-amber-100/60 mb-4">
                 <FileSearch className="w-3.5 h-3.5" />
-                Real Examples
+                Live Resource Data
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                 What Verification Looks Like
               </h2>
-              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-amber-50/80 text-amber-700 border border-amber-100/60">
-                <Info className="w-3.5 h-3.5" />
-                Example resources for demonstration purposes
-              </div>
-              <p className="text-[15px] text-gray-500 mt-3 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
                 Each resource card shows its verification tier, confidence score, and last verified date.
-                Here are four examples at different verification levels.
+                These cards display real data from our community resource database.
               </p>
             </motion.div>
 
+            {resourcesLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                <span className="ml-3 text-[14px] text-gray-500">Loading resources...</span>
+              </div>
+            ) : exampleResources.length === 0 ? (
+              <div className="glass-card rounded-2xl p-12 shadow-premium text-center">
+                <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                  <FileSearch className="w-7 h-7 text-gray-300" />
+                </div>
+                <h3 className="text-[18px] font-bold text-gray-900 mb-2">No verified resources to display</h3>
+                <p className="text-[14px] text-gray-500 max-w-sm mx-auto">
+                  Community resources will appear here once they are added to the database and verified.
+                </p>
+              </div>
+            ) : (
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -1593,24 +1682,25 @@ export default function VerificationPage() {
                     <div className="flex items-center gap-4 mb-4">
                       <ConfidenceRing value={resource.confidence} size={52} strokeWidth={3} />
                       <div className="flex-1 space-y-1.5">
-                        <div className="flex items-center gap-2 text-[12px] text-gray-500">
-                          <Phone className="w-3 h-3 text-gray-400" />
-                          {resource.phone}
-                        </div>
-                        <div className="flex items-center gap-2 text-[12px] text-gray-500">
-                          <MapPin className="w-3 h-3 text-gray-400" />
-                          {resource.address}
-                        </div>
-                        <div className="flex items-center gap-2 text-[12px] text-gray-500">
-                          <MapPin className="w-3 h-3 text-gray-400" />
-                          {resource.distance} away
-                        </div>
+                        {resource.distance && (
+                          <div className="flex items-center gap-2 text-[12px] text-gray-500">
+                            <MapPin className="w-3 h-3 text-gray-400" />
+                            {resource.distance} away
+                          </div>
+                        )}
+                        {resource.services && (
+                          <div className="flex items-center gap-2 text-[12px] text-gray-500">
+                            <FileCheck className="w-3 h-3 text-gray-400" />
+                            <span className="truncate">{resource.services}</span>
+                          </div>
+                        )}
+                        {!resource.distance && !resource.services && (
+                          <div className="flex items-center gap-2 text-[12px] text-gray-400">
+                            <Info className="w-3 h-3" />
+                            Details on file
+                          </div>
+                        )}
                       </div>
-                    </div>
-
-                    {/* Notes */}
-                    <div className="bg-white/60 rounded-xl p-3 border border-gray-100/60 mb-3">
-                      <p className="text-[12px] text-gray-600">{resource.notes}</p>
                     </div>
 
                     {/* Footer badges */}
@@ -1619,10 +1709,12 @@ export default function VerificationPage() {
                         <Database className="w-2.5 h-2.5" />
                         {resource.source}
                       </span>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${isStale ? 'bg-amber-50/60 text-amber-600 border border-amber-100/40' : 'bg-emerald-50/60 text-emerald-600 border border-emerald-100/40'}`}>
-                        <Clock className="w-2.5 h-2.5" />
-                        {resource.lastVerified}
-                      </span>
+                      {resource.lastVerified && (
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${isStale ? 'bg-amber-50/60 text-amber-600 border border-amber-100/40' : 'bg-emerald-50/60 text-emerald-600 border border-emerald-100/40'}`}>
+                          <Clock className="w-2.5 h-2.5" />
+                          {resource.lastVerified}
+                        </span>
+                      )}
                       {isStale && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50/60 text-amber-700 border border-amber-100/40">
                           <Phone className="w-2.5 h-2.5" />
@@ -1640,6 +1732,7 @@ export default function VerificationPage() {
                 )
               })}
             </motion.div>
+            )}
           </div>
         </section>
 
@@ -1865,16 +1958,28 @@ export default function VerificationPage() {
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
                 Verification Audit Log
               </h2>
-              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-cyan-50/80 text-cyan-700 border border-cyan-100/60">
-                <Info className="w-3.5 h-3.5" />
-                Example audit log entries for demonstration
-              </div>
-              <p className="text-[15px] text-gray-500 mt-3 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[15px] text-gray-500 mt-4 max-w-2xl mx-auto leading-relaxed">
                 Every verification action is logged and publicly accessible. This is our commitment
                 to accountability — you can see exactly when and how resources are verified.
               </p>
             </motion.div>
 
+            {auditLogsLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                <span className="ml-3 text-[14px] text-gray-500">Loading audit log...</span>
+              </div>
+            ) : auditLogs.length === 0 ? (
+              <div className="glass-card rounded-2xl p-12 shadow-premium text-center">
+                <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                  <FileSearch className="w-7 h-7 text-gray-300" />
+                </div>
+                <h3 className="text-[18px] font-bold text-gray-900 mb-2">No audit log entries yet</h3>
+                <p className="text-[14px] text-gray-500 max-w-sm mx-auto">
+                  Audit log entries will appear here as community resources are verified and updated.
+                </p>
+              </div>
+            ) : (
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -1896,7 +2001,7 @@ export default function VerificationPage() {
               {/* Table rows */}
               <div className="max-h-96 overflow-y-auto">
                 {auditLogs.map((log) => {
-                  const LogIcon = log.icon
+                  const LogIcon = getAuditIcon(log.iconType)
                   return (
                     <div key={log.id} className="grid grid-cols-12 gap-2 px-6 py-3.5 border-b border-gray-50 hover:bg-gray-50/40 transition-colors">
                       <div className="col-span-2 text-[11px] font-mono text-gray-400 flex items-center">{log.id}</div>
@@ -1929,13 +2034,14 @@ export default function VerificationPage() {
 
               {/* Footer */}
               <div className="px-6 py-4 bg-gray-50/40 border-t border-gray-100/60 flex items-center justify-between">
-                <p className="text-[11px] text-gray-400">Showing last 8 entries • Updated in real-time</p>
+                <p className="text-[11px] text-gray-400">Showing last {auditLogs.length} entries • Updated in real-time</p>
                 <button className="text-[12px] font-semibold text-blue-600 hover:text-blue-500 transition-colors inline-flex items-center gap-1">
                   View Full Audit Log
                   <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
             </motion.div>
+            )}
           </div>
         </section>
 

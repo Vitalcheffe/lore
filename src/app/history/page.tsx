@@ -81,7 +81,7 @@ const confidenceFilters = [
   { label: 'Low (<50%)', value: 'low' },
 ]
 
-const recentSearches = ['housing assistance', 'food stamps', 'crisis support', 'legal aid']
+// Recent searches will be populated from real conversation data
 
 // ─── DATE GROUPING HELPERS ───────────────────────────────
 function getDateGroup(dateStr: string): string {
@@ -297,6 +297,7 @@ export default function HistoryPage() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   const [selectedConversations, setSelectedConversations] = useState<string[]>([])
   const [showRecentSearches, setShowRecentSearches] = useState(false)
+  const [recentSearches, setRecentSearches] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const itemsPerPage = 20
@@ -349,6 +350,28 @@ export default function HistoryPage() {
       setDataLoading(false)
     }
   }, [isAuthenticated, authLoading, fetchConversations])
+
+  // Fetch recent searches from the 4 most recent conversation titles
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return
+    const fetchRecentSearches = async () => {
+      try {
+        const params = new URLSearchParams()
+        params.set('userId', user.id)
+        params.set('take', '4')
+        const res = await fetch(`/api/conversations?${params.toString()}`)
+        if (res.ok) {
+          const json = await res.json()
+          const apiData: ApiConversation[] = Array.isArray(json) ? json : (json.conversations || [])
+          const searches = apiData.slice(0, 4).map((c) => c.title).filter(Boolean)
+          setRecentSearches(searches)
+        }
+      } catch {
+        // Silently fail — recent searches are non-essential
+      }
+    }
+    fetchRecentSearches()
+  }, [isAuthenticated, user?.id])
 
   // Delete a single conversation
   const handleDelete = async (id: string) => {
@@ -605,16 +628,20 @@ export default function HistoryPage() {
                       className="absolute top-full left-0 right-0 mt-2 glass-card rounded-xl shadow-premium-lg z-20 p-2"
                     >
                       <p className="px-3 py-2 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Recent searches</p>
-                      {recentSearches.map((term) => (
-                        <button
-                          key={term}
-                          onMouseDown={() => setSearchQuery(term)}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] text-gray-600 hover:bg-white/60 transition-all text-left"
-                        >
-                          <Clock className="w-3.5 h-3.5 text-gray-400" />
-                          {term}
-                        </button>
-                      ))}
+                      {recentSearches.length === 0 ? (
+                        <p className="px-3 py-2 text-[12px] text-gray-400">No recent searches</p>
+                      ) : (
+                        recentSearches.map((term) => (
+                          <button
+                            key={term}
+                            onMouseDown={() => setSearchQuery(term)}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] text-gray-600 hover:bg-white/60 transition-all text-left"
+                          >
+                            <Clock className="w-3.5 h-3.5 text-gray-400" />
+                            {term}
+                          </button>
+                        ))
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

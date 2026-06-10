@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -46,10 +47,13 @@ const troubleshootingTips = [
   },
 ]
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordForm() {
+  const searchParams = useSearchParams()
+  const resetToken = searchParams.get('token')
+
   const [email, setEmail] = useState('')
   const [focused, setFocused] = useState<string | null>(null)
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(resetToken ? 3 : 1)
   const [resendCountdown, setResendCountdown] = useState(0)
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
@@ -100,10 +104,32 @@ export default function ForgotPasswordPage() {
     setResendCountdown(60)
   }
 
-  const handleResetSubmit = (e: React.FormEvent) => {
+  const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (newPassword && confirmNewPassword && newPassword === confirmNewPassword) {
+    if (!newPassword || !confirmNewPassword || newPassword !== confirmNewPassword) return
+    if (!resetToken) {
+      setApiError('Missing reset token. Please use the link from your email.')
+      return
+    }
+    setIsLoading(true)
+    setApiError('')
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken, password: newPassword, confirmPassword: confirmNewPassword }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setApiError(data.error || data.details?.join(', ') || 'Failed to reset password. Please try again.')
+        setIsLoading(false)
+        return
+      }
       setCurrentStep(4)
+      setIsLoading(false)
+    } catch {
+      setApiError('An unexpected error occurred. Please try again.')
+      setIsLoading(false)
     }
   }
 
@@ -393,16 +419,13 @@ export default function ForgotPasswordPage() {
                       Try another email address
                     </button>
 
-                    {/* Simulate clicking the link (demo) */}
-                    <motion.button
-                      whileHover={{ scale: 1.005 }}
-                      whileTap={{ scale: 0.995 }}
-                      onClick={() => setCurrentStep(3)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-[14px] font-semibold text-white rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all"
-                    >
-                      I clicked the reset link
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.button>
+                    {/* Info message — user must click the real link from their email */}
+                    <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-blue-50/60 border border-blue-100/60">
+                      <Mail className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+                      <p className="text-[12px] text-blue-700/80 leading-relaxed">
+                        Check your email for a password reset link. If an account with that email exists, you&apos;ll receive a reset link shortly.
+                      </p>
+                    </div>
                   </motion.div>
 
                   <div className="mt-4">
@@ -583,16 +606,36 @@ export default function ForgotPasswordPage() {
                     type="submit"
                     whileHover={{ scale: 1.005 }}
                     whileTap={{ scale: 0.995 }}
-                    disabled={!newPassword || !confirmNewPassword || newPassword !== confirmPassword}
+                    disabled={!newPassword || !confirmNewPassword || newPassword !== confirmNewPassword || isLoading}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3.5 text-[14px] font-semibold rounded-xl transition-all mt-2 ${
-                      newPassword && confirmNewPassword && newPassword === confirmNewPassword
+                      newPassword && confirmNewPassword && newPassword === confirmNewPassword && !isLoading
                         ? 'text-white bg-gradient-to-b from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30'
                         : 'text-white/60 bg-gray-300 cursor-not-allowed'
                     }`}
                   >
-                    Reset password
-                    <ArrowRight className="w-4 h-4" />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Resetting...
+                      </>
+                    ) : (
+                      <>
+                        Reset password
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </motion.button>
+                  {/* Error message */}
+                  {apiError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-100"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                      <span className="text-[13px] text-red-600 font-medium">{apiError}</span>
+                    </motion.div>
+                  )}
                 </form>
               </motion.div>
             )}
@@ -752,5 +795,17 @@ export default function ForgotPasswordPage() {
         </motion.div>
       </main>
     </div>
+  )
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center mesh-gradient-bg">
+        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    }>
+      <ForgotPasswordForm />
+    </Suspense>
   )
 }

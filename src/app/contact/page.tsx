@@ -530,6 +530,7 @@ export default function ContactPage() {
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const [attachedFile, setAttachedFile] = useState<string | null>(null)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
 
@@ -539,7 +540,7 @@ export default function ContactPage() {
   }
 
   const handleFileAttach = () => {
-    setAttachedFile('screenshot-placeholder.png')
+    // File upload is not yet supported — placeholder only
   }
 
   const handleRemoveFile = () => {
@@ -549,6 +550,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setFormError(null)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -556,19 +558,21 @@ export default function ContactPage() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
+          organization: formData.organization,
           subject: formData.subject,
+          urgency: formData.urgency,
           message: formData.message,
         }),
       })
       if (res.ok) {
         setFormSubmitted(true)
       } else {
-        console.error('Contact form submission failed')
-        setFormSubmitted(true) // Still show success for demo UX
+        const data = await res.json().catch(() => ({}))
+        setFormError(data.error || 'Failed to send your message. Please try again later.')
       }
     } catch (error) {
       console.error('Contact form error:', error)
-      setFormSubmitted(true) // Still show success for demo UX
+      setFormError('Network error — please check your connection and try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -996,6 +1000,7 @@ export default function ContactPage() {
                     <button
                       onClick={() => {
                         setFormSubmitted(false)
+                        setFormError(null)
                         setFormData({ name: '', email: '', organization: '', subject: '', urgency: 'medium', message: '', contactMethod: 'email' })
                         setAttachedFile(null)
                       }}
@@ -1014,6 +1019,23 @@ export default function ContactPage() {
                     className="glass-card rounded-2xl p-6 sm:p-8 md:p-10 shadow-premium"
                   >
                     <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Error Message */}
+                      {formError && (
+                        <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-red-200 bg-red-50/60">
+                          <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[13px] font-semibold text-red-700">Submission Failed</p>
+                            <p className="text-[12px] text-red-600 mt-0.5">{formError}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setFormError(null)}
+                            className="p-1 rounded-lg hover:bg-red-100/60 transition-colors ml-auto shrink-0"
+                          >
+                            <X className="w-4 h-4 text-red-400" />
+                          </button>
+                        </div>
+                      )}
                       {/* Row 1: Name + Email */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
