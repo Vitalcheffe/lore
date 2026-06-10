@@ -79,6 +79,13 @@ function parseHFResult(result: any): Array<{ label: string; confidence: number }
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication for classification
+    const { getAuthenticatedUserId } = await import("@/lib/auth-helpers");
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
     const { text } = await request.json();
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {

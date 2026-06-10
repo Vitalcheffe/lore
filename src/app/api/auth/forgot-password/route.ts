@@ -38,9 +38,10 @@ export async function POST(req: NextRequest) {
       })
 
       // TODO: Send password reset email with link containing the token
-      // The reset link would be: `${BASE_URL}/forgot-password?token=${token}`
-      // For now, the token is stored in the DB and the email sending
-      // would be integrated with an email service (e.g., SendGrid, Resend)
+      // The reset link would be: `${BASE_URL}/reset-password?token=${token}`
+      // For now, the token is stored in the DB. Email sending requires
+      // an email service (e.g., SendGrid, Resend) to be configured.
+      // The reset token is available in the DB for manual verification if needed.
     }
 
     // Always return success to prevent email enumeration

@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
         success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/app?upgraded=true&plan=${plan}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
         metadata: { plan, userId: user.id },
+        expand: ['line_items'],
       })
 
       return NextResponse.json({

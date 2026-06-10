@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
     const userId = await getAuthenticatedUserId(request)
 
     if (!userId) {
-      return NextResponse.json({ digest: null, pastDigests: [] })
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
     }
 
     const today = new Date().toISOString().split('T')[0]
@@ -237,7 +240,7 @@ Keep it concise and helpful. If the knowledge base is new/empty, encourage them 
     return {
       source,
       target,
-      type: e.source === 'ai' ? 'auto' : 'manual',
+      type: 'manual', // edges don't track source origin in current schema
       confidence: Math.round(e.strength / 10 * 100),
     }
   })

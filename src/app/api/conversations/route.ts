@@ -8,7 +8,10 @@ export async function GET(request: NextRequest) {
     const sessionUserId = await getAuthenticatedUserId(request);
 
     if (!sessionUserId) {
-      return NextResponse.json({ conversations: [], total: 0 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -99,14 +102,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const effectiveUserId = sessionUserId || null;
+    const effectiveUserId = sessionUserId;
+
+    if (!effectiveUserId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
     const conversation = await db.chatConversation.create({
       data: {
         title,
         preview: preview || title,
         pinned: pinned || false,
-        isGuest: !effectiveUserId,
+        isGuest: false,
         userId: effectiveUserId,
       },
     });

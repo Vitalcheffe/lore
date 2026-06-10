@@ -23,24 +23,27 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, Number(searchParams.get('page')) || 1);
     const pageSize = Math.min(100, Math.max(1, Number(searchParams.get('pageSize')) || 20));
 
+    // Fetch more items to support proper pagination
+    const fetchLimit = page * pageSize;
+
     // Get recent activity from various models
     const [recentNodes, recentNotes, recentEdges] = await Promise.all([
       db.knowledgeNode.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
-        take: 10,
+        take: fetchLimit,
         select: { id: true, title: true, type: true, createdAt: true },
       }),
       db.note.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
-        take: 10,
+        take: fetchLimit,
         select: { id: true, title: true, type: true, createdAt: true },
       }),
       db.knowledgeEdge.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
-        take: 10,
+        take: fetchLimit,
         select: { id: true, label: true, type: true, createdAt: true, sourceId: true, targetId: true },
       }),
     ]);

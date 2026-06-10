@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, name, email, username, image, plan, currentPassword, newPassword, bio } = body;
+    const { userId, name, email, username, image, currentPassword, newPassword } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -150,18 +150,17 @@ export async function PUT(request: NextRequest) {
     if (email !== undefined) updateData.email = email;
     if (username !== undefined) updateData.username = username;
     if (image !== undefined) updateData.image = image;
-    if (plan !== undefined) updateData.plan = plan;
+    // NOTE: plan is NOT updated here — plan changes only via Stripe webhook to prevent billing bypass
 
     // Handle password change
     if (currentPassword && newPassword) {
-      const existingUserData = await db.user.findUnique({ where: { id: userId } });
-      if (!existingUserData?.passwordHash) {
+      if (!existingUser?.passwordHash) {
         return NextResponse.json(
           { error: "No password set for this account. Use OAuth instead." },
           { status: 400 }
         );
       }
-      const passwordMatch = await bcrypt.compare(currentPassword, existingUserData.passwordHash);
+      const passwordMatch = await bcrypt.compare(currentPassword, existingUser.passwordHash);
       if (!passwordMatch) {
         return NextResponse.json(
           { error: "Current password is incorrect" },

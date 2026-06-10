@@ -9,18 +9,10 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json({
-        totalNodes: 0,
-        totalNotes: 0,
-        totalChatConversations: 0,
-        totalDigests: 0,
-        totalEdges: 0,
-        aiQueriesToday: 0,
-        nodesLimit: 50,
-        aiQueriesLimit: 10,
-        storageUsedMB: 0,
-        storageLimitMB: 100,
-      });
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
     }
 
     // Verify the authenticated user matches the requested userId

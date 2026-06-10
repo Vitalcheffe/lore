@@ -5,27 +5,46 @@ import { getAuthenticatedUserId } from '@/lib/auth-helpers'
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    // Require authentication to use AI chat
+    const userId = await getAuthenticatedUserId(req)
+    if (!userId) {
+      return Response.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { messages } = body
+
+    // Validate messages input
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return Response.json({ error: 'Messages array is required' }, { status: 400 })
+    }
+
+    // Limit messages to last 20 to control costs
+    const trimmedMessages = messages.slice(-20)
+
+    // Validate each message has role and content
+    for (const m of trimmedMessages) {
+      if (!m.role || !m.content || typeof m.content !== 'string') {
+        return Response.json({ error: 'Each message must have a role and content string' }, { status: 400 })
+      }
+    }
 
     // Fetch user's real knowledge nodes to include in the AI context
-    const userId = await getAuthenticatedUserId(req)
     let nodeContext = ''
 
-    if (userId) {
-      const nodes = await db.knowledgeNode.findMany({
-        where: { userId },
-        select: { title: true, type: true, content: true, tags: true },
-        orderBy: { updatedAt: 'desc' },
-        take: 50,
-      })
+    const nodes = await db.knowledgeNode.findMany({
+      where: { userId },
+      select: { title: true, type: true, content: true, tags: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 50,
+    })
 
-      if (nodes.length > 0) {
-        const nodeDescriptions = nodes.map(n => {
-          const tagStr = n.tags ? ` [${n.tags}]` : ''
-          return `- ${n.title} (${n.type})${tagStr}: ${(n.content || '').slice(0, 200)}`
-        }).join('\n')
-        nodeContext = `\n\nHere are the user's knowledge nodes:\n${nodeDescriptions}`
-      }
+    if (nodes.length > 0) {
+      const nodeDescriptions = nodes.map(n => {
+        const tagStr = n.tags ? ` [${n.tags}]` : ''
+        return `- ${n.title} (${n.type})${tagStr}: ${(n.content || '').slice(0, 200)}`
+      }).join('\n')
+      nodeContext = `\n\nHere are the user's knowledge nodes:\n${nodeDescriptions}`
     }
 
     const zai = await ZAI.create()
@@ -38,7 +57,7 @@ If you're unsure, say so and suggest which nodes might have the answer.`
     const response = await zai.chat.completions.create({
       messages: [
         { role: 'system', content: systemPrompt },
-        ...messages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content })),
+        ...trimmedMessages.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content })),
       ],
     })
 

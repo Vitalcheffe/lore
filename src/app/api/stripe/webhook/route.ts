@@ -34,13 +34,27 @@ export async function POST(req: NextRequest) {
           const plan = session.metadata?.plan
 
           if (userId && plan) {
+            // Retrieve the subscription to get correct period end and price info
+            let stripePriceId = session.line_items?.data?.[0]?.price?.id || null
+            let periodEnd = session.expires_at ? new Date(session.expires_at * 1000) : null
+
+            if (session.subscription) {
+              try {
+                const subscription = await stripe.subscriptions.retrieve(session.subscription)
+                periodEnd = new Date(subscription.current_period_end * 1000)
+                stripePriceId = subscription.items?.data?.[0]?.price?.id || stripePriceId
+              } catch (err: any) {
+                console.error('Failed to retrieve subscription:', err.message)
+              }
+            }
+
             await db.user.update({
               where: { id: userId },
               data: {
                 plan,
                 stripeSubscriptionId: session.subscription,
-                stripePriceId: session.line_items?.data?.[0]?.price?.id,
-                stripeCurrentPeriodEnd: new Date(session.expires_at * 1000),
+                stripePriceId,
+                stripeCurrentPeriodEnd: periodEnd,
               },
             })
           }
