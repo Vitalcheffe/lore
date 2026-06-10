@@ -139,8 +139,8 @@ function Animated404() {
   )
 }
 
-// ─── MOCK SEARCH BAR ─────────────────────────────────────
-function MockSearchBar() {
+// ─── SEARCH BAR ─────────────────────────────────────
+function SearchBar() {
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -502,8 +502,8 @@ export default function NotFound() {
             </motion.div>
           </motion.div>
 
-          {/* ═══ Mock Search ═══ */}
-          <MockSearchBar />
+          {/* ═══ Search ═══ */}
+          <SearchBar />
 
           {/* ═══ Helpful Link Cards ═══ */}
           <div>

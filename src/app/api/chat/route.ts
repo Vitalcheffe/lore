@@ -1,14 +1,37 @@
 import { NextRequest } from 'next/server'
 import ZAI from 'z-ai-web-dev-sdk'
+import { db } from '@/lib/db'
+import { getAuthenticatedUserId } from '@/lib/auth-helpers'
 
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
 
+    // Fetch user's real knowledge nodes to include in the AI context
+    const userId = await getAuthenticatedUserId(req)
+    let nodeContext = ''
+
+    if (userId) {
+      const nodes = await db.knowledgeNode.findMany({
+        where: { userId },
+        select: { title: true, type: true, content: true, tags: true },
+        orderBy: { updatedAt: 'desc' },
+        take: 50,
+      })
+
+      if (nodes.length > 0) {
+        const nodeDescriptions = nodes.map(n => {
+          const tagStr = n.tags ? ` [${n.tags}]` : ''
+          return `- ${n.title} (${n.type})${tagStr}: ${(n.content || '').slice(0, 200)}`
+        }).join('\n')
+        nodeContext = `\n\nHere are the user's knowledge nodes:\n${nodeDescriptions}`
+      }
+    }
+
     const zai = await ZAI.create()
 
-    const systemPrompt = `You are Lore's AI assistant. You help users query and understand their team's knowledge base. 
-You have access to the team's knowledge graph with nodes about: API Design, Authentication, Database Schema, Knowledge Graph, Morning Digest, AI Chat Engine, and more.
+    const systemPrompt = `You are Lore's AI assistant. You help users query and understand their knowledge base.${nodeContext}
+
 Always reference which knowledge nodes your answers come from. Be concise but thorough.
 If you're unsure, say so and suggest which nodes might have the answer.`
 

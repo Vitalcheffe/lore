@@ -99,21 +99,15 @@ function RenderMessageContent({ content }: { content: string }) {
   )
 }
 
-// ─── Source Badge Colors ───────────────────────────────────
-const sourceColors: Record<string, string> = {
-  'API Design': '#059669',
-  Authentication: '#059669',
-  'Database Schema': '#059669',
-  'Knowledge Graph': '#0891B2',
-  'Morning Digest': '#0891B2',
-  'AI Chat Engine': '#059669',
-  'User Sessions': '#059669',
-  'Sprint Planning': '#DB2777',
-  'Team Onboarding': '#DB2777',
-  'AWS Setup': '#EA580C',
-  'Rate Limiting': '#059669',
-  'Stripe Integration': '#EA580C',
-  'Privacy Policy': '#EA580C',
+// ─── Source Badge Colors (dynamic hash-based for any source name) ──
+const sourceColorPalette = ['#059669', '#0891B2', '#7C3AED', '#DB2777', '#EA580C', '#3B82F6', '#0D9488']
+function getSourceColor(sourceName: string): string {
+  // Deterministic hash so same source always gets same color
+  let hash = 0
+  for (let i = 0; i < sourceName.length; i++) {
+    hash = sourceName.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return sourceColorPalette[Math.abs(hash) % sourceColorPalette.length]
 }
 
 // ─── Helper: format relative time ──────────────────────────
@@ -763,24 +757,23 @@ export default function AIChatPage() {
                       <div className="px-3.5 pb-2.5 pt-1 border-t border-[rgba(0,0,0,0.04)]">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <Network className="w-2.5 h-2.5 text-[#A1A1AA]" />
-                          {msg.sources.map((source) => (
+                          {msg.sources.map((source) => {
+                            const srcColor = getSourceColor(source)
+                            return (
                             <Badge
                               key={source}
                               variant="outline"
                               className="text-[9px] font-medium py-0 px-1.5 border-[#E5E7EB]"
                               style={{
-                                color: sourceColors[source] || '#71717A',
-                                borderColor: sourceColors[source]
-                                  ? `${sourceColors[source]}30`
-                                  : '#E5E7EB',
-                                backgroundColor: sourceColors[source]
-                                  ? `${sourceColors[source]}08`
-                                  : 'transparent',
+                                color: srcColor,
+                                borderColor: `${srcColor}30`,
+                                backgroundColor: `${srcColor}08`,
                               }}
                             >
                               {source}
                             </Badge>
-                          ))}
+                            )
+                          })}
                         </div>
                       </div>
                     )}
