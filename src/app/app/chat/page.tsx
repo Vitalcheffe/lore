@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import { ChatEmptyState } from '@/components/app/empty-states'
+import { MarkdownRenderer } from '@/components/chat/MarkdownRenderer'
 
 // ─── Types ─────────────────────────────────────────────────
 interface ChatMessage {
@@ -66,40 +67,7 @@ function TypingIndicator() {
   )
 }
 
-// ─── Markdown-like Renderer ────────────────────────────────
-function RenderMessageContent({ content }: { content: string }) {
-  const lines = content.split('\n')
-  return (
-    <div className="space-y-1.5">
-      {lines.map((line, i) => {
-        // Bold headers or list items with bold
-        const processed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Italic
-        const withItalic = processed.replace(/\*(.*?)\*/g, '<em class="text-[#71717A] text-xs">$1</em>')
 
-        if (line.startsWith('1. ') || line.startsWith('2. ') || line.startsWith('3. ') || line.startsWith('4. ') || line.startsWith('5. ')) {
-          return (
-            <p
-              key={i}
-              className="text-sm leading-relaxed pl-2"
-              dangerouslySetInnerHTML={{ __html: withItalic }}
-            />
-          )
-        }
-        if (line.trim() === '') {
-          return <div key={i} className="h-1" />
-        }
-        return (
-          <p
-            key={i}
-            className="text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: withItalic }}
-          />
-        )
-      })}
-    </div>
-  )
-}
 
 // ─── Source Badge Colors (dynamic hash-based for any source name) ──
 const sourceColorPalette = ['#059669', '#0891B2', '#7C3AED', '#DB2777', '#EA580C', '#3B82F6', '#0D9488']
@@ -726,7 +694,7 @@ export default function AIChatPage() {
                       }`}
                     >
                       {msg.role === 'assistant' ? (
-                        <RenderMessageContent content={msg.content} />
+                        <MarkdownRenderer content={msg.content} />
                       ) : (
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                       )}

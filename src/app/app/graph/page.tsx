@@ -18,6 +18,7 @@ import {
   Filter,
   Copy,
   Check,
+  Share2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -1197,10 +1198,24 @@ export default function KnowledgeGraphPage() {
                   <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-[#18181B]">{selectedNode.title}</h2>
                 </div>
-                {/* Node ID with copy button */}
+                {/* Node ID with copy & share buttons */}
                 <div className="flex items-center gap-1.5 mt-1">
                   <p className="text-[10px] text-[#A1A1AA] font-mono truncate max-w-[180px]">{selectedNode.id}</p>
                   <CopyIdButton id={selectedNode.id} />
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(`${window.location.origin}/app/graph?node=${selectedNode.id}`)
+                        toast.success('Share link copied to clipboard!')
+                      } catch {
+                        toast.error('Failed to copy share link')
+                      }
+                    }}
+                    className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+                    title="Share node link"
+                  >
+                    <Share2 className="w-3 h-3" />
+                  </button>
                 </div>
                   <Badge
                     className="mt-2 text-[10px] font-semibold capitalize"

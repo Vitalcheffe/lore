@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Check,
   X,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -429,6 +430,33 @@ export function NotificationCenter() {
                 </div>
               </ScrollArea>
             )}
+
+            {/* ── What's New Section ────────────────────────── */}
+            <div className="border-t border-[#F3F4F6]">
+              <div className="px-4 pt-3 pb-1 flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-xs font-bold text-[#18181B]">What&apos;s New</span>
+                <Badge className="h-[16px] min-w-[16px] px-1 text-[8px] font-bold bg-emerald-600 text-white border-0 shadow-sm flex items-center justify-center rounded-full">
+                  New
+                </Badge>
+              </div>
+              <div className="px-4 pb-3 pt-1 space-y-2">
+                {[
+                  { title: 'Dark Mode', desc: 'Switch between light and dark themes' },
+                  { title: 'Data Export', desc: 'Download your knowledge as JSON' },
+                  { title: 'Achievements', desc: 'Earn badges as you build your graph' },
+                  { title: 'Markdown Chat', desc: 'AI responses now render with syntax highlighting' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold text-[#18181B] leading-tight">{item.title}</p>
+                      <p className="text-[10px] text-[#71717A] leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Footer */}
             {notifications.length > 0 && (

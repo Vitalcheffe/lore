@@ -38,6 +38,8 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/use-auth'
 import { ProfileCompletionCard } from '@/components/app/profile-completion'
+import { ACHIEVEMENTS } from '@/components/app/achievements'
+import { useAchievementStore } from '@/stores/achievement-store'
 
 // ─── Types ──────────────────────────────────────────────────
 interface UserStats {
@@ -227,6 +229,7 @@ function ProTipCard() {
 // ═══════════════════════════════════════════════════════════════
 export default function DashboardPage() {
   const { user } = useAuth()
+  const { triggerAchievement } = useAchievementStore()
   const [addNodeOpen, setAddNodeOpen] = useState(false)
   const greeting = useMemo(() => getGreeting(), [])
 
@@ -284,6 +287,16 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboardData()
   }, [fetchDashboardData])
+
+  // ── Trigger achievements based on stats ──
+  useEffect(() => {
+    if (!isLoading && nodes.length > 0) {
+      if (nodes.length >= 1) triggerAchievement(ACHIEVEMENTS.first_node)
+      if (nodes.length >= 5) triggerAchievement(ACHIEVEMENTS.five_nodes)
+      if (nodes.length >= 10) triggerAchievement(ACHIEVEMENTS.ten_nodes)
+      if (edges.length >= 1) triggerAchievement(ACHIEVEMENTS.first_edge)
+    }
+  }, [isLoading, nodes.length, edges.length, triggerAchievement])
 
   // ── Compute derived data ──
   const nodeCount = nodes.length
@@ -471,6 +484,42 @@ export default function DashboardPage() {
           </a>
         </div>
       </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════
+          WELCOME BACK BANNER
+          ═══════════════════════════════════════════════════════ */}
+      {nodeCount > 0 && (
+        <motion.div variants={itemVariants}>
+          <Card className="bg-gradient-to-r from-emerald-600 to-emerald-500 border-0 text-white overflow-hidden relative">
+            <CardContent className="p-5 flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="w-4 h-4 text-emerald-200" />
+                  <h2 className="text-base font-bold text-white">
+                    Welcome back, {firstName}!
+                  </h2>
+                </div>
+                <p className="text-sm text-emerald-100">
+                  {nodeCount} node{nodeCount !== 1 ? 's' : ''}, {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
+                </p>
+              </div>
+              {/* Mini sparkline indicator */}
+              <div className="flex items-end gap-[3px] h-8 shrink-0">
+                {[0.4, 0.6, 0.45, 0.8, 0.65, 0.9, 1.0].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-[5px] rounded-full bg-white/40"
+                    style={{ height: `${h * 100}%` }}
+                  />
+                ))}
+              </div>
+              {/* Decorative circle */}
+              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/5" />
+              <div className="absolute -right-2 -bottom-8 w-20 h-20 rounded-full bg-white/5" />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════
           PROFILE COMPLETION

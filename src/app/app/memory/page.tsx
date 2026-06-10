@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { formatDistanceToNow } from 'date-fns'
 import {
   Search,
   Plus,
@@ -60,6 +59,7 @@ interface Note {
   tags: string[]
   pinned: boolean
   updatedAt: string
+  createdAt: string
   color: string
   sourceUrl?: string
 }
@@ -91,6 +91,24 @@ const typeConfig: Record<NoteType, { label: string; color: string; bgColor: stri
 }
 
 // ─── Helpers ───────────────────────────────────────────────
+function timeAgo(dateString: string): string {
+  const now = new Date()
+  const date = new Date(dateString)
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  if (seconds < 60) return 'Just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days === 1) return 'Yesterday'
+  if (days < 7) return `${days}d ago`
+  const weeks = Math.floor(days / 7)
+  if (weeks === 1) return '1w ago'
+  if (weeks < 5) return `${weeks}w ago`
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 function apiNoteToNote(apiNote: ApiNote): Note {
   const noteType = (apiNote.type || 'note') as NoteType
   const config = typeConfig[noteType] || typeConfig.note
@@ -102,7 +120,8 @@ function apiNoteToNote(apiNote: ApiNote): Note {
     content: apiNote.content || '',
     tags: apiNote.tags ? apiNote.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
     pinned: apiNote.pinned || false,
-    updatedAt: formatDistanceToNow(new Date(apiNote.updatedAt), { addSuffix: true }),
+    updatedAt: timeAgo(apiNote.updatedAt),
+    createdAt: timeAgo(apiNote.createdAt),
     color: config.color,
     sourceUrl: apiNote.sourceUrl || undefined,
   }
@@ -534,7 +553,7 @@ export default function MemoryPage() {
                       return (
                         <motion.div key={note.id} variants={itemVariants}>
                           <Card
-                            className="bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group"
+                            className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
                             onClick={() => setDetailNote(note)}
                           >
                             <CardContent className="p-4 flex items-start gap-4">
@@ -583,7 +602,7 @@ export default function MemoryPage() {
                     return (
                       <motion.div key={note.id} variants={itemVariants}>
                         <Card
-                          className="bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group h-full flex flex-col"
+                          className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group h-full flex flex-col ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
                           onClick={() => setDetailNote(note)}
                         >
                           <CardContent className="p-5 flex flex-col flex-1">
@@ -646,7 +665,7 @@ export default function MemoryPage() {
                                 {note.category}
                               </span>
                               <span className="text-[10px] text-[#A1A1AA]">
-                                {note.updatedAt}
+                                {note.createdAt}
                               </span>
                             </div>
                           </CardContent>
@@ -911,6 +930,22 @@ export default function MemoryPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* ═══════════════════════════════════════════════════════
+          FLOATING ACTION BUTTON (mobile only)
+          ═══════════════════════════════════════════════════════ */}
+      <motion.button
+        onClick={() => setNewNoteOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:from-emerald-600 hover:to-emerald-800 active:scale-95 transition-all"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 260, damping: 20 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92 }}
+        aria-label="Create new note"
+      >
+        <Plus className="w-6 h-6" />
+      </motion.button>
     </div>
   )
 }

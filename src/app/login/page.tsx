@@ -233,6 +233,31 @@ export default function LoginPage() {
                 End-to-end encrypted
               </div>
             </div>
+
+            {/* Social proof — trusted by teams */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="mt-8 text-center"
+            >
+              <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-3">
+                Trusted by teams at
+              </p>
+              <div className="flex items-center justify-center flex-wrap gap-2">
+                {['Acme Corp', 'NovaTech', 'Meridian', 'Apex Labs', 'Vantage AI'].map((name) => (
+                  <span
+                    key={name}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] text-[11px] font-semibold text-gray-500 tracking-tight"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-gray-400 font-medium">
+                Join <span className="text-emerald-600 font-bold">2,000+</span> knowledge workers
+              </p>
+            </motion.div>
           </motion.div>
         </div>
       </main>

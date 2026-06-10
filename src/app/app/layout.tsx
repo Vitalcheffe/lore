@@ -1,15 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, MessageCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { AppSidebar } from '@/components/app/sidebar'
 import { CommandPalette } from '@/components/app/command-palette'
 import { KeyboardShortcuts } from '@/components/app/keyboard-shortcuts'
+import { ShortcutHelp } from '@/components/app/shortcut-help'
 import { OnboardingModal } from '@/components/app/onboarding-modal'
 import { PageTransition } from '@/components/app/page-transition'
+import { LoadingBar } from '@/components/app/loading-bar'
 import { PageSkeleton, type PageSkeletonVariant } from '@/components/app/page-skeleton'
 import { NotificationCenter } from '@/components/app/notification-center'
+import { AchievementPopup } from '@/components/app/achievements'
+import { useAchievementStore } from '@/stores/achievement-store'
 import { useAuth } from '@/hooks/use-auth'
 import { ErrorBoundary } from '@/components/app/error-boundary'
 import { Button } from '@/components/ui/button'
@@ -43,6 +48,7 @@ function getPageTitle(pathname: string): string {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { currentAchievement, clearAchievement } = useAchievementStore()
   const { isAuthenticated, isLoading, user } = useAuth()
   const pathname = usePathname()
   const skeletonVariant = getSkeletonVariant(pathname)
@@ -59,6 +65,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex">
+      <LoadingBar />
       {/* ── Sidebar ──────────────────────────────────────── */}
       <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -134,11 +141,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <PageTransition>{children}</PageTransition>
               <CommandPalette />
               <KeyboardShortcuts />
+              <ShortcutHelp />
               <OnboardingModal />
+              <AchievementPopup achievement={currentAchievement} onClose={clearAchievement} />
             </ErrorBoundary>
           )}
         </div>
       </main>
+
+      {/* ── Floating Feedback Button (desktop only) ─────── */}
+      {isAuthenticated && (
+        <div className="hidden lg:block fixed bottom-6 right-6 z-40">
+          <motion.a
+            href="mailto:feedback@lore.app"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/35 transition-shadow"
+            aria-label="Send feedback"
+          >
+            <MessageCircle className="w-5 h-5" />
+            {/* Tooltip */}
+            <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-[#18181B] px-2.5 py-1 text-[11px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md">
+              Feedback
+              <span className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-[#18181B]" />
+            </span>
+          </motion.a>
+        </div>
+      )}
     </div>
   )
 }
