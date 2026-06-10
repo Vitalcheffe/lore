@@ -22,6 +22,8 @@ import {
   Crown,
   Sparkles,
   Zap,
+  Calendar,
+  Mail,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -97,9 +99,9 @@ const sections: SettingsSection[] = [
 
 // ─── ANIMATION VARIANTS ─────────────────────────────────
 const contentVariants = {
-  enter: { opacity: 0, x: 12 },
-  center: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-  exit: { opacity: 0, x: -12, transition: { duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  enter: { opacity: 0, x: 16, scale: 0.98 },
+  center: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+  exit: { opacity: 0, x: -16, scale: 0.98, transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 }
 
 // ─── HELPER: format storage ─────────────────────────────
@@ -118,11 +120,15 @@ export default function SettingsPage() {
   const [loadingData, setLoadingData] = useState(true)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Save button animation state
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false)
+
   // ─── Profile state (initialized from session, overridden by API) ──
   const [name, setName] = useState(user?.name ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
+  const [joinDate, setJoinDate] = useState('')
 
   // ─── Subscription state ─────────────────────────────
   const [currentPlan, setCurrentPlan] = useState<'free' | 'pro' | 'enterprise'>(
@@ -201,6 +207,7 @@ export default function SettingsPage() {
           if (profile.email) setEmail(profile.email)
           if (profile.username) setUsername(profile.username)
           if (profile.plan) setCurrentPlan(profile.plan as 'free' | 'pro' | 'enterprise')
+          if (profile.createdAt) setJoinDate(new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }))
 
           // Profile API also returns stats
           if (profile.stats) {
@@ -276,8 +283,12 @@ export default function SettingsPage() {
       })
       if (res.ok) {
         setLastSaved(true)
+        setShowSaveSuccess(true)
         sonnerToast.success('Settings saved ✓')
-        setTimeout(() => setLastSaved(false), 2000)
+        setTimeout(() => {
+          setLastSaved(false)
+          setShowSaveSuccess(false)
+        }, 2000)
       }
     } catch {
       console.error('Failed to save settings')
@@ -386,6 +397,9 @@ export default function SettingsPage() {
     : 0
   const isOverAiLimit = usageStats.aiQueriesLimit > 0 && usageStats.aiQueriesToday > usageStats.aiQueriesLimit
 
+  // ─── Find active section index for animated underline ──
+  const activeIndex = sections.findIndex((s) => s.key === activeSection)
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
       {/* ═══ HEADER ═══ */}
@@ -403,21 +417,75 @@ export default function SettingsPage() {
             <h1 className="text-2xl font-bold tracking-tight text-[#18181B]">Settings</h1>
             <p className="text-sm text-[#71717A]">
               Manage your preferences and account
-              {saving && (
+              {saving && !showSaveSuccess && (
                 <span className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Saving...
                 </span>
               )}
-              {lastSaved && !saving && (
-                <span className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600">
-                  <Check className="w-3 h-3" />
+              {showSaveSuccess && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  >
+                    <Check className="w-3 h-3" />
+                  </motion.div>
                   Saved
-                </span>
+                </motion.span>
               )}
             </p>
           </div>
         </div>
+      </motion.div>
+
+      {/* ═══ PROFILE CARD ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="mb-6"
+      >
+        <Card className="bg-gradient-to-r from-emerald-50/80 to-teal-50/60 border-emerald-100/80 shadow-sm overflow-hidden">
+          <CardContent className="p-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-emerald-500/20 shrink-0">
+                {initials || '??'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-bold text-[#18181B] truncate">{name || 'Your Name'}</h2>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+                  <span className="flex items-center gap-1.5 text-sm text-[#71717A]">
+                    <Mail className="w-3.5 h-3.5" />
+                    {email || 'your@email.com'}
+                  </span>
+                  {joinDate && (
+                    <span className="flex items-center gap-1.5 text-sm text-[#71717A]">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Joined {joinDate}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <Badge className={`shrink-0 text-xs font-semibold ${
+                currentPlan === 'pro'
+                  ? 'bg-emerald-600 text-white border-0 hover:bg-emerald-700'
+                  : currentPlan === 'enterprise'
+                  ? 'bg-emerald-700 text-white border-0 hover:bg-emerald-800'
+                  : 'bg-white text-emerald-700 border-emerald-200 hover:bg-white'
+              }`}>
+                {currentPlan === 'pro' && <Crown className="w-3 h-3 mr-1" />}
+                {currentPlan === 'free' ? 'Free Plan' : currentPlan === 'pro' ? 'Pro Plan' : 'Enterprise'}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       {/* ═══ LAYOUT: SIDEBAR + CONTENT ═══ */}
@@ -426,12 +494,24 @@ export default function SettingsPage() {
         <motion.nav
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
           className="lg:w-[240px] shrink-0"
         >
-          <Card className="bg-white border-[#E5E7EB] shadow-sm">
-            <CardContent className="p-2">
-              <div className="space-y-0.5">
+          <Card className="bg-white border-[#E5E7EB] shadow-sm overflow-hidden">
+            <CardContent className="p-2 relative">
+              {/* Animated sliding indicator */}
+              <motion.div
+                className="absolute left-2 right-2 h-[42px] rounded-xl bg-emerald-50 border border-emerald-100 z-0"
+                animate={{
+                  top: activeIndex * 44 + 8,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 350,
+                  damping: 30,
+                }}
+              />
+              <div className="space-y-0.5 relative z-10">
                 {sections.map((section) => {
                   const Icon = section.icon
                   const isActive = activeSection === section.key
@@ -441,10 +521,10 @@ export default function SettingsPage() {
                       onClick={() => setActiveSection(section.key)}
                       className={`
                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left
-                        transition-all duration-200 group
+                        transition-colors duration-200 group
                         ${isActive
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                          : 'text-[#52525B] hover:bg-[#F9FAFB] hover:text-[#18181B] border border-transparent'
+                          ? 'text-emerald-700'
+                          : 'text-[#52525B] hover:text-[#18181B]'
                         }
                       `}
                     >
@@ -458,11 +538,17 @@ export default function SettingsPage() {
                       >
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className={`text-sm font-medium ${isActive ? 'font-semibold' : ''}`}>
+                      <span className={`text-sm font-medium transition-all duration-200 ${isActive ? 'font-semibold' : ''}`}>
                         {section.label}
                       </span>
                       {isActive && (
-                        <ChevronRight className="w-3.5 h-3.5 text-emerald-500 ml-auto" />
+                        <motion.div
+                          initial={{ opacity: 0, x: -4 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronRight className="w-3.5 h-3.5 text-emerald-500 ml-auto" />
+                        </motion.div>
                       )}
                     </button>
                   )
@@ -583,10 +669,50 @@ export default function SettingsPage() {
                     <Button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20"
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 min-w-[140px]"
                     >
-                      {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                      Save Changes
+                      <AnimatePresence mode="wait">
+                        {showSaveSuccess ? (
+                          <motion.span
+                            key="success"
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.5 }}
+                            className="flex items-center gap-2"
+                          >
+                            <motion.div
+                              initial={{ scale: 0, rotate: -180 }}
+                              animate={{ scale: 1, rotate: 0 }}
+                              transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                            >
+                              <Check className="w-4 h-4" />
+                            </motion.div>
+                            Saved!
+                          </motion.span>
+                        ) : saving ? (
+                          <motion.span
+                            key="saving"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-center gap-2"
+                          >
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Saving...
+                          </motion.span>
+                        ) : (
+                          <motion.span
+                            key="default"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-center gap-2"
+                          >
+                            <Save className="w-4 h-4" />
+                            Save Changes
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </Button>
                   </CardContent>
                 </Card>
@@ -697,9 +823,11 @@ export default function SettingsPage() {
                           </span>
                         </div>
                         <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${nodesPercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                            style={{ width: `${Math.min(100, nodesPercent)}%` }}
+                          <motion.div
+                            className={`h-full rounded-full ${nodesPercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, nodesPercent)}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut' }}
                           />
                         </div>
                       </div>
@@ -721,9 +849,11 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${isOverAiLimit ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                            style={{ width: `${Math.min(100, aiQueriesPercent)}%` }}
+                          <motion.div
+                            className={`h-full rounded-full ${isOverAiLimit ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, aiQueriesPercent)}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
                           />
                         </div>
                         {isOverAiLimit && (
@@ -747,9 +877,11 @@ export default function SettingsPage() {
                           </span>
                         </div>
                         <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${storagePercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                            style={{ width: `${Math.min(100, storagePercent)}%` }}
+                          <motion.div
+                            className={`h-full rounded-full ${storagePercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(100, storagePercent)}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
                           />
                         </div>
                       </div>
@@ -1276,7 +1408,7 @@ export default function SettingsPage() {
                     </CardContent>
                   </Card>
 
-                  {/* Danger Zone */}
+                  {/* Danger Zone - now inside privacy-security section */}
                   <Card className="bg-white border-red-200 shadow-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
@@ -1426,7 +1558,7 @@ export default function SettingsPage() {
           </AnimatePresence>
           )}
 
-          {/* ═══ DANGER ZONE ═══ */}
+          {/* ═══ DANGER ZONE (always visible at bottom) ═══ */}
           {!loadingData && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}

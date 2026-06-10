@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search,
@@ -18,6 +18,8 @@ import {
   Sparkles,
   Filter,
   Loader2,
+  Send,
+  Zap,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -144,16 +146,28 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.05 },
+    transition: { staggerChildren: 0.07 },
   },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+    scale: 1,
+    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+}
+
+// New note slide-in from top animation
+const newNoteVariants = {
+  hidden: { opacity: 0, y: -30, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }, // spring-like bounce ease
   },
 }
 
@@ -181,6 +195,18 @@ export default function MemoryPage() {
   const [detailNote, setDetailNote] = useState<Note | null>(null)
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  // Track newly created note for special animation
+  const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null)
+
+  // Card flip state
+  const [flippingCardId, setFlippingCardId] = useState<string | null>(null)
+  const flipTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Quick add state
+  const [quickTitle, setQuickTitle] = useState('')
+  const [quickType, setQuickType] = useState<NoteType>('note')
+  const [quickCreating, setQuickCreating] = useState(false)
 
   // New note form state
   const [newTitle, setNewTitle] = useState('')
@@ -280,6 +306,60 @@ export default function MemoryPage() {
     return result
   }, [notes, selectedCategory, typeFilter, searchQuery])
 
+  // ─── Handle card click with flip effect ──────────────────
+  const handleCardClick = useCallback((note: Note) => {
+    if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current)
+    setFlippingCardId(note.id)
+    flipTimeoutRef.current = setTimeout(() => {
+      setDetailNote(note)
+      setFlippingCardId(null)
+    }, 300)
+  }, [])
+
+  // ─── Quick add note ──────────────────────────────────────
+  const handleQuickAdd = async () => {
+    if (!quickTitle.trim()) return
+    setQuickCreating(true)
+    try {
+      const res = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: quickTitle.trim(),
+          type: quickType,
+          category: 'Ideas',
+          content: '',
+          tags: '',
+          pinned: false,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to create note')
+      const data = await res.json()
+      const createdNote = apiNoteToNote(data.note)
+
+      setNewlyCreatedId(createdNote.id)
+      setNotes([createdNote, ...notes])
+      setQuickTitle('')
+      setQuickType('note')
+
+      // Clear the newly created flag after animation
+      setTimeout(() => setNewlyCreatedId(null), 800)
+
+      const isFirstNote = notes.length === 0
+      if (isFirstNote) {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD'] })
+        toast.success('🎉 First note created!', { description: 'Your memory bank is growing!' })
+      } else {
+        toast.success('Note saved! 📝')
+      }
+    } catch (err) {
+      console.error('Failed to quick create note:', err)
+    } finally {
+      setQuickCreating(false)
+    }
+  }
+
   // ─── Create note via API ─────────────────────────────────
   const handleCreateNote = async () => {
     if (!newTitle.trim()) return
@@ -310,6 +390,7 @@ export default function MemoryPage() {
       const data = await res.json()
       const createdNote = apiNoteToNote(data.note)
 
+      setNewlyCreatedId(createdNote.id)
       setNotes([createdNote, ...notes])
       setNewTitle('')
       setNewType('note')
@@ -317,6 +398,10 @@ export default function MemoryPage() {
       setNewContent('')
       setNewTags('')
       setNewNoteOpen(false)
+
+      // Clear the newly created flag after animation
+      setTimeout(() => setNewlyCreatedId(null), 800)
+
       if (isFirstNote) {
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 }, colors: ['#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD'] })
         toast.success('🎉 First note created!', { description: 'Your memory bank is growing!' })
@@ -506,6 +591,61 @@ export default function MemoryPage() {
                 ))}
               </div>
 
+              {/* ═══════════════════════════════════════════════════
+                  QUICK ADD MINI FORM
+                  ═══════════════════════════════════════════════════ */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="mb-5"
+              >
+                <Card className="bg-white border-[#E5E7EB] shadow-sm overflow-hidden">
+                  <CardContent className="p-3">
+                    <form
+                      onSubmit={(e) => { e.preventDefault(); handleQuickAdd() }}
+                      className="flex items-center gap-2"
+                    >
+                      <div className="flex-1 relative">
+                        <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-emerald-500" />
+                        <Input
+                          placeholder="Quick add a note..."
+                          value={quickTitle}
+                          onChange={(e) => setQuickTitle(e.target.value)}
+                          className="pl-9 h-8 text-sm border-[#E5E7EB] bg-[#F9FAFB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                        />
+                      </div>
+                      <Select value={quickType} onValueChange={(v) => setQuickType(v as NoteType)}>
+                        <SelectTrigger className="w-[120px] h-8 text-xs border-[#E5E7EB]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="note">📝 Note</SelectItem>
+                          <SelectItem value="bookmark">🔖 Bookmark</SelectItem>
+                          <SelectItem value="insight">💡 Insight</SelectItem>
+                          <SelectItem value="snippet">💻 Snippet</SelectItem>
+                          <SelectItem value="meeting">👥 Meeting</SelectItem>
+                          <SelectItem value="idea">✨ Idea</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="submit"
+                        size="sm"
+                        disabled={!quickTitle.trim() || quickCreating}
+                        className="bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-md shadow-emerald-500/20 h-8 px-3 gap-1"
+                      >
+                        {quickCreating ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Send className="w-3.5 h-3.5" />
+                        )}
+                        <span className="hidden sm:inline">Add</span>
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
               {/* Results count */}
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs text-[#71717A]">
@@ -548,137 +688,169 @@ export default function MemoryPage() {
                   {filteredNotes.map((note) => {
                     const config = typeConfig[note.type]
                     const TypeIcon = config.icon
+                    const isNew = note.id === newlyCreatedId
+                    const isFlipping = note.id === flippingCardId
 
                     if (viewMode === 'list') {
                       return (
-                        <motion.div key={note.id} variants={itemVariants}>
-                          <Card
-                            className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
-                            onClick={() => setDetailNote(note)}
+                        <motion.div
+                          key={note.id}
+                          variants={isNew ? newNoteVariants : itemVariants}
+                          initial={isNew ? 'hidden' : undefined}
+                          animate="visible"
+                          style={{ perspective: 800 }}
+                        >
+                          <motion.div
+                            animate={isFlipping ? { rotateY: 180, scale: 0.95 } : { rotateY: 0, scale: 1 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
                           >
-                            <CardContent className="p-4 flex items-start gap-4">
-                              <div
-                                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                                style={{ background: config.bgColor }}
-                              >
-                                <TypeIcon className="w-4 h-4" style={{ color: config.color }} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <h4 className="text-sm font-semibold text-[#18181B] truncate">
-                                    {note.title}
-                                  </h4>
-                                  {note.pinned && (
-                                    <Pin className="w-3 h-3 text-amber-500 shrink-0" />
-                                  )}
-                                </div>
-                                <p className="text-xs text-[#71717A] truncate">
-                                  {note.content}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px] font-medium"
-                                  style={{
-                                    color: config.color,
-                                    borderColor: config.color + '40',
-                                    backgroundColor: config.bgColor,
-                                  }}
+                            <Card
+                              className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
+                              style={!note.pinned ? { borderLeftWidth: '3px', borderLeftColor: config.color } : undefined}
+                              onClick={() => handleCardClick(note)}
+                            >
+                              <CardContent className="p-4 flex items-start gap-4">
+                                <div
+                                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                                  style={{ background: config.bgColor }}
                                 >
-                                  {config.label}
-                                </Badge>
-                                <span className="text-[10px] text-[#A1A1AA] whitespace-nowrap">
-                                  {note.updatedAt}
-                                </span>
-                              </div>
-                            </CardContent>
-                          </Card>
+                                  <TypeIcon className="w-4 h-4" style={{ color: config.color }} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-0.5">
+                                    <h4 className="text-sm font-semibold text-[#18181B] truncate">
+                                      {note.title}
+                                    </h4>
+                                    {note.pinned && (
+                                      <Pin className="w-3 h-3 text-amber-500 shrink-0" />
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-[#71717A] truncate">
+                                    {note.content}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-[10px] font-medium"
+                                    style={{
+                                      color: config.color,
+                                      borderColor: config.color + '40',
+                                      backgroundColor: config.bgColor,
+                                    }}
+                                  >
+                                    {config.label}
+                                  </Badge>
+                                  <span className="text-[10px] text-[#A1A1AA] whitespace-nowrap">
+                                    {note.updatedAt}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
                         </motion.div>
                       )
                     }
 
                     // Grid card
                     return (
-                      <motion.div key={note.id} variants={itemVariants}>
-                        <Card
-                          className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group h-full flex flex-col ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
-                          onClick={() => setDetailNote(note)}
+                      <motion.div
+                        key={note.id}
+                        variants={isNew ? newNoteVariants : itemVariants}
+                        initial={isNew ? 'hidden' : undefined}
+                        animate="visible"
+                        style={{ perspective: 800 }}
+                      >
+                        <motion.div
+                          animate={isFlipping ? { rotateY: 180, scale: 0.95 } : { rotateY: 0, scale: 1 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
                         >
-                          <CardContent className="p-5 flex flex-col flex-1">
-                            {/* Header */}
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-7 h-7 rounded-lg flex items-center justify-center"
-                                  style={{ background: config.bgColor }}
-                                >
-                                  <TypeIcon className="w-3.5 h-3.5" style={{ color: config.color }} />
+                          <Card
+                            className={`bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group h-full flex flex-col ${note.pinned ? 'border-l-4 border-l-amber-400' : ''}`}
+                            style={!note.pinned ? { borderLeftWidth: '3px', borderLeftColor: config.color } : undefined}
+                            onClick={() => handleCardClick(note)}
+                          >
+                            <CardContent className="p-5 flex flex-col flex-1">
+                              {/* Header */}
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                                    style={{ background: config.bgColor }}
+                                  >
+                                    <TypeIcon className="w-3.5 h-3.5" style={{ color: config.color }} />
+                                  </div>
+                                  <Badge
+                                    variant="outline"
+                                    className="text-[9px] font-semibold"
+                                    style={{
+                                      color: config.color,
+                                      borderColor: config.color + '40',
+                                      backgroundColor: config.bgColor,
+                                    }}
+                                  >
+                                    {config.label}
+                                  </Badge>
                                 </div>
-                                <Badge
-                                  variant="outline"
-                                  className="text-[9px] font-semibold"
-                                  style={{
-                                    color: config.color,
-                                    borderColor: config.color + '40',
-                                    backgroundColor: config.bgColor,
-                                  }}
-                                >
-                                  {config.label}
-                                </Badge>
+                                {note.pinned && (
+                                  <Pin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                )}
                               </div>
-                              {note.pinned && (
-                                <Pin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                              )}
-                            </div>
 
-                            {/* Title */}
-                            <h4 className="text-sm font-semibold text-[#18181B] mb-1.5 leading-snug group-hover:text-emerald-700 transition-colors">
-                              {note.title}
-                            </h4>
+                              {/* Title */}
+                              <h4 className="text-sm font-semibold text-[#18181B] mb-1.5 leading-snug group-hover:text-emerald-700 transition-colors">
+                                {note.title}
+                              </h4>
 
-                            {/* Content preview */}
-                            <p className="text-xs text-[#71717A] leading-relaxed mb-3 line-clamp-3 flex-1">
-                              {note.content}
-                            </p>
+                              {/* Content preview */}
+                              <p className="text-xs text-[#71717A] leading-relaxed mb-3 line-clamp-3 flex-1">
+                                {note.content}
+                              </p>
 
-                            {/* Tags */}
-                            <div className="flex flex-wrap gap-1.5 mb-3">
-                              {note.tags.slice(0, 3).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#F3F4F6] text-[#52525B]"
-                                >
-                                  {tag}
+                              {/* Tags */}
+                              <div className="flex flex-wrap gap-1.5 mb-3">
+                                {note.tags.slice(0, 3).map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#F3F4F6] text-[#52525B]"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                                {note.tags.length > 3 && (
+                                  <span className="text-[10px] text-[#A1A1AA] self-center">
+                                    +{note.tags.length - 3}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Footer */}
+                              <div className="flex items-center justify-between pt-2 border-t border-[#F3F4F6]">
+                                <span className="text-[10px] text-[#A1A1AA]">
+                                  {note.category}
                                 </span>
-                              ))}
-                              {note.tags.length > 3 && (
-                                <span className="text-[10px] text-[#A1A1AA] self-center">
-                                  +{note.tags.length - 3}
+                                <span className="text-[10px] text-[#A1A1AA]">
+                                  {note.createdAt}
                                 </span>
-                              )}
-                            </div>
-
-                            {/* Footer */}
-                            <div className="flex items-center justify-between pt-2 border-t border-[#F3F4F6]">
-                              <span className="text-[10px] text-[#A1A1AA]">
-                                {note.category}
-                              </span>
-                              <span className="text-[10px] text-[#A1A1AA]">
-                                {note.createdAt}
-                              </span>
-                            </div>
-                          </CardContent>
-                        </Card>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
                       </motion.div>
                     )
                   })}
                 </motion.div>
               )}
 
-              {/* Empty state */}
+              {/* ─── Empty state with bounce ──────────────────── */}
               {!loading && filteredNotes.length === 0 && notes.length === 0 && (
-                <NotesEmptyState onCreateNote={() => setNewNoteOpen(true)} />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  <NotesEmptyState onCreateNote={() => setNewNoteOpen(true)} />
+                </motion.div>
               )}
               {!loading && filteredNotes.length === 0 && notes.length > 0 && (
                 <div className="flex flex-col items-center justify-center py-16">
