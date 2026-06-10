@@ -11,10 +11,12 @@ import {
   Sun,
   MessageSquare,
   BookOpen,
+  Users,
   Settings,
   LogOut,
   X,
 } from 'lucide-react'
+import { SidebarSearch } from '@/components/app/sidebar-search'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,12 +25,13 @@ import { useAuth } from '@/hooks/use-auth'
 
 // ─── Navigation Items ──────────────────────────────────────
 const navItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '/app' },
-  { label: 'Knowledge Graph', icon: Network, href: '/app/graph' },
-  { label: 'Morning Digest', icon: Sun, href: '/app/digest' },
-  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat' },
-  { label: 'Memory', icon: BookOpen, href: '/app/memory' },
-  { label: 'Settings', icon: Settings, href: '/app/settings' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/app', shortcut: '⌘D' },
+  { label: 'Knowledge Graph', icon: Network, href: '/app/graph', shortcut: '⌘G' },
+  { label: 'Morning Digest', icon: Sun, href: '/app/digest', shortcut: '⌘M' },
+  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat', shortcut: '⌘K' },
+  { label: 'Memory', icon: BookOpen, href: '/app/memory', shortcut: '⌘N' },
+  { label: 'Team', icon: Users, href: '/app/team', shortcut: '⌘T' },
+  { label: 'Settings', icon: Settings, href: '/app/settings', shortcut: '⌘S' },
 ]
 
 // ─── Plan badge styles ──────────────────────────────────────
@@ -124,8 +127,11 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
           </button>
         </div>
 
+        {/* ── Search ──────────────────────────────────────── */}
+        <SidebarSearch />
+
         {/* ── Navigation ────────────────────────────────── */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 pb-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const active = isActive(item.href)
             return (
@@ -134,7 +140,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                 href={item.href}
                 onClick={onClose}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+                  group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                   ${
                     active
                       ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100'
@@ -148,8 +154,12 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                   }`}
                 />
                 {item.label}
-                {active && (
+                {active ? (
                   <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                ) : (
+                  <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {item.shortcut}
+                  </span>
                 )}
               </Link>
             )

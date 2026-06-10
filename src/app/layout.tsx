@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,14 +21,20 @@ export const metadata: Metadata = {
   description: "Lore gives your team a shared memory that's structured, always consistent, and available everywhere. Powered by Aurora DSQL's multi-region architecture.",
   keywords: ["Lore", "team memory", "knowledge management", "Aurora DSQL", "AWS", "knowledge graph", "AI", "multi-region"],
   authors: [{ name: "Lore Team" }],
+  manifest: "/manifest.json",
   icons: {
     icon: "/logo.svg",
+    apple: "/logo.svg",
   },
   openGraph: {
     title: "LORE — Your Team's Memory, Alive",
     description: "Inconsistent memory is misinformation. Lore gives your team a memory that's always consistent, everywhere.",
     type: "website",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#059669",
 };
 
 export default function RootLayout({

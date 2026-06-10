@@ -43,6 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { toast } from 'sonner'
 
 // ─── Types ─────────────────────────────────────────────────
 type NoteType = 'note' | 'bookmark' | 'insight' | 'snippet' | 'meeting' | 'idea'
@@ -294,6 +295,7 @@ export default function MemoryPage() {
       setNewContent('')
       setNewTags('')
       setNewNoteOpen(false)
+      toast.success('Note saved! 📝')
     } catch (err) {
       console.error('Failed to create note:', err)
     } finally {
@@ -309,6 +311,7 @@ export default function MemoryPage() {
       if (!res.ok) throw new Error('Failed to delete note')
       setNotes(notes.filter((n) => n.id !== id))
       setDetailNote(null)
+      toast.success('Note deleted')
     } catch (err) {
       console.error('Failed to delete note:', err)
     } finally {
@@ -333,6 +336,7 @@ export default function MemoryPage() {
       if (detailNote?.id === note.id) {
         setDetailNote(updatedNote)
       }
+      toast.success(note.pinned ? 'Note unpinned' : 'Note pinned')
     } catch (err) {
       console.error('Failed to toggle pin:', err)
     }

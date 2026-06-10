@@ -44,6 +44,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { toast } from 'sonner'
 
 // ─── Types ─────────────────────────────────────────────────
 interface GraphNode {
@@ -392,6 +393,7 @@ export default function KnowledgeGraphPage() {
           createEdge()
           setAddEdgeSource(null)
           setToolMode('select')
+          toast.success('Connection created!')
         }
         return
       }
@@ -408,6 +410,7 @@ export default function KnowledgeGraphPage() {
         setNodes((prev) => prev.filter((n) => n.id !== nodeId))
         setEdges((prev) => prev.filter((e) => e.source !== nodeId && e.target !== nodeId))
         if (selectedNodeId === nodeId) setSelectedNodeId(null)
+        toast.success('Node deleted')
         return
       }
 
@@ -510,6 +513,7 @@ export default function KnowledgeGraphPage() {
         const createdNode = mapApiNodeToGraphNode(data.node)
         setNodes((prev) => [...prev, createdNode])
         setSelectedNodeId(createdNode.id)
+        toast.success('Knowledge node created! 🧠')
       } else {
         // Fallback: add locally
         const id = `local-${Date.now()}`
@@ -560,6 +564,7 @@ export default function KnowledgeGraphPage() {
     setNodes((prev) => prev.filter((n) => n.id !== selectedNodeId))
     setEdges((prev) => prev.filter((e) => e.source !== selectedNodeId && e.target !== selectedNodeId))
     setSelectedNodeId(null)
+    toast.success('Node deleted')
   }
 
   const handleEditNode = async () => {

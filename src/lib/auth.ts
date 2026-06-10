@@ -15,11 +15,13 @@ declare module 'next-auth' {
   interface User {
     id: string;
     plan: string;
+    onboardingComplete?: boolean;
   }
   interface Session {
     user: User & {
       id: string;
       plan: string;
+      onboardingComplete?: boolean;
     };
   }
 }
@@ -28,6 +30,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
     plan: string;
+    onboardingComplete?: boolean;
   }
 }
 
@@ -117,6 +120,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           plan: user.plan,
+          onboardingComplete: user.onboardingComplete,
         };
       },
     }),
@@ -136,6 +140,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.plan = (user as any).plan || 'free';
+        token.onboardingComplete = (user as any).onboardingComplete ?? false;
       }
 
       if (account && user && account.type === 'oauth') {
@@ -148,6 +153,7 @@ export const authOptions: NextAuthOptions = {
         });
         token.id = dbUser.id;
         token.plan = dbUser.plan;
+        token.onboardingComplete = dbUser.onboardingComplete;
       }
 
       return token;
@@ -157,6 +163,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.plan = token.plan;
+        session.user.onboardingComplete = token.onboardingComplete;
       }
       return session;
     },

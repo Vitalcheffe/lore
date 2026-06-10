@@ -14,16 +14,20 @@ import {
   TrendingUp,
   Circle,
   Mail,
-  RefreshCw,
-  Ban,
   Zap,
   ExternalLink,
   Loader2,
 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 
 // ═══════════════════════════════════════════════════════════════
-// LORE — Team Management Page (Dark Mode)
+// LORE — Team Management Page (Light Mode)
 // ═══════════════════════════════════════════════════════════════
 
 type Role = 'admin' | 'editor' | 'viewer';
@@ -56,22 +60,22 @@ interface Activity {
 }
 
 function roleBadgeColor(role: string) {
-  if (role === 'admin') return { bg: 'rgba(139,92,246,0.1)', text: '#A78BFA', border: 'rgba(139,92,246,0.15)' };
-  if (role === 'editor') return { bg: 'rgba(59,130,246,0.1)', text: '#60A5FA', border: 'rgba(59,130,246,0.15)' };
-  return { bg: 'rgba(100,116,139,0.1)', text: '#94A3B8', border: 'rgba(100,116,139,0.15)' };
+  if (role === 'admin') return { bg: 'rgba(5,150,105,0.08)', text: '#059669', border: 'rgba(5,150,105,0.15)' };
+  if (role === 'editor') return { bg: 'rgba(13,148,136,0.08)', text: '#0D9488', border: 'rgba(13,148,136,0.15)' };
+  return { bg: 'rgba(113,113,122,0.08)', text: '#71717A', border: 'rgba(113,113,122,0.15)' };
 }
 
 function statusDot(status: string) {
   if (status === 'online') return '#22C55E';
   if (status === 'away') return '#F59E0B';
-  return '#64748B';
+  return '#94A3B8';
 }
 
 function getInitials(name: string) {
   return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 }
 
-const memberColors = ['#8B5CF6', '#3B82F6', '#22C55E', '#F59E0B', '#EC4899', '#A78BFA', '#6D28D9', '#F43F5E', '#06B6D4', '#84CC16'];
+const memberColors = ['#059669', '#0D9488', '#3B82F6', '#F59E0B', '#EC4899', '#7C3AED', '#047857', '#F43F5E', '#06B6D4', '#84CC16'];
 
 const staggerContainer = {
   animate: { transition: { staggerChildren: 0.04 } },
@@ -200,8 +204,8 @@ export default function TeamPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="h-full bg-[#000000] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-[#8B5CF6] animate-spin" />
+      <div className="h-full bg-[#F9FAFB] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
       </div>
     );
   }
@@ -209,34 +213,34 @@ export default function TeamPage() {
   // No team yet — show create team form
   if (!hasTeam) {
     return (
-      <div className="h-full bg-[#000000] overflow-y-auto dark-scrollbar">
+      <div className="h-full bg-[#F9FAFB] overflow-y-auto">
         <div className="max-w-lg mx-auto p-8 flex flex-col items-center justify-center min-h-[80vh]">
-          <div className="h-16 w-16 rounded-2xl bg-[rgba(139,92,246,0.1)] flex items-center justify-center mb-6">
-            <Users className="h-8 w-8 text-[#A78BFA]" />
+          <div className="h-16 w-16 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6">
+            <Users className="h-8 w-8 text-emerald-600" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Create Your Team</h1>
-          <p className="text-sm text-[rgba(255,255,255,0.5)] text-center mb-8">
+          <h1 className="text-2xl font-bold text-[#18181B] mb-2">Create Your Team</h1>
+          <p className="text-sm text-[#71717A] text-center mb-8">
             Start collaborating with your team on a shared knowledge graph. Invite members, share insights, and build collective memory.
           </p>
           <div className="w-full space-y-4">
             <div>
-              <label className="text-xs font-medium text-[rgba(255,255,255,0.5)] mb-1.5 block">Team Name</label>
-              <input
+              <Label className="text-xs font-medium text-[#71717A] mb-1.5 block">Team Name</Label>
+              <Input
                 type="text"
                 value={teamNameInput}
                 onChange={(e) => setTeamNameInput(e.target.value)}
                 placeholder="e.g., Lore Engineering"
-                className="w-full h-10 px-3 rounded-lg bg-[#12121E] border border-[rgba(255,255,255,0.06)] text-sm text-white placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(139,92,246,0.3)] focus:outline-none transition-colors"
+                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
               />
             </div>
-            <button
+            <Button
               onClick={handleCreateTeam}
               disabled={!teamNameInput.trim() || creatingTeam}
-              className="btn-violet w-full flex items-center justify-center gap-2 !py-3 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-md shadow-emerald-500/20 gap-2 h-10"
             >
               {creatingTeam ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               {creatingTeam ? 'Creating...' : 'Create Team'}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -244,7 +248,7 @@ export default function TeamPage() {
   }
 
   return (
-    <div className="h-full bg-[#000000] overflow-y-auto dark-scrollbar">
+    <div className="h-full bg-[#F9FAFB] overflow-y-auto">
       <motion.div
         initial="initial"
         animate="animate"
@@ -255,41 +259,45 @@ export default function TeamPage() {
         <motion.div variants={staggerItem} className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
-              <p className="section-label">[ TEAM ]</p>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">
+              <p className="text-xs font-bold tracking-widest uppercase text-emerald-600 mb-2">[ TEAM ]</p>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#18181B] mt-2">
                 Team Management
               </h1>
-              <p className="text-sm text-[rgba(255,255,255,0.5)] mt-1">
+              <p className="text-sm text-[#71717A] mt-1">
                 Manage your team members, roles, and permissions.
               </p>
             </div>
             {currentUserRole === 'admin' && (
-              <button
+              <Button
                 onClick={() => setShowInviteModal(true)}
-                className="btn-violet flex items-center gap-2 shrink-0"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-md shadow-emerald-500/20 gap-2 shrink-0"
               >
                 <UserPlus className="h-4 w-4" />
                 Invite Member
-              </button>
+              </Button>
             )}
           </div>
 
           {/* ── Stats Row ──────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: 'Members', value: String(stats.totalMembers), change: '', icon: <Users className="h-4 w-4" />, color: '#8B5CF6' },
-              { label: 'Active Today', value: String(stats.activeToday), change: '', icon: <Circle className="h-2.5 w-2.5 fill-[#22C55E] text-[#22C55E]" />, color: '#22C55E' },
-              { label: 'Facts Contributed', value: stats.totalFacts.toLocaleString(), change: '', icon: <Zap className="h-4 w-4" />, color: '#F59E0B' },
-              { label: 'Avg. Queries/Day', value: String(stats.avgQueriesPerDay), change: '', icon: <TrendingUp className="h-4 w-4" />, color: '#3B82F6' },
+              { label: 'Members', value: String(stats.totalMembers), icon: <Users className="h-4 w-4" />, color: '#059669' },
+              { label: 'Active Today', value: String(stats.activeToday), icon: <Circle className="h-2.5 w-2.5 fill-[#22C55E] text-[#22C55E]" />, color: '#22C55E' },
+              { label: 'Facts Contributed', value: stats.totalFacts.toLocaleString(), icon: <Zap className="h-4 w-4" />, color: '#EA580C' },
+              { label: 'Avg. Queries/Day', value: String(stats.avgQueriesPerDay), icon: <TrendingUp className="h-4 w-4" />, color: '#0D9488' },
             ].map((stat) => (
-              <motion.div key={stat.label} variants={staggerItem} className="card-dark">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: `${stat.color}10` }}>
-                    <span style={{ color: stat.color }}>{stat.icon}</span>
-                  </div>
-                </div>
-                <div className="text-2xl font-bold stat-mono mb-1 text-white">{stat.value}</div>
-                <span className="text-[11px] text-[rgba(255,255,255,0.3)]">{stat.label}</span>
+              <motion.div key={stat.label} variants={staggerItem}>
+                <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow">
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: `${stat.color}10` }}>
+                        <span style={{ color: stat.color }}>{stat.icon}</span>
+                      </div>
+                    </div>
+                    <div className="text-2xl font-bold text-[#18181B] mb-1" style={{ fontVariantNumeric: 'tabular-nums' }}>{stat.value}</div>
+                    <span className="text-[11px] text-[#71717A]">{stat.label}</span>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
@@ -300,290 +308,306 @@ export default function TeamPage() {
           {/* ─── LEFT COLUMN (2/3) ──────────────────────────────── */}
           <div className="lg:col-span-2 space-y-4">
             {/* ── Members Table ──────────────────────────────────── */}
-            <motion.div variants={staggerItem} className="card-dark !p-0 overflow-hidden">
-              <div className="px-5 py-4 border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white">Members</h3>
-                <span className="text-[11px] text-[rgba(255,255,255,0.35)] stat-mono">{members.length} total</span>
-              </div>
-              {members.length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <Users className="h-8 w-8 text-[rgba(255,255,255,0.1)] mx-auto mb-2" />
-                  <p className="text-sm text-[rgba(255,255,255,0.3)]">No team members yet</p>
+            <motion.div variants={staggerItem}>
+              <Card className="bg-white border-[#E5E7EB] !p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#18181B]">Members</h3>
+                  <span className="text-[11px] text-[#71717A]" style={{ fontVariantNumeric: 'tabular-nums' }}>{members.length} total</span>
                 </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="data-table-dark">
-                    <thead>
-                      <tr>
-                        <th>Member</th>
-                        <th>Role</th>
-                        <th>Facts</th>
-                        <th>Queries</th>
-                        <th>Last Active</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {members.map((member, i) => {
-                        const badge = roleBadgeColor(member.role);
-                        return (
-                          <tr key={member.id} className="cursor-pointer group">
-                            <td>
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
-                                  style={{ background: `${memberColors[i % memberColors.length]}12` }}
+                {members.length === 0 ? (
+                  <div className="px-5 py-8 text-center">
+                    <Users className="h-8 w-8 text-[#D4D4D8] mx-auto mb-2" />
+                    <p className="text-sm text-[#71717A]">No team members yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-[#F3F4F6]">
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-5 py-2.5">Member</th>
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-3 py-2.5">Role</th>
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-3 py-2.5">Facts</th>
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-3 py-2.5">Queries</th>
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-3 py-2.5">Last Active</th>
+                          <th className="text-left text-[10px] font-semibold text-[#71717A] uppercase tracking-wider px-3 py-2.5">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {members.map((member, i) => {
+                          const badge = roleBadgeColor(member.role);
+                          return (
+                            <tr key={member.id} className="cursor-pointer group hover:bg-[#F9FAFB] transition-colors border-b border-[#F3F4F6] last:border-b-0">
+                              <td className="px-5 py-3">
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
+                                    style={{ background: `${memberColors[i % memberColors.length]}12` }}
+                                  >
+                                    <span className="text-xs font-bold" style={{ color: memberColors[i % memberColors.length] }}>
+                                      {getInitials(member.name)}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-semibold text-[#18181B] group-hover:text-emerald-700 transition-colors truncate">
+                                      {member.name}
+                                    </p>
+                                    <p className="text-[10px] text-[#A1A1AA] truncate">
+                                      {member.email}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span
+                                  className="text-[10px] px-2.5 py-1 rounded-lg font-medium capitalize"
+                                  style={{ background: badge.bg, color: badge.text, border: `1px solid ${badge.border}` }}
                                 >
-                                  <span className="text-xs font-bold" style={{ color: memberColors[i % memberColors.length] }}>
-                                    {getInitials(member.name)}
+                                  {member.role}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span className="text-sm text-[#18181B]" style={{ fontVariantNumeric: 'tabular-nums' }}>{member.facts}</span>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span className="text-sm text-[#18181B]" style={{ fontVariantNumeric: 'tabular-nums' }}>{member.queries}</span>
+                              </td>
+                              <td className="px-3 py-3">
+                                <span className="text-xs text-[#71717A]">{member.lastActive}</span>
+                              </td>
+                              <td className="px-3 py-3">
+                                <div className="flex items-center gap-1.5">
+                                  <span
+                                    className="h-2 w-2 rounded-full shrink-0"
+                                    style={{ background: statusDot(member.status) }}
+                                  />
+                                  <span className="text-[10px] text-[#71717A] capitalize">
+                                    {member.status}
                                   </span>
                                 </div>
-                                <div className="min-w-0">
-                                  <p className="text-sm font-semibold text-white group-hover:text-[#A78BFA] transition-colors truncate">
-                                    {member.name}
-                                  </p>
-                                  <p className="text-[10px] text-[rgba(255,255,255,0.2)] truncate">
-                                    {member.email}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <span
-                                className="text-[10px] px-2.5 py-1 rounded-lg font-medium capitalize"
-                                style={{ background: badge.bg, color: badge.text, border: `1px solid ${badge.border}` }}
-                              >
-                                {member.role}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="text-sm stat-mono text-white">{member.facts}</span>
-                            </td>
-                            <td>
-                              <span className="text-sm stat-mono text-white">{member.queries}</span>
-                            </td>
-                            <td>
-                              <span className="text-xs text-[rgba(255,255,255,0.5)]">{member.lastActive}</span>
-                            </td>
-                            <td>
-                              <div className="flex items-center gap-1.5">
-                                <span
-                                  className="h-2 w-2 rounded-full shrink-0"
-                                  style={{ background: statusDot(member.status) }}
-                                />
-                                <span className="text-[10px] text-[rgba(255,255,255,0.35)] capitalize">
-                                  {member.status}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </Card>
             </motion.div>
 
             {/* ── Pending Invitations ────────────────────────────── */}
-            <motion.div variants={staggerItem} className="card-dark !p-0 overflow-hidden">
-              <div className="px-5 py-4 border-b border-[rgba(255,255,255,0.06)] flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white">Pending Invitations</h3>
-                <span className="text-[11px] text-[rgba(255,255,255,0.35)] stat-mono">{invitations.length} pending</span>
-              </div>
-              {invitations.length === 0 ? (
-                <div className="px-5 py-8 text-center">
-                  <Mail className="h-8 w-8 text-[rgba(255,255,255,0.1)] mx-auto mb-2" />
-                  <p className="text-sm text-[rgba(255,255,255,0.3)]">No pending invitations</p>
+            <motion.div variants={staggerItem}>
+              <Card className="bg-white border-[#E5E7EB] !p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-[#18181B]">Pending Invitations</h3>
+                  <span className="text-[11px] text-[#71717A]" style={{ fontVariantNumeric: 'tabular-nums' }}>{invitations.length} pending</span>
                 </div>
-              ) : (
-                <div className="divide-y divide-[rgba(255,255,255,0.04)]">
-                  {invitations.map((inv) => {
-                    const badge = roleBadgeColor(inv.role);
-                    return (
-                      <div
-                        key={inv.id}
-                        className="flex items-center gap-3 px-5 py-3 hover:bg-[rgba(139,92,246,0.03)] transition-colors"
-                      >
-                        <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 bg-[#12121E] border border-[rgba(255,255,255,0.06)]">
-                          <Mail className="h-3.5 w-3.5 text-[rgba(255,255,255,0.3)]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-[rgba(255,255,255,0.65)] truncate">{inv.email}</p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span
-                              className="text-[9px] px-1.5 py-0.5 rounded font-medium capitalize"
-                              style={{ background: badge.bg, color: badge.text, border: `1px solid ${badge.border}` }}
-                            >
-                              {inv.role}
-                            </span>
-                            <span className="text-[10px] text-[rgba(255,255,255,0.2)]">{inv.sentDate}</span>
+                {invitations.length === 0 ? (
+                  <div className="px-5 py-8 text-center">
+                    <Mail className="h-8 w-8 text-[#D4D4D8] mx-auto mb-2" />
+                    <p className="text-sm text-[#71717A]">No pending invitations</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#F3F4F6]">
+                    {invitations.map((inv) => {
+                      const badge = roleBadgeColor(inv.role);
+                      return (
+                        <div
+                          key={inv.id}
+                          className="flex items-center gap-3 px-5 py-3 hover:bg-[#F9FAFB] transition-colors"
+                        >
+                          <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 bg-[#F9FAFB] border border-[#E5E7EB]">
+                            <Mail className="h-3.5 w-3.5 text-[#71717A]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-[#52525B] truncate">{inv.email}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span
+                                className="text-[9px] px-1.5 py-0.5 rounded font-medium capitalize"
+                                style={{ background: badge.bg, color: badge.text, border: `1px solid ${badge.border}` }}
+                              >
+                                {inv.role}
+                              </span>
+                              <span className="text-[10px] text-[#A1A1AA]">{inv.sentDate}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                )}
+              </Card>
             </motion.div>
           </div>
 
           {/* ─── RIGHT COLUMN (1/3) ─────────────────────────────── */}
           <div className="space-y-4">
             {/* ── Team Settings ──────────────────────────────────── */}
-            <motion.div variants={staggerItem} className="card-dark">
-              <h3 className="text-sm font-bold text-white mb-4">Team Settings</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-[rgba(255,255,255,0.35)]">Team Name</p>
-                    <p className="text-sm font-semibold text-white mt-0.5">{team?.name || 'My Team'}</p>
-                  </div>
-                </div>
-                <div className="h-px bg-[rgba(255,255,255,0.04)]" />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-[rgba(255,255,255,0.35)]">Team URL</p>
-                    <p className="text-sm font-mono text-[rgba(255,255,255,0.65)] mt-0.5">{team?.slug || 'team'}.getlore.dev</p>
-                  </div>
-                  <button
-                    onClick={handleCopyUrl}
-                    className="h-7 w-7 rounded-lg flex items-center justify-center text-[rgba(255,255,255,0.25)] hover:text-[#A78BFA] hover:bg-[rgba(139,92,246,0.06)] transition-colors"
-                  >
-                    {copiedUrl ? <Check className="h-3.5 w-3.5 text-[#22C55E]" /> : <Copy className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-                <div className="h-px bg-[rgba(255,255,255,0.04)]" />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-[rgba(255,255,255,0.35)]">Plan</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-sm font-semibold text-white capitalize">{team?.plan || 'Free'}</span>
-                      <span className="badge-violet text-[9px]">Current</span>
+            <motion.div variants={staggerItem}>
+              <Card className="bg-white border-[#E5E7EB]">
+                <CardContent className="p-5">
+                  <h3 className="text-sm font-bold text-[#18181B] mb-4">Team Settings</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-[#71717A]">Team Name</p>
+                        <p className="text-sm font-semibold text-[#18181B] mt-0.5">{team?.name || 'My Team'}</p>
+                      </div>
                     </div>
+                    <div className="h-px bg-[#F3F4F6]" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-[#71717A]">Team URL</p>
+                        <p className="text-sm font-mono text-[#52525B] mt-0.5">{team?.slug || 'team'}.getlore.dev</p>
+                      </div>
+                      <button
+                        onClick={handleCopyUrl}
+                        className="h-7 w-7 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+                      >
+                        {copiedUrl ? <Check className="h-3.5 w-3.5 text-[#22C55E]" /> : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+                    </div>
+                    <div className="h-px bg-[#F3F4F6]" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-[#71717A]">Plan</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-sm font-semibold text-[#18181B] capitalize">{team?.plan || 'Free'}</span>
+                          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50 text-[9px]">Current</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <button className="w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-emerald-600 hover:text-emerald-700 transition-colors mt-2 py-2 rounded-lg hover:bg-emerald-50">
+                      <ExternalLink className="h-3 w-3" />
+                      Manage Subscription
+                    </button>
                   </div>
-                </div>
-                <button className="w-full flex items-center justify-center gap-1.5 text-[11px] font-medium text-[#A78BFA] hover:text-white transition-colors mt-2 py-2 rounded-lg hover:bg-[rgba(139,92,246,0.04)]">
-                  <ExternalLink className="h-3 w-3" />
-                  Manage Subscription
-                </button>
-              </div>
+                </CardContent>
+              </Card>
             </motion.div>
 
             {/* ── Roles & Permissions ────────────────────────────── */}
-            <motion.div variants={staggerItem} className="card-dark">
-              <h3 className="text-sm font-bold text-white mb-4">Roles & Permissions</h3>
-              <div className="space-y-3">
-                {[
-                  {
-                    role: 'admin' as Role,
-                    icon: <Shield className="h-4 w-4" />,
-                    color: '#8B5CF6',
-                    members: roleCounts.admin,
-                    permissions: [
-                      { name: 'Manage members', allowed: true },
-                      { name: 'Edit all content', allowed: true },
-                      { name: 'Delete facts & decisions', allowed: true },
-                      { name: 'Manage billing', allowed: true },
-                    ],
-                  },
-                  {
-                    role: 'editor' as Role,
-                    icon: <Pencil className="h-4 w-4" />,
-                    color: '#3B82F6',
-                    members: roleCounts.editor,
-                    permissions: [
-                      { name: 'Create facts & decisions', allowed: true },
-                      { name: 'Edit own content', allowed: true },
-                      { name: 'Delete own content', allowed: true },
-                      { name: 'Manage members', allowed: false },
-                    ],
-                  },
-                  {
-                    role: 'viewer' as Role,
-                    icon: <Eye className="h-4 w-4" />,
-                    color: '#22C55E',
-                    members: roleCounts.viewer,
-                    permissions: [
-                      { name: 'View all content', allowed: true },
-                      { name: 'Query knowledge', allowed: true },
-                      { name: 'Create facts', allowed: false },
-                      { name: 'Edit content', allowed: false },
-                    ],
-                  },
-                ].map((roleItem) => (
-                  <div
-                    key={roleItem.role}
-                    className="bg-[#12121E] border border-[rgba(255,255,255,0.04)] rounded-xl p-3"
-                  >
-                    <div className="flex items-center gap-2.5 mb-2">
+            <motion.div variants={staggerItem}>
+              <Card className="bg-white border-[#E5E7EB]">
+                <CardContent className="p-5">
+                  <h3 className="text-sm font-bold text-[#18181B] mb-4">Roles & Permissions</h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        role: 'admin' as Role,
+                        icon: <Shield className="h-4 w-4" />,
+                        color: '#059669',
+                        members: roleCounts.admin,
+                        permissions: [
+                          { name: 'Manage members', allowed: true },
+                          { name: 'Edit all content', allowed: true },
+                          { name: 'Delete facts & decisions', allowed: true },
+                          { name: 'Manage billing', allowed: true },
+                        ],
+                      },
+                      {
+                        role: 'editor' as Role,
+                        icon: <Pencil className="h-4 w-4" />,
+                        color: '#0D9488',
+                        members: roleCounts.editor,
+                        permissions: [
+                          { name: 'Create facts & decisions', allowed: true },
+                          { name: 'Edit own content', allowed: true },
+                          { name: 'Delete own content', allowed: true },
+                          { name: 'Manage members', allowed: false },
+                        ],
+                      },
+                      {
+                        role: 'viewer' as Role,
+                        icon: <Eye className="h-4 w-4" />,
+                        color: '#3B82F6',
+                        members: roleCounts.viewer,
+                        permissions: [
+                          { name: 'View all content', allowed: true },
+                          { name: 'Query knowledge', allowed: true },
+                          { name: 'Create facts', allowed: false },
+                          { name: 'Edit content', allowed: false },
+                        ],
+                      },
+                    ].map((roleItem) => (
                       <div
-                        className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ background: `${roleItem.color}10` }}
+                        key={roleItem.role}
+                        className="bg-[#F9FAFB] border border-[#F3F4F6] rounded-xl p-3"
                       >
-                        <span style={{ color: roleItem.color }}>{roleItem.icon}</span>
+                        <div className="flex items-center gap-2.5 mb-2">
+                          <div
+                            className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ background: `${roleItem.color}10` }}
+                          >
+                            <span style={{ color: roleItem.color }}>{roleItem.icon}</span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold text-[#18181B] capitalize">{roleItem.role}</p>
+                            <p className="text-[10px] text-[#A1A1AA]">
+                              {roleItem.members} member{roleItem.members !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-1.5 mt-2">
+                          {roleItem.permissions.map((perm) => (
+                            <div key={perm.name} className="flex items-center gap-2">
+                              {perm.allowed ? (
+                                <Check className="h-3 w-3 text-emerald-500 shrink-0" />
+                              ) : (
+                                <X className="h-3 w-3 text-[#D4D4D8] shrink-0" />
+                              )}
+                              <span className={`text-[11px] ${perm.allowed ? 'text-[#52525B]' : 'text-[#A1A1AA]'}`}>
+                                {perm.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-white capitalize">{roleItem.role}</p>
-                        <p className="text-[10px] text-[rgba(255,255,255,0.25)]">
-                          {roleItem.members} member{roleItem.members !== 1 ? 's' : ''}
-                        </p>
-                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* ── Activity Feed ──────────────────────────────────── */}
+            <motion.div variants={staggerItem}>
+              <Card className="bg-white border-[#E5E7EB]">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-[#18181B]">Activity Feed</h3>
+                  </div>
+                  {activities.length === 0 ? (
+                    <div className="py-6 text-center">
+                      <Zap className="h-6 w-6 text-[#D4D4D8] mx-auto mb-2" />
+                      <p className="text-xs text-[#A1A1AA]">No team activity yet</p>
                     </div>
-                    <div className="space-y-1.5 mt-2">
-                      {roleItem.permissions.map((perm) => (
-                        <div key={perm.name} className="flex items-center gap-2">
-                          {perm.allowed ? (
-                            <Check className="h-3 w-3 text-[#22C55E] shrink-0" />
-                          ) : (
-                            <X className="h-3 w-3 text-[rgba(255,255,255,0.15)] shrink-0" />
-                          )}
-                          <span className={`text-[11px] ${perm.allowed ? 'text-[rgba(255,255,255,0.55)]' : 'text-[rgba(255,255,255,0.2)]'}`}>
-                            {perm.name}
+                  ) : (
+                    <div className="space-y-0">
+                      {activities.map((activity, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 py-2.5 group"
+                          style={{
+                            borderBottom: i < activities.length - 1 ? '1px solid #F3F4F6' : 'none',
+                          }}
+                        >
+                          <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50">
+                            <Zap className="h-3.5 w-3.5 text-emerald-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-[#52525B] group-hover:text-[#18181B] transition-colors truncate">
+                              {activity.text}
+                            </p>
+                          </div>
+                          <span className="text-[10px] text-[#A1A1AA] shrink-0 whitespace-nowrap">
+                            {activity.time}
                           </span>
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* ── Activity Feed ──────────────────────────────────── */}
-            <motion.div variants={staggerItem} className="card-dark">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-white">Activity Feed</h3>
-              </div>
-              {activities.length === 0 ? (
-                <div className="py-6 text-center">
-                  <Zap className="h-6 w-6 text-[rgba(255,255,255,0.1)] mx-auto mb-2" />
-                  <p className="text-xs text-[rgba(255,255,255,0.25)]">No team activity yet</p>
-                </div>
-              ) : (
-                <div className="space-y-0">
-                  {activities.map((activity, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 py-2.5 group"
-                      style={{
-                        borderBottom: i < activities.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                      }}
-                    >
-                      <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(139,92,246,0.06)]">
-                        <Zap className="h-3.5 w-3.5 text-[#A78BFA]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[rgba(255,255,255,0.55)] group-hover:text-[rgba(255,255,255,0.75)] transition-colors truncate">
-                          {activity.text}
-                        </p>
-                      </div>
-                      <span className="text-[10px] text-[rgba(255,255,255,0.2)] shrink-0 whitespace-nowrap">
-                        {activity.time}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                  )}
+                </CardContent>
+              </Card>
             </motion.div>
           </div>
         </div>
@@ -597,7 +621,7 @@ export default function TeamPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
                 onClick={() => setShowInviteModal(false)}
               />
               <motion.div
@@ -608,42 +632,42 @@ export default function TeamPage() {
                 className="fixed inset-0 z-50 flex items-center justify-center p-4"
               >
                 <div
-                  className="card-dark w-full max-w-md p-6 gradient-border"
+                  className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-md p-6 shadow-xl"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-xl bg-[rgba(139,92,246,0.1)] flex items-center justify-center">
-                        <UserPlus className="h-4 w-4 text-[#A78BFA]" />
+                      <div className="h-9 w-9 rounded-xl bg-emerald-50 flex items-center justify-center">
+                        <UserPlus className="h-4 w-4 text-emerald-600" />
                       </div>
-                      <h3 className="text-lg font-bold text-white">Invite Team Member</h3>
+                      <h3 className="text-lg font-bold text-[#18181B]">Invite Team Member</h3>
                     </div>
                     <button
                       onClick={() => setShowInviteModal(false)}
-                      className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.3)] hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-[#F9FAFB] text-[#71717A] hover:text-[#18181B] transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
 
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-[rgba(255,255,255,0.5)] mb-1.5 block">
+                    <Label className="text-xs font-medium text-[#71717A] mb-1.5 block">
                       Email Address
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="email"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       placeholder="colleague@company.com"
                       aria-label="Invitee email"
-                      className="w-full h-10 px-3 rounded-lg bg-[#12121E] border border-[rgba(255,255,255,0.06)] text-sm text-white placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(139,92,246,0.3)] focus:outline-none transition-colors"
+                      className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
                     />
                   </div>
 
                   <div className="mb-4">
-                    <label className="text-xs font-medium text-[rgba(255,255,255,0.5)] mb-2 block">
+                    <Label className="text-xs font-medium text-[#71717A] mb-2 block">
                       Role
-                    </label>
+                    </Label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['admin', 'editor', 'viewer'] as Role[]).map((role) => {
                         const isSelected = inviteRole === role;
@@ -653,13 +677,13 @@ export default function TeamPage() {
                             onClick={() => setInviteRole(role)}
                             className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border capitalize ${
                               isSelected
-                                ? 'bg-[rgba(139,92,246,0.08)] border-[rgba(139,92,246,0.3)] text-white'
-                                : 'bg-[#12121E] border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] hover:border-[rgba(255,255,255,0.12)] hover:text-[rgba(255,255,255,0.6)]'
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                : 'bg-[#F9FAFB] border-[#E5E7EB] text-[#71717A] hover:border-emerald-200 hover:text-[#18181B]'
                             }`}
                           >
-                            {role === 'admin' && <Shield className="h-4 w-4" style={{ color: isSelected ? '#A78BFA' : 'rgba(255,255,255,0.2)' }} />}
-                            {role === 'editor' && <Pencil className="h-4 w-4" style={{ color: isSelected ? '#60A5FA' : 'rgba(255,255,255,0.2)' }} />}
-                            {role === 'viewer' && <Eye className="h-4 w-4" style={{ color: isSelected ? '#4ADE80' : 'rgba(255,255,255,0.2)' }} />}
+                            {role === 'admin' && <Shield className="h-4 w-4" style={{ color: isSelected ? '#059669' : '#A1A1AA' }} />}
+                            {role === 'editor' && <Pencil className="h-4 w-4" style={{ color: isSelected ? '#0D9488' : '#A1A1AA' }} />}
+                            {role === 'viewer' && <Eye className="h-4 w-4" style={{ color: isSelected ? '#3B82F6' : '#A1A1AA' }} />}
                             <span>{role}</span>
                           </button>
                         );
@@ -668,34 +692,35 @@ export default function TeamPage() {
                   </div>
 
                   <div className="mb-5">
-                    <label className="text-xs font-medium text-[rgba(255,255,255,0.5)] mb-1.5 block">
-                      Personal Message <span className="text-[rgba(255,255,255,0.2)]">(optional)</span>
-                    </label>
-                    <textarea
+                    <Label className="text-xs font-medium text-[#71717A] mb-1.5 block">
+                      Personal Message <span className="text-[#A1A1AA]">(optional)</span>
+                    </Label>
+                    <Textarea
                       value={inviteMessage}
                       onChange={(e) => setInviteMessage(e.target.value)}
                       placeholder="Add a personal note to your invitation..."
                       aria-label="Personal message"
                       rows={3}
-                      className="w-full bg-[#12121E] border border-[rgba(255,255,255,0.06)] rounded-xl p-3 text-sm text-white placeholder:text-[rgba(255,255,255,0.2)] focus:border-[rgba(139,92,246,0.3)] focus:outline-none resize-none transition-colors"
+                      className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
                     />
                   </div>
 
                   <div className="flex items-center justify-end gap-3">
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={() => setShowInviteModal(false)}
-                      className="btn-ghost-dark text-sm !py-2"
+                      className="border-[#E5E7EB] text-sm"
                     >
                       Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={handleInvite}
                       disabled={!inviteEmail.trim() || inviteSending}
-                      className="btn-violet text-sm !py-2 disabled:opacity-50"
+                      className="bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white shadow-md shadow-emerald-500/20 text-sm gap-1.5 disabled:opacity-50"
                     >
                       {inviteSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-3.5 w-3.5" />}
                       {inviteSending ? 'Sending...' : 'Send Invitation'}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </motion.div>

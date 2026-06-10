@@ -96,6 +96,48 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/user/profile — Update onboarding status and other profile fields
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userId, onboardingComplete } = body;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify the authenticated user matches the requested userId
+    const authError = await requireSameUser(request, userId);
+    if (authError) return authError;
+
+    // Build update data
+    const updateData: Record<string, unknown> = {};
+    if (onboardingComplete !== undefined) updateData.onboardingComplete = onboardingComplete;
+
+    const updatedUser = await db.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      onboardingComplete: updatedUser.onboardingComplete,
+      updatedAt: updatedUser.updatedAt,
+    });
+  } catch (error) {
+    console.error("Update onboarding error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 // PUT /api/user/profile — Update user profile
 export async function PUT(request: NextRequest) {
   try {

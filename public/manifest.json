@@ -1,0 +1,19 @@
+{
+  "name": "LORE — Your Team's Memory, Alive",
+  "short_name": "LORE",
+  "description": "Knowledge management platform with AI-powered graph, digest, and chat",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["productivity", "utilities"]
+}

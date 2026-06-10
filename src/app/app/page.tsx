@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/use-auth'
+import { ProfileCompletionCard } from '@/components/app/profile-completion'
 
 // ─── Types ──────────────────────────────────────────────────
 interface UserStats {
@@ -403,6 +404,11 @@ export default function DashboardPage() {
           </Badge>
         </div>
       </motion.div>
+
+      {/* ═══════════════════════════════════════════════════════
+          PROFILE COMPLETION
+          ═══════════════════════════════════════════════════════ */}
+      <ProfileCompletionCard nodeCount={nodeCount} />
 
       {/* ═══════════════════════════════════════════════════════
           QUICK STATS ROW

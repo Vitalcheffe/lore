@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import { Brain, Mail, Lock, User, ArrowRight, Eye, EyeOff, Shield, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,6 +72,31 @@ export default function SignupPage() {
       if (signInResult?.error) {
         router.push('/login')
       } else if (signInResult?.ok) {
+        // Celebrate! 🎉
+        const duration = 1500
+        const end = Date.now() + duration
+        const colors = ['#059669', '#10B981', '#34D399', '#6EE7B7', '#A7F3D0']
+
+        ;(function frame() {
+          confetti({
+            particleCount: 3,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors,
+          })
+          confetti({
+            particleCount: 3,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors,
+          })
+          if (Date.now() < end) {
+            requestAnimationFrame(frame)
+          }
+        })()
+
         router.push('/app')
       }
     } catch {

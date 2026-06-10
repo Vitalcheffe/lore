@@ -2,14 +2,58 @@
 
 import { useState } from 'react'
 import { Menu } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { AppSidebar } from '@/components/app/sidebar'
+import { CommandPalette } from '@/components/app/command-palette'
+import { KeyboardShortcuts } from '@/components/app/keyboard-shortcuts'
+import { OnboardingModal } from '@/components/app/onboarding-modal'
+import { PageSkeleton, type PageSkeletonVariant } from '@/components/app/page-skeleton'
+import { NotificationCenter } from '@/components/app/notification-center'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
+
+// Map pathname to skeleton variant
+function getSkeletonVariant(pathname: string): PageSkeletonVariant {
+  if (pathname === '/app') return 'dashboard'
+  if (pathname.startsWith('/app/graph')) return 'graph'
+  if (pathname.startsWith('/app/chat')) return 'chat'
+  if (pathname.startsWith('/app/memory')) return 'memory'
+  if (pathname.startsWith('/app/digest')) return 'digest'
+  if (pathname.startsWith('/app/settings')) return 'settings'
+  if (pathname.startsWith('/app/team')) return 'team'
+  return 'dashboard'
+}
+
+// Map pathname to page title
+function getPageTitle(pathname: string): string {
+  if (pathname === '/app') return 'Dashboard'
+  if (pathname.startsWith('/app/graph')) return 'Knowledge Graph'
+  if (pathname.startsWith('/app/chat')) return 'AI Chat'
+  if (pathname.startsWith('/app/memory')) return 'Memory'
+  if (pathname.startsWith('/app/digest')) return 'Morning Digest'
+  if (pathname.startsWith('/app/settings')) return 'Settings'
+  if (pathname.startsWith('/app/team')) return 'Team'
+  return 'Lore'
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
+  const pathname = usePathname()
+  const skeletonVariant = getSkeletonVariant(pathname)
+  const pageTitle = getPageTitle(pathname)
+
+  const initials = user?.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '??'
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex">
@@ -33,15 +77,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
 
+        {/* ── Desktop Header Bar ──────────────────────────── */}
+        <div className="hidden lg:flex h-14 bg-white border-b border-[#E5E7EB] items-center justify-between px-6 shrink-0">
+          <h1 className="text-sm font-bold text-[#18181B]">{pageTitle}</h1>
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
+            <Separator orientation="vertical" className="h-5 bg-[#E5E7EB]" />
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? 'User'} />
+              <AvatarFallback className="bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+
         {/* ── Content ────────────────────────────────────── */}
         <div className="flex-1 overflow-y-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center h-full min-h-[60vh]">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-                <p className="text-sm text-[#71717A]">Loading...</p>
-              </div>
-            </div>
+            <PageSkeleton variant={skeletonVariant} />
           ) : !isAuthenticated ? (
             <div className="flex items-center justify-center h-full min-h-[60vh] p-6">
               <div className="text-center max-w-md">
@@ -74,7 +128,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           ) : (
-            children
+            <>
+              {children}
+              <CommandPalette />
+              <KeyboardShortcuts />
+              <OnboardingModal />
+            </>
           )}
         </div>
       </main>

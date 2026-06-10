@@ -54,6 +54,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
+import { toast as sonnerToast } from 'sonner'
 
 // ─── TYPES ──────────────────────────────────────────────
 type SectionKey =
@@ -270,6 +271,7 @@ export default function SettingsPage() {
       })
       if (res.ok) {
         setLastSaved(true)
+        sonnerToast.success('Settings saved ✓')
         setTimeout(() => setLastSaved(false), 2000)
       }
     } catch {

@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { toast } from 'sonner'
 
 // ─── Types ─────────────────────────────────────────────────
 interface ChatMessage {
@@ -424,6 +425,7 @@ export default function AIChatPage() {
     // The conversation will be created when the user sends their first message
     setActiveConvoId('')
     setSidebarOpen(false)
+    toast.success('New chat started')
   }
 
   // ─── Toggle Pin ──────────────────────────────────────
@@ -445,6 +447,7 @@ export default function AIChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pinned: newPinned }),
       })
+      toast.success('Chat pinned')
     } catch (err) {
       console.error('Failed to toggle pin:', err)
       // Revert on error
@@ -468,6 +471,7 @@ export default function AIChatPage() {
       await fetch(`/api/conversations/${convoId}`, {
         method: 'DELETE',
       })
+      toast.success('Conversation deleted')
     } catch (err) {
       console.error('Failed to delete conversation:', err)
     }
