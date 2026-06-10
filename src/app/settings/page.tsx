@@ -1490,14 +1490,8 @@ export default function SettingsPage() {
                                   <p className="text-[12px] text-gray-400 mt-0.5">Create and manage API keys for programmatic access</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/80 border border-gray-100/40">
-                                <div className="flex-1">
-                                  <p className="text-[12px] font-mono text-gray-500">cpk_****_****_****_****_demo</p>
-                                  <p className="text-[10px] text-gray-400 mt-0.5">Created: June 15, 2026</p>
-                                </div>
-                                <button className="px-3 py-1.5 text-[10px] font-semibold text-red-500 hover:text-red-600 rounded-lg hover:bg-red-50/60 transition-all">
-                                  Revoke
-                                </button>
+                              <div className="p-3 rounded-lg bg-gray-50/80 border border-gray-100/40">
+                                <p className="text-[12px] text-gray-400">No API keys generated yet. Create one to access the API programmatically.</p>
                               </div>
                               <button className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 text-[12px] font-semibold text-blue-600 bg-blue-50/60 border border-blue-100/60 rounded-xl hover:bg-blue-50 transition-all">
                                 <Key className="w-3.5 h-3.5" />
@@ -1570,9 +1564,9 @@ export default function SettingsPage() {
                                       Debug logging is enabled. Open your browser console to view detailed logs.
                                     </p>
                                     <div className="mt-2 text-[11px] font-mono text-amber-600/70 space-y-0.5">
-                                      <p>Version: 1.0.0-demo</p>
-                                      <p>Build: 2026.06.15</p>
-                                      <p>Environment: development</p>
+                                      <p>Version: {process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0'}</p>
+                                      <p>Build: {process.env.NEXT_PUBLIC_BUILD_DATE || new Date().toISOString().split('T')[0]}</p>
+                                      <p>Environment: {process.env.NODE_ENV || 'production'}</p>
                                     </div>
                                   </div>
                                 </div>
