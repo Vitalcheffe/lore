@@ -160,6 +160,11 @@ export default function SettingsPage() {
   const [weeklySummary, setWeeklySummary] = useState(false)
   const [newFeatures, setNewFeatures] = useState(true)
   const [digestReminders, setDigestReminders] = useState(true)
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true
+    const stored = localStorage.getItem('lore-sound-enabled')
+    return stored === null ? true : stored === 'true'
+  })
 
   // ─── Privacy & Security state ───────────────────────
   const [twoFactor, setTwoFactor] = useState(false)
@@ -1171,6 +1176,24 @@ export default function SettingsPage() {
                       <Switch
                         checked={digestReminders}
                         onCheckedChange={(v) => { setDigestReminders(v); persistSetting({ digestReminders: v }) }}
+                        className="data-[state=checked]:bg-emerald-600"
+                      />
+                    </div>
+
+                    <Separator className="bg-[#E5E7EB]" />
+
+                    {/* Notification Sounds */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-[#18181B]">Notification Sounds</p>
+                        <p className="text-xs text-[#71717A]">Play sounds for achievements and notifications</p>
+                      </div>
+                      <Switch
+                        checked={soundEnabled}
+                        onCheckedChange={(v) => {
+                          setSoundEnabled(v)
+                          localStorage.setItem('lore-sound-enabled', String(v))
+                        }}
                         className="data-[state=checked]:bg-emerald-600"
                       />
                     </div>

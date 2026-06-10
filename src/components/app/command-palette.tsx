@@ -17,6 +17,8 @@ import {
   Sparkles,
   Search,
   Loader2,
+  Clock,
+  ArrowUpLeft,
 } from 'lucide-react'
 import {
   Command,
@@ -134,6 +136,7 @@ export function CommandPalette() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [recentSearches, setRecentSearches] = useState<string[]>([])
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const router = useRouter()
 
@@ -148,6 +151,20 @@ export function CommandPalette() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  // ── Load recent searches when opening ──────────────────────
+  useEffect(() => {
+    if (open) {
+      try {
+        const stored = localStorage.getItem('lore-recent-searches')
+        if (stored) {
+          setRecentSearches(JSON.parse(stored).slice(0, 5))
+        }
+      } catch {
+        // ignore localStorage errors
+      }
+    }
+  }, [open])
 
   // ── Focus input when opening ───────────────────────────────
   useEffect(() => {
@@ -212,6 +229,22 @@ export function CommandPalette() {
     return () => { cancelled = true }
   }, [open])
 
+  // ── Save search to recent when performing a search ──────────
+  const saveRecentSearch = useCallback((query: string) => {
+    const trimmed = query.trim()
+    if (!trimmed || trimmed.length < 2) return
+    try {
+      const stored = localStorage.getItem('lore-recent-searches')
+      const existing: string[] = stored ? JSON.parse(stored) : []
+      // Remove duplicates and add to front
+      const updated = [trimmed, ...existing.filter((s) => s !== trimmed)].slice(0, 5)
+      localStorage.setItem('lore-recent-searches', JSON.stringify(updated))
+      setRecentSearches(updated)
+    } catch {
+      // ignore localStorage errors
+    }
+  }, [])
+
   // ── Debounced search API call ───────────────────────────────
   useEffect(() => {
     // Clear previous timer
@@ -235,6 +268,8 @@ export function CommandPalette() {
         if (res.ok) {
           const data = await res.json()
           setSearchResults(data.results ?? [])
+          // Save the search term to recent searches when results come back
+          saveRecentSearch(searchQuery)
         } else {
           setSearchResults([])
         }
@@ -250,7 +285,7 @@ export function CommandPalette() {
         clearTimeout(searchTimerRef.current)
       }
     }
-  }, [searchQuery])
+  }, [searchQuery, saveRecentSearch])
 
   // ── Reset search when palette closes ─────────────────────────
   useEffect(() => {
@@ -466,6 +501,23 @@ export function CommandPalette() {
                                 {conv.preview}
                               </span>
                             )}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
+
+                    {/* ── Recent Searches ───────────────────────── */}
+                    {recentSearches.length > 0 && (
+                      <CommandGroup heading="Recent Searches">
+                        {recentSearches.map((term, idx) => (
+                          <CommandItem
+                            key={`recent-${idx}-${term}`}
+                            value={`recent-${term}`}
+                            onSelect={() => setSearchQuery(term)}
+                          >
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="truncate">{term}</span>
+                            <ArrowUpLeft className="ml-auto w-3 h-3 text-gray-300" />
                           </CommandItem>
                         ))}
                       </CommandGroup>

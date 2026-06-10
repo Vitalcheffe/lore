@@ -69,6 +69,7 @@ interface GraphEdge {
   target: string
   label: string
   type: 'related' | 'depends_on' | 'created_by' | 'references' | 'part_of'
+  strength: number
 }
 
 type ToolMode = 'select' | 'addEdge' | 'delete'
@@ -162,6 +163,7 @@ function mapApiEdgeToGraphEdge(apiEdge: ApiEdge): GraphEdge {
     target: apiEdge.targetId,
     label: apiEdge.label || 'connected',
     type: apiEdge.type as GraphEdge['type'],
+    strength: apiEdge.strength ?? 5,
   }
 }
 
@@ -411,14 +413,14 @@ export default function KnowledgeGraphPage() {
                 // Fallback: add locally if API fails
                 setEdges((prev) => [
                   ...prev,
-                  { id: `local-${Date.now()}`, source: addEdgeSource, target: nodeId, label: 'connected', type: 'related' },
+                  { id: `local-${Date.now()}`, source: addEdgeSource, target: nodeId, label: 'connected', type: 'related', strength: 5 },
                 ])
               }
             } catch {
               // Fallback: add locally if API fails
               setEdges((prev) => [
                 ...prev,
-                { id: `local-${Date.now()}`, source: addEdgeSource, target: nodeId, label: 'connected', type: 'related' },
+                { id: `local-${Date.now()}`, source: addEdgeSource, target: nodeId, label: 'connected', type: 'related', strength: 5 },
               ])
             }
           }
@@ -1066,6 +1068,17 @@ export default function KnowledgeGraphPage() {
                 const sourceType = source.type
                 const color = typeColors[sourceType] || '#9CA3AF'
 
+                // Connection strength visual mapping (1-10)
+                const strength = edge.strength ?? 5
+                const strengthStrokeWidth =
+                  strength <= 3 ? Math.max(0.8, style.strokeWidth * 0.6) :
+                  strength <= 6 ? style.strokeWidth :
+                  Math.min(style.strokeWidth * 1.8, 4.5)
+                const strengthOpacity =
+                  strength <= 3 ? 0.2 :
+                  strength <= 6 ? 0.45 :
+                  0.75
+
                 // Calculate midpoint for label
                 const midX = (source.x + target.x) / 2
                 const midY = (source.y + target.y) / 2
@@ -1082,11 +1095,11 @@ export default function KnowledgeGraphPage() {
                       y2={target.y}
                       stroke={isHighlighted || isConnectedToSelected ? color : '#D1D5DB'}
                       strokeWidth={
-                        isHighlighted || isConnectedToSelected ? style.strokeWidth + 1 : style.strokeWidth
+                        isHighlighted || isConnectedToSelected ? strengthStrokeWidth + 1 : strengthStrokeWidth
                       }
                       strokeDasharray={style.strokeDasharray}
                       opacity={
-                        isHighlighted || isConnectedToSelected ? 0.8 : hoveredNodeId && !isHighlighted ? 0.15 : 0.4
+                        isHighlighted || isConnectedToSelected ? Math.min(strengthOpacity + 0.25, 0.95) : hoveredNodeId && !isHighlighted ? 0.1 : strengthOpacity
                       }
                       markerEnd={
                         isHighlighted || isConnectedToSelected ? `url(#arrow-${sourceType})` : undefined

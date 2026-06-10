@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trophy, Star, Zap, Brain, Network, Flame, BookOpen } from 'lucide-react'
+import { playAchievementSound } from '@/lib/sounds'
 
 export interface Achievement {
   id: string
@@ -91,6 +92,8 @@ export function AchievementPopup({ achievement, onClose }: AchievementPopupProps
 
   useEffect(() => {
     if (!achievement || dismissed) return
+    // Play achievement sound when popup first appears
+    playAchievementSound()
     const timer = setTimeout(() => {
       setDismissed(true)
       onClose?.()

@@ -81,13 +81,22 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
-            &copy; 2026 Lore. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <p className="text-xs text-gray-500">
+              &copy; 2026 Lore. All rights reserved.
+            </p>
+            <span className="hidden sm:inline text-gray-700">·</span>
+            <p className="text-xs text-gray-500">
+              Made with <span className="text-red-400">&#x2764;&#xFE0F;</span> for knowledge workers
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Built on Aurora DSQL
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/5 text-gray-400 border border-white/10">
+              Built with Next.js, Prisma &amp; AI
             </span>
           </div>
         </div>
