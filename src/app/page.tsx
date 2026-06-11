@@ -1,668 +1,640 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
-import Link from 'next/link'
-import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion'
-import {
-  ArrowRight,
-  Brain,
-  Network,
-  Sparkles,
-  Check,
-  ChevronDown,
-  Zap,
-  Shield,
-  Users,
-  Database,
-  MessageSquare,
-  Sun,
-  BookOpen,
-  Cloud,
-  Server,
-  Link2,
-  Activity,
-  Key,
-  Lock,
-  X,
-  Star,
-  Crown,
-  Globe,
-  Cpu,
-  RefreshCw,
-  Layers,
-  TrendingUp,
-  Award,
-} from 'lucide-react'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { Playfair_Display, Cormorant_Garamond, Inter } from 'next/font/google'
 
 // ═══════════════════════════════════════════════════════════════
-// TYPES
+// FONTS
 // ═══════════════════════════════════════════════════════════════
 
-interface GraphNodeData {
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '600'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+// ═══════════════════════════════════════════════════════════════
+// PALETTE
+// ═══════════════════════════════════════════════════════════════
+
+const COLORS = {
+  gold: '#D4A853',
+  goldLight: '#F0D68A',
+  goldDark: '#A07830',
+  terracotta: '#C75B39',
+  brick: '#B23421',
+  deepBrown: '#483924',
+  cream: '#FDF5E6',
+  ivory: '#FFFFF0',
+  bgDark: '#0D0A07',
+  bgWarm: '#1A1410',
+  bgCard: '#16120E',
+  bgCardHover: '#1E1812',
+  hopeBlue: '#4A90D9',
+  hopeViolet: '#7B5EA7',
+  hopeRose: '#D4728C',
+  hopeEmerald: '#2E8B6E',
+  hopeAmber: '#E8A838',
+  textPrimary: '#F5EDE0',
+  textSecondary: 'rgba(245, 237, 224, 0.55)',
+  textTertiary: 'rgba(245, 237, 224, 0.3)',
+  border: 'rgba(212, 168, 83, 0.12)',
+  borderHover: 'rgba(212, 168, 83, 0.25)',
+}
+
+// ═══════════════════════════════════════════════════════════════
+// IMPACT DATA
+// ═══════════════════════════════════════════════════════════════
+
+interface ImpactTier {
   id: string
+  amount: number
   label: string
-  x: number
-  y: number
-  r: number
+  subtitle: string
+  description: string
+  details: string[]
   color: string
-  ampX: number
-  ampY: number
-  spdX: number
-  spdY: number
-  phX: number
-  phY: number
+  icon: string
 }
 
-interface GraphEdgeData {
-  from: string
-  to: string
-  speed: number
-  particles: number
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GRAPH DATA
-// ═══════════════════════════════════════════════════════════════
-
-const GRAPH_NODES: GraphNodeData[] = [
-  { id: 'core', label: 'Core', x: 500, y: 260, r: 22, color: '#059669', ampX: 6, ampY: 5, spdX: 0.4, spdY: 0.3, phX: 0, phY: 0 },
-  { id: 'api', label: 'API', x: 300, y: 160, r: 14, color: '#10B981', ampX: 8, ampY: 6, spdX: 0.5, spdY: 0.4, phX: 1.2, phY: 0.8 },
-  { id: 'auth', label: 'Auth', x: 720, y: 150, r: 12, color: '#34D399', ampX: 7, ampY: 5, spdX: 0.45, spdY: 0.35, phX: 2.1, phY: 1.5 },
-  { id: 'data', label: 'Data', x: 340, y: 380, r: 15, color: '#0D9488', ampX: 5, ampY: 7, spdX: 0.35, spdY: 0.45, phX: 0.5, phY: 2.2 },
-  { id: 'ai', label: 'AI', x: 700, y: 370, r: 13, color: '#14B8A6', ampX: 6, ampY: 8, spdX: 0.55, spdY: 0.3, phX: 3.0, phY: 0.3 },
-  { id: 'slack', label: 'Slack', x: 110, y: 100, r: 10, color: '#6EE7B7', ampX: 9, ampY: 7, spdX: 0.6, spdY: 0.5, phX: 0.8, phY: 1.0 },
-  { id: 'github', label: 'GitHub', x: 140, y: 300, r: 10, color: '#6EE7B7', ampX: 8, ampY: 6, spdX: 0.5, spdY: 0.55, phX: 1.5, phY: 2.5 },
-  { id: 'notion', label: 'Notion', x: 510, y: 70, r: 11, color: '#A7F3D0', ampX: 7, ampY: 9, spdX: 0.4, spdY: 0.6, phX: 2.3, phY: 0.7 },
-  { id: 'docs', label: 'Docs', x: 870, y: 220, r: 10, color: '#6EE7B7', ampX: 6, ampY: 8, spdX: 0.55, spdY: 0.4, phX: 3.2, phY: 1.8 },
-  { id: 'search', label: 'Search', x: 840, y: 400, r: 9, color: '#A7F3D0', ampX: 7, ampY: 5, spdX: 0.45, spdY: 0.5, phX: 0.3, phY: 3.0 },
-  { id: 'graph', label: 'Graph', x: 500, y: 470, r: 11, color: '#6EE7B7', ampX: 5, ampY: 6, spdX: 0.5, spdY: 0.35, phX: 1.8, phY: 0.2 },
-  { id: 'n1', label: '', x: 180, y: 40, r: 5, color: '#D1FAE5', ampX: 10, ampY: 8, spdX: 0.7, spdY: 0.6, phX: 0.2, phY: 1.3 },
-  { id: 'n2', label: '', x: 920, y: 80, r: 5, color: '#D1FAE5', ampX: 8, ampY: 10, spdX: 0.6, spdY: 0.7, phX: 1.1, phY: 0.4 },
-  { id: 'n3', label: '', x: 80, y: 430, r: 6, color: '#A7F3D0', ampX: 9, ampY: 7, spdX: 0.55, spdY: 0.45, phX: 2.7, phY: 1.9 },
-  { id: 'n4', label: '', x: 900, y: 500, r: 5, color: '#D1FAE5', ampX: 7, ampY: 9, spdX: 0.65, spdY: 0.55, phX: 0.9, phY: 2.6 },
-  { id: 'n5', label: '', x: 440, y: 520, r: 4, color: '#ECFDF5', ampX: 6, ampY: 5, spdX: 0.5, spdY: 0.6, phX: 3.5, phY: 0.1 },
-]
-
-const GRAPH_EDGES: GraphEdgeData[] = [
-  { from: 'core', to: 'api', speed: 0.3, particles: 2 },
-  { from: 'core', to: 'auth', speed: 0.25, particles: 2 },
-  { from: 'core', to: 'data', speed: 0.35, particles: 2 },
-  { from: 'core', to: 'ai', speed: 0.3, particles: 2 },
-  { from: 'api', to: 'slack', speed: 0.4, particles: 1 },
-  { from: 'api', to: 'github', speed: 0.35, particles: 1 },
-  { from: 'api', to: 'notion', speed: 0.3, particles: 1 },
-  { from: 'auth', to: 'docs', speed: 0.3, particles: 1 },
-  { from: 'data', to: 'graph', speed: 0.25, particles: 1 },
-  { from: 'ai', to: 'search', speed: 0.35, particles: 1 },
-  { from: 'ai', to: 'docs', speed: 0.3, particles: 1 },
-  { from: 'slack', to: 'n1', speed: 0.5, particles: 1 },
-  { from: 'notion', to: 'n2', speed: 0.45, particles: 1 },
-  { from: 'github', to: 'n3', speed: 0.4, particles: 1 },
-  { from: 'search', to: 'n4', speed: 0.45, particles: 1 },
-  { from: 'graph', to: 'n5', speed: 0.5, particles: 1 },
-  { from: 'data', to: 'github', speed: 0.3, particles: 1 },
-  { from: 'auth', to: 'notion', speed: 0.35, particles: 1 },
-]
-
-// ═══════════════════════════════════════════════════════════════
-// FEATURE DATA
-// ═══════════════════════════════════════════════════════════════
-
-const features = [
+const IMPACT_TIERS: ImpactTier[] = [
   {
-    icon: Network,
-    title: 'Knowledge Graph',
-    subtitle: 'See every connection',
-    desc: 'Visualize how every piece of knowledge connects. Dependencies, relationships, and impact — mapped instantly in an interactive graph that evolves with your team.',
-    color: '#059669',
-    glowColor: 'rgba(5,150,105,0.15)',
+    id: 'supplies',
+    amount: 5000,
+    label: 'Fournitures',
+    subtitle: 'Le premier pas vers le savoir',
+    description: 'Fournitures scolaires complètes pour 10 filles pendant une anneee entiere. Cahiers, manuels, instruments de geometrie, et tout le materiel necessaire pour apprendre dans de bonnes conditions.',
+    details: ['Cahiers et manuels scolaires', 'Instruments de geometrie et calculatrices', 'Cartables et trousses completes', 'Materiel artistique pour les ateliers creatifs'],
+    color: COLORS.hopeAmber,
+    icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
   },
   {
-    icon: Sun,
-    title: 'Morning Digest',
-    subtitle: 'Start every day with clarity',
-    desc: 'Wake up to a personalized briefing on what changed, what\'s relevant, and what needs your attention. Never miss a critical update again.',
-    color: '#0D9488',
-    glowColor: 'rgba(13,148,136,0.15)',
+    id: 'classroom',
+    amount: 25000,
+    label: 'Salle de classe',
+    subtitle: 'Un espace pour grandir',
+    description: 'Equipement complet d\'une salle de classe dediee : bureaux, chaises, tableau interactif, eclairage adequat et ventilation. Un environnement d\'apprentissage digne de ces jeunes filles.',
+    details: ['Bureaux et chaises pour 30 eleves', 'Tableau blanc interactif et projection', 'Eclairage LED et ventilation', 'Bibliotheque de classe avec 200 ouvrages'],
+    color: COLORS.hopeEmerald,
+    icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
   },
   {
-    icon: MessageSquare,
-    title: 'AI Chat',
-    subtitle: 'Ask anything about your knowledge',
-    desc: 'Ask in natural language. Lore finds the answer from your team\'s collective memory — with sources and confidence scores.',
-    color: '#10B981',
-    glowColor: 'rgba(16,185,129,0.15)',
+    id: 'dormitory',
+    amount: 100000,
+    label: 'Dortoir',
+    subtitle: 'Un foyer, une securite',
+    description: 'Construction et amenagement complet d\'un dortoir pour 20 filles. Lits, linge de maison, espaces de vie commune, sanitaires prives et une piece de detente pour qu\'elles se sentent chez elles.',
+    details: ['20 lits avec literie complete', 'Sanitaires et douches prives', 'Espace commun et salle de detente', 'Linge de maison et rangements individuels'],
+    color: COLORS.hopeBlue,
+    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
   },
   {
-    icon: BookOpen,
-    title: 'Structured Memory',
-    subtitle: 'Never lose a thought',
-    desc: 'Every fact, decision, and context is captured and organized automatically. No more "where did we decide that?"',
-    color: '#047857',
-    glowColor: 'rgba(4,120,87,0.15)',
+    id: 'kitchen',
+    amount: 150000,
+    label: 'Cuisine et refectoire',
+    subtitle: 'Nourrir le corps et l\'esprit',
+    description: 'Une cuisine professionnelle et un refectoire ou chaque fille prend ses repas dans la dignite. Equipement professionnel, stockage alimentaire, et un espace chaleureux pour les repas en communaute.',
+    details: ['Cuisine professionnelle equipee', 'Refectoire pour 60 couverts', 'Chaine froide et stockage alimentaire', 'Programme nutritionnel equilibre'],
+    color: COLORS.terracotta,
+    icon: 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z',
+  },
+  {
+    id: 'operation',
+    amount: 500000,
+    label: 'Fonctionnement annuel',
+    subtitle: 'Assurer la perennite',
+    description: 'Le fonctionnement complet du pensionnat pendant une annee entiere. Personnel encadrant, programmes educatifs, suivi sanitaire, activites parascolaires et tout ce qui fait d\'un pensionnat un veritable foyer.',
+    details: ['Equipe educative et encadrante complete', 'Programmes scolaires et parascolaires', 'Suivi medical et psychologique', 'Activites sportives, culturelles et artistiques'],
+    color: COLORS.hopeViolet,
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
   },
 ]
 
 // ═══════════════════════════════════════════════════════════════
-// HOW IT WORKS DATA
+// ANIMATED COUNTER
 // ═══════════════════════════════════════════════════════════════
 
-const steps = [
-  {
-    step: '01',
-    icon: Link2,
-    title: 'Connect Your Knowledge',
-    desc: 'Integrate with Slack, Notion, GitHub, and more. Lore listens to your team\'s conversations, documents, and decisions — zero friction, zero config.',
-    color: '#10B981',
-  },
-  {
-    step: '02',
-    icon: Network,
-    title: 'Watch It Connect',
-    desc: 'Raw information becomes structured knowledge. Relationships are mapped, entities are linked, and context is preserved in a living knowledge graph.',
-    color: '#059669',
-  },
-  {
-    step: '03',
-    icon: Sparkles,
-    title: 'Ask Anything',
-    desc: 'Ask in natural language and get instant answers from your team\'s memory — complete with sources and confidence scores.',
-    color: '#0D9488',
-  },
-]
-
-// ═══════════════════════════════════════════════════════════════
-// COMPARISON DATA
-// ═══════════════════════════════════════════════════════════════
-
-type CellStatus = 'best' | 'partial' | 'none' | 'basic'
-
-interface ComparisonRow {
-  feature: string
-  icon: React.ElementType
-  lore: CellStatus
-  obsidian: CellStatus
-  notion: CellStatus
-  memai: CellStatus
-}
-
-const comparisonRows: ComparisonRow[] = [
-  { feature: 'Knowledge Graph', icon: Network, lore: 'best', obsidian: 'basic', notion: 'none', memai: 'partial' },
-  { feature: 'AI Chat', icon: MessageSquare, lore: 'best', obsidian: 'none', notion: 'partial', memai: 'partial' },
-  { feature: 'Smart Digest', icon: Sun, lore: 'best', obsidian: 'none', notion: 'none', memai: 'partial' },
-  { feature: 'Team Memory', icon: Users, lore: 'best', obsidian: 'none', notion: 'partial', memai: 'none' },
-  { feature: 'Real-time Sync', icon: RefreshCw, lore: 'best', obsidian: 'none', notion: 'partial', memai: 'none' },
-]
-
-// ═══════════════════════════════════════════════════════════════
-// TESTIMONIALS DATA
-// ═══════════════════════════════════════════════════════════════
-
-const testimonials = [
-  {
-    name: 'Sarah Chen',
-    title: 'VP of Engineering',
-    company: 'TechFlow',
-    initials: 'SC',
-    color: '#059669',
-    bgColor: '#ECFDF5',
-    quote: 'Lore transformed how our distributed team shares knowledge. What used to take 30 minutes of Slack archaeology now takes a 10-second query. It\'s like having a senior engineer who never forgets.',
-  },
-  {
-    name: 'Marcus Williams',
-    title: 'Head of Product',
-    company: 'DataSync',
-    initials: 'MW',
-    color: '#0D9488',
-    bgColor: '#F0FDFA',
-    quote: 'The morning digest alone saves our team 2 hours per day. We start every standup with Lore\'s summary instead of 15 minutes of "what did I miss?" — it\'s become our single source of truth.',
-  },
-  {
-    name: 'Dr. Priya Patel',
-    title: 'CTO',
-    company: 'NovaStar',
-    initials: 'PP',
-    color: '#10B981',
-    bgColor: '#ECFDF5',
-    quote: 'Finally, a knowledge tool that actually understands context. The graph visualization revealed connections between projects we never knew existed. Our decision-making is faster and more informed.',
-  },
-]
-
-// ═══════════════════════════════════════════════════════════════
-// PRICING DATA
-// ═══════════════════════════════════════════════════════════════
-
-const pricingTiers = [
-  {
-    name: 'Free',
-    price: '$0',
-    period: 'forever',
-    desc: 'For individuals and small teams getting started.',
-    features: ['Up to 3 users', '1,000 knowledge nodes', 'Basic knowledge graph', 'Community support', '7-day history'],
-    cta: 'Get Started Free',
-    featured: false,
-  },
-  {
-    name: 'Pro',
-    price: '$12',
-    period: 'per user / month',
-    desc: 'For growing teams that need AI-powered recall.',
-    features: ['Unlimited users', '50,000 knowledge nodes', 'AI Chat with sources', 'Smart Morning Digest', 'Priority support', '30-day history', 'All integrations'],
-    cta: 'Start Pro Trial',
-    featured: true,
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    period: 'tailored pricing',
-    desc: 'For organizations that need full control and scale.',
-    features: ['Unlimited everything', 'SSO / SAML', 'Custom integrations', 'Dedicated support', 'SLA guarantee', 'Unlimited history', 'On-premise option', 'Audit logs'],
-    cta: 'Contact Sales',
-    featured: false,
-  },
-]
-
-// ═══════════════════════════════════════════════════════════════
-// MARQUEE COMPANIES
-// ═══════════════════════════════════════════════════════════════
-
-const companies = [
-  'Acme Corp', 'TechFlow', 'DataSync', 'NovaStar', 'Quantum Labs',
-  'SkyBridge', 'Meridian', 'PulseAI', 'Cirrus', 'Helix Systems',
-  'Apex Digital', 'Orion Tech', 'Zenith', 'Flux', 'Prism Analytics',
-]
-
-// ═══════════════════════════════════════════════════════════════
-// HELPER: FadeIn on scroll
-// ═══════════════════════════════════════════════════════════════
-
-function FadeIn({
-  children,
-  className = '',
-  delay = 0,
-  duration = 0.5,
-  direction = 'up',
-}: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
+function AnimatedCounter({ value, duration = 1.5, prefix = '', suffix = '' }: {
+  value: number
   duration?: number
-  direction?: 'up' | 'down' | 'left' | 'right'
-}) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-60px' })
-
-  const directionMap = {
-    up: { y: 30, x: 0 },
-    down: { y: -30, x: 0 },
-    left: { y: 0, x: 30 },
-    right: { y: 0, x: -30 },
-  }
-
-  const offset = directionMap[direction]
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: offset.x, y: offset.y }}
-      animate={isInView ? { opacity: 1, x: 0, y: 0 } : { opacity: 0, x: offset.x, y: offset.y }}
-      transition={{ duration, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
-// HELPER: Animated Counter
-// ═══════════════════════════════════════════════════════════════
-
-function AnimatedCounter({
-  target,
-  suffix = '',
-  prefix = '',
-  duration = 2,
-}: {
-  target: number
-  suffix?: string
   prefix?: string
-  duration?: number
+  suffix?: string
 }) {
+  const [display, setDisplay] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
-  const motionVal = useMotionValue(0)
-  const rounded = useTransform(motionVal, (latest) => {
-    if (target >= 1000) return Math.round(latest).toLocaleString()
-    if (Number.isInteger(target)) return Math.round(latest).toString()
-    return latest.toFixed(1)
-  })
-  const [display, setDisplay] = useState('0')
+  const inView = useInView(ref, { once: true })
 
   useEffect(() => {
-    if (isInView) {
-      const controls = animate(motionVal, target, {
-        duration,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      })
-      return controls.stop
+    if (!inView) return
+    const start = performance.now()
+    const animate = (now: number) => {
+      const elapsed = (now - start) / 1000
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 4)
+      setDisplay(Math.round(eased * value))
+      if (progress < 1) requestAnimationFrame(animate)
     }
-  }, [isInView, motionVal, target, duration])
-
-  useEffect(() => {
-    const unsubscribe = rounded.on('change', (v) => setDisplay(v))
-    return unsubscribe
-  }, [rounded])
+    requestAnimationFrame(animate)
+  }, [inView, value, duration])
 
   return (
-    <span ref={ref}>
-      {prefix}
-      {display}
-      {suffix}
+    <span ref={ref} className="tabular-nums">
+      {prefix}{display.toLocaleString('fr-FR')}{suffix}
     </span>
   )
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ANIMATED KNOWLEDGE GRAPH BACKGROUND
+// PROGRESS BAR
 // ═══════════════════════════════════════════════════════════════
 
-function AnimatedGraphBackground() {
-  const [tick, setTick] = useState(0)
-  const lastUpdateRef = useRef(0)
-  const frameRef = useRef<number>(0)
-
-  useEffect(() => {
-    const animateFrame = (time: number) => {
-      if (time - lastUpdateRef.current > 33) {
-        setTick(time / 1000)
-        lastUpdateRef.current = time
-      }
-      frameRef.current = requestAnimationFrame(animateFrame)
-    }
-    frameRef.current = requestAnimationFrame(animateFrame)
-    return () => cancelAnimationFrame(frameRef.current)
-  }, [])
-
-  const nodeMap = useMemo(() => {
-    const map = new Map<string, GraphNodeData>()
-    GRAPH_NODES.forEach((n) => map.set(n.id, n))
-    return map
-  }, [])
-
-  const getPos = (node: GraphNodeData, t: number) => ({
-    x: node.x + node.ampX * Math.sin(t * node.spdX + node.phX),
-    y: node.y + node.ampY * Math.cos(t * node.spdY + node.phY),
-  })
-
-  const animatedNodes = useMemo(
-    () => GRAPH_NODES.map((n) => ({ ...n, ...getPos(n, tick) })),
-    [tick]
-  )
-
-  const nodePosMap = useMemo(() => {
-    const map = new Map<string, { x: number; y: number }>()
-    animatedNodes.forEach((n) => map.set(n.id, { x: n.x, y: n.y }))
-    return map
-  }, [animatedNodes])
+function ImpactProgress({ amount, total = 500000 }: { amount: number; total?: number }) {
+  const percentage = Math.min((amount / total) * 100, 100)
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true })
 
   return (
-    <svg
-      viewBox="0 0 1000 560"
-      className="w-full h-full"
-      preserveAspectRatio="xMidYMid slice"
-      fill="none"
-    >
-      <defs>
-        <filter id="edgeGlow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id="nodeGlow" x="-100%" y="-100%" width="300%" height="300%">
-          <feGaussianBlur stdDeviation="6" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <radialGradient id="nodeGradCore">
-          <stop offset="0%" stopColor="#10B981" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#059669" stopOpacity="0.7" />
-        </radialGradient>
-      </defs>
-
-      {/* Edges */}
-      {GRAPH_EDGES.map((edge, i) => {
-        const from = nodePosMap.get(edge.from)
-        const to = nodePosMap.get(edge.to)
-        if (!from || !to) return null
-        return (
-          <line
-            key={`e-${i}`}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-            stroke="#A7F3D0"
-            strokeWidth={1.5}
-            opacity={0.35}
-            filter="url(#edgeGlow)"
-          />
-        )
-      })}
-
-      {/* Particles flowing along edges */}
-      {GRAPH_EDGES.map((edge, i) => {
-        const from = nodePosMap.get(edge.from)
-        const to = nodePosMap.get(edge.to)
-        if (!from || !to) return null
-
-        return Array.from({ length: edge.particles }).map((_, p) => {
-          const progress = ((tick * edge.speed + p * 0.5) % 1)
-          const px = from.x + (to.x - from.x) * progress
-          const py = from.y + (to.y - from.y) * progress
-          const opacity = 0.8 - Math.abs(progress - 0.5) * 1.2
-
-          return (
-            <circle
-              key={`p-${i}-${p}`}
-              cx={px}
-              cy={py}
-              r={2.5}
-              fill="#34D399"
-              opacity={Math.max(0, opacity)}
-              filter="url(#edgeGlow)"
-            />
-          )
-        })
-      })}
-
-      {/* Nodes */}
-      {animatedNodes.map((node) => (
-        <g key={node.id}>
-          {/* Outer glow ring */}
-          {node.r > 10 && (
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={node.r + 6 + 3 * Math.sin(tick * 1.5 + node.phX)}
-              fill="none"
-              stroke={node.color}
-              strokeWidth={1}
-              opacity={0.15 + 0.05 * Math.sin(tick * 2 + node.phY)}
-            />
-          )}
-          {/* Main node */}
-          <circle
-            cx={node.x}
-            cy={node.y}
-            r={node.r}
-            fill={node.id === 'core' ? 'url(#nodeGradCore)' : node.color}
-            opacity={node.r > 10 ? 0.9 : 0.7}
-            filter={node.r > 10 ? 'url(#nodeGlow)' : undefined}
-          />
-          {/* Label */}
-          {node.label && (
-            <text
-              x={node.x}
-              y={node.y + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-              fontSize={node.r > 15 ? 10 : node.r > 10 ? 8 : 6}
-              fontWeight={node.r > 15 ? 700 : 600}
-              style={{ pointerEvents: 'none' }}
-            >
-              {node.label}
-            </text>
-          )}
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
-// COMPARISON CELL
-// ═══════════════════════════════════════════════════════════════
-
-function ComparisonCell({ status }: { status: CellStatus }) {
-  if (status === 'best') {
-    return (
-      <div className="flex items-center justify-center gap-1.5">
-        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-[rgba(16,185,129,0.15)] flex items-center justify-center">
-          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
-        </div>
-        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] px-2 py-0.5 rounded-full">
-          Best
+    <div ref={ref} className="w-full">
+      <div className="flex justify-between items-baseline mb-3">
+        <span style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }} className="text-xs tracking-widest uppercase">
+          Objectif
+        </span>
+        <span style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }} className="text-xs tracking-wide">
+          {percentage.toFixed(1)}%
         </span>
       </div>
-    )
-  }
-  if (status === 'partial') {
-    return (
-      <div className="flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center">
-          <span className="text-[10px] font-bold text-amber-500">~</span>
-        </div>
+      <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: 'rgba(212, 168, 83, 0.08)' }}>
+        <motion.div
+          className="h-full rounded-full"
+          style={{
+            background: `linear-gradient(90deg, ${COLORS.goldDark}, ${COLORS.gold}, ${COLORS.goldLight})`,
+          }}
+          initial={{ width: 0 }}
+          animate={inView ? { width: `${percentage}%` } : { width: 0 }}
+          transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+        />
       </div>
-    )
-  }
-  if (status === 'basic') {
-    return (
-      <div className="flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-[#27272A] flex items-center justify-center">
-          <Check className="w-3 h-3 text-gray-400" strokeWidth={3} />
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className="flex items-center justify-center">
-      <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center">
-        <X className="w-3 h-3 text-red-400" strokeWidth={3} />
+      <div className="flex justify-between items-baseline mt-3">
+        <span style={{ color: COLORS.gold, fontFamily: playfair.style.fontFamily }} className="text-lg font-bold">
+          <AnimatedCounter value={amount} prefix="" suffix=" MAD" />
+        </span>
+        <span style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }} className="text-xs">
+          sur {total.toLocaleString('fr-FR')} MAD
+        </span>
       </div>
     </div>
   )
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MINI FEATURE SVG PREVIEWS
+// IMPACT CARD
 // ═══════════════════════════════════════════════════════════════
 
-function GraphMiniSVG() {
+function ImpactCard({ tier, index, isActive, onClick }: {
+  tier: ImpactTier
+  index: number
+  isActive: boolean
+  onClick: () => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-50px' })
+
   return (
-    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
-      <line x1="30" y1="25" x2="60" y2="45" stroke="#A7F3D0" strokeWidth="1.5" />
-      <line x1="60" y1="45" x2="95" y2="30" stroke="#A7F3D0" strokeWidth="1.5" />
-      <line x1="60" y1="45" x2="45" y2="65" stroke="#A7F3D0" strokeWidth="1.5" />
-      <line x1="60" y1="45" x2="90" y2="60" stroke="#A7F3D0" strokeWidth="1.5" />
-      <circle r="3" fill="#34D399" opacity="0.8">
-        <animateMotion dur="2.5s" repeatCount="indefinite" path="M30,25 L60,45" />
-      </circle>
-      <circle r="3" fill="#34D399" opacity="0.8">
-        <animateMotion dur="3s" repeatCount="indefinite" path="M60,45 L95,30" />
-      </circle>
-      <circle cx="30" cy="25" r="7" fill="#10B981" opacity="0.9" />
-      <circle cx="60" cy="45" r="9" fill="#059669" />
-      <circle cx="95" cy="30" r="6" fill="#34D399" opacity="0.8" />
-      <circle cx="45" cy="65" r="6" fill="#0D9488" opacity="0.8" />
-      <circle cx="90" cy="60" r="5" fill="#14B8A6" opacity="0.7" />
-    </svg>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+      onClick={onClick}
+      className="cursor-pointer group"
+    >
+      <div
+        className="relative overflow-hidden rounded-lg transition-all duration-500"
+        style={{
+          backgroundColor: isActive ? COLORS.bgCardHover : COLORS.bgCard,
+          border: `1px solid ${isActive ? tier.color + '40' : COLORS.border}`,
+          boxShadow: isActive ? `0 0 40px ${tier.color}10` : 'none',
+        }}
+      >
+        {/* Top accent line */}
+        <div
+          className="h-px w-full transition-all duration-700"
+          style={{
+            background: isActive
+              ? `linear-gradient(90deg, transparent, ${tier.color}, transparent)`
+              : 'transparent',
+          }}
+        />
+
+        <div className="p-6 md:p-8">
+          {/* Amount + Icon row */}
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <div
+                className="text-3xl md:text-4xl font-bold tracking-tight"
+                style={{
+                  color: tier.color,
+                  fontFamily: playfair.style.fontFamily,
+                }}
+              >
+                <AnimatedCounter value={tier.amount} suffix=" MAD" duration={2} />
+              </div>
+              <div
+                className="text-lg font-semibold mt-1"
+                style={{
+                  color: COLORS.textPrimary,
+                  fontFamily: cormorant.style.fontFamily,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {tier.label}
+              </div>
+            </div>
+            <div
+              className="w-10 h-10 rounded-md flex items-center justify-center transition-all duration-500"
+              style={{
+                backgroundColor: isActive ? tier.color + '18' : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${isActive ? tier.color + '30' : 'transparent'}`,
+              }}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={isActive ? tier.color : COLORS.textTertiary}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d={tier.icon} />
+              </svg>
+            </div>
+          </div>
+
+          {/* Subtitle */}
+          <div
+            className="text-sm mb-4"
+            style={{
+              color: COLORS.textSecondary,
+              fontFamily: cormorant.style.fontFamily,
+              letterSpacing: '0.06em',
+            }}
+          >
+            {tier.subtitle}
+          </div>
+
+          {/* Expandable content */}
+          <AnimatePresence>
+            {isActive && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 border-t" style={{ borderColor: COLORS.border }}>
+                  <p
+                    className="text-sm leading-relaxed mb-5"
+                    style={{
+                      color: COLORS.textSecondary,
+                      fontFamily: inter.style.fontFamily,
+                      lineHeight: '1.8',
+                    }}
+                  >
+                    {tier.description}
+                  </p>
+                  <div className="space-y-2.5">
+                    {tier.details.map((detail, i) => (
+                      <motion.div
+                        key={detail}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + i * 0.08, duration: 0.4 }}
+                        className="flex items-start gap-3"
+                      >
+                        <div
+                          className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
+                          style={{ backgroundColor: tier.color }}
+                        />
+                        <span
+                          className="text-sm"
+                          style={{
+                            color: 'rgba(245, 237, 224, 0.7)',
+                            fontFamily: inter.style.fontFamily,
+                          }}
+                        >
+                          {detail}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Expand indicator */}
+          <div className="flex items-center justify-center mt-4">
+            <motion.svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={isActive ? tier.color : COLORS.textTertiary}
+              strokeWidth="1.5"
+              animate={{ rotate: isActive ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <path d="M6 9l6 6 6-6" />
+            </motion.svg>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   )
 }
-
-function DigestMiniSVG() {
-  return (
-    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
-      <rect x="10" y="10" width="100" height="60" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-      <rect x="18" y="20" width="50" height="4" rx="2" fill="#059669" opacity="0.6" />
-      <rect x="18" y="30" width="70" height="3" rx="1.5" fill="#D1FAE5" />
-      <rect x="18" y="38" width="55" height="3" rx="1.5" fill="#D1FAE5" />
-      <rect x="18" y="46" width="65" height="3" rx="1.5" fill="#D1FAE5" />
-      <circle cx="95" cy="25" r="8" fill="#10B981" opacity="0.3" />
-      <Sun x="89" y="19" width="12" height="12" fill="#059669" opacity="0.7" />
-    </svg>
-  )
-}
-
-function ChatMiniSVG() {
-  return (
-    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
-      <rect x="8" y="8" width="60" height="22" rx="8" fill="#059669" opacity="0.15" />
-      <rect x="14" y="16" width="35" height="3" rx="1.5" fill="#059669" opacity="0.5" />
-      <rect x="52" y="38" width="60" height="28" rx="8" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-      <rect x="58" y="46" width="40" height="3" rx="1.5" fill="#A7F3D0" />
-      <rect x="58" y="53" width="30" height="3" rx="1.5" fill="#D1FAE5" />
-    </svg>
-  )
-}
-
-function MemoryMiniSVG() {
-  return (
-    <svg viewBox="0 0 120 80" className="w-full h-auto" fill="none">
-      <rect x="15" y="10" width="90" height="60" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-      <rect x="22" y="18" width="30" height="35" rx="4" fill="#D1FAE5" />
-      <rect x="26" y="23" width="22" height="3" rx="1.5" fill="#059669" opacity="0.4" />
-      <rect x="26" y="30" width="18" height="2" rx="1" fill="#A7F3D0" />
-      <rect x="26" y="35" width="20" height="2" rx="1" fill="#A7F3D0" />
-      <rect x="26" y="40" width="16" height="2" rx="1" fill="#A7F3D0" />
-      <rect x="58" y="18" width="40" height="14" rx="4" fill="#D1FAE5" />
-      <rect x="62" y="23" width="25" height="3" rx="1.5" fill="#059669" opacity="0.4" />
-      <rect x="58" y="38" width="40" height="14" rx="4" fill="#D1FAE5" />
-      <rect x="62" y="43" width="20" height="3" rx="1.5" fill="#059669" opacity="0.4" />
-      <rect x="58" y="58" width="40" height="6" rx="3" fill="#10B981" opacity="0.2" />
-    </svg>
-  )
-}
-
-const featureSVGs = [<GraphMiniSVG key="g" />, <DigestMiniSVG key="d" />, <ChatMiniSVG key="c" />, <MemoryMiniSVG key="m" />]
 
 // ═══════════════════════════════════════════════════════════════
-// ANIMATED CONNECTOR (How It Works)
+// GOLD DIVIDER
 // ═══════════════════════════════════════════════════════════════
 
-function AnimatedConnector({ isInView, delay = 0 }: { isInView: boolean; delay?: number }) {
+function GoldDivider() {
   return (
-    <svg className="absolute top-1/2 -right-5 w-10 h-1 hidden lg:block" viewBox="0 0 40 4" fill="none">
-      <motion.line
-        x1="0"
-        y1="2"
-        x2="40"
-        y2="2"
-        stroke="#A7F3D0"
-        strokeWidth={2}
-        strokeDasharray="6 4"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-        transition={{ duration: 1.2, delay, ease: [0.25, 0.4, 0.25, 1] }}
-      />
-    </svg>
+    <div className="flex items-center justify-center gap-4 my-12 md:my-16">
+      <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.border})` }} />
+      <svg width="16" height="16" viewBox="0 0 16 16">
+        <polygon points="8,1 15,5 15,11 8,15 1,11 1,5" fill="none" stroke={COLORS.gold} strokeWidth="0.5" opacity="0.4" />
+      </svg>
+      <div className="h-px flex-1" style={{ background: `linear-gradient(270deg, transparent, ${COLORS.border})` }} />
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FLOATING PARTICLES (subtle background)
+// ═══════════════════════════════════════════════════════════════
+
+function FloatingParticles() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+    const particles = Array.from({ length: 40 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 1.5 + 0.3,
+      speedX: (Math.random() - 0.5) * 0.15,
+      speedY: (Math.random() - 0.5) * 0.1 - 0.05,
+      opacity: Math.random() * 0.25 + 0.05,
+    }))
+
+    let animationId: number
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      particles.forEach(p => {
+        p.x += p.speedX
+        p.y += p.speedY
+        if (p.x < 0) p.x = canvas.width
+        if (p.x > canvas.width) p.x = 0
+        if (p.y < 0) p.y = canvas.height
+        if (p.y > canvas.height) p.y = 0
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(212, 168, 83, ${p.opacity})`
+        ctx.fill()
+      })
+      animationId = requestAnimationFrame(animate)
+    }
+    animate()
+
+    return () => cancelAnimationFrame(animationId)
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INTERACTIVE SLIDER
+// ═══════════════════════════════════════════════════════════════
+
+function ImpactSlider({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const sliderRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!sliderRef.current) return
+    const rect = sliderRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
+    const percentage = x / rect.width
+    const newValue = Math.round(percentage * 500000 / 1000) * 1000
+    onChange(Math.max(0, Math.min(500000, newValue)))
+  }, [onChange])
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true)
+    handleMove(e.clientX)
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true)
+    handleMove(e.touches[0].clientX)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+    const handleMouseMove = (e: MouseEvent) => handleMove(e.clientX)
+    const handleTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX)
+    const handleUp = () => setIsDragging(false)
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchmove', handleTouchMove)
+    window.addEventListener('mouseup', handleUp)
+    window.addEventListener('touchend', handleUp)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('mouseup', handleUp)
+      window.removeEventListener('touchend', handleUp)
+    }
+  }, [isDragging, handleMove])
+
+  const percentage = (value / 500000) * 100
+
+  // Find the current tier color
+  const currentTier = [...IMPACT_TIERS].reverse().find(t => value >= t.amount)
+  const activeColor = currentTier?.color || COLORS.gold
+
+  return (
+    <div className="w-full">
+      <div
+        ref={sliderRef}
+        className="relative w-full h-2 rounded-full cursor-pointer select-none"
+        style={{ backgroundColor: 'rgba(212, 168, 83, 0.08)' }}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+      >
+        {/* Fill */}
+        <div
+          className="absolute top-0 left-0 h-full rounded-full transition-all duration-150"
+          style={{
+            width: `${percentage}%`,
+            background: `linear-gradient(90deg, ${COLORS.goldDark}, ${activeColor})`,
+          }}
+        />
+
+        {/* Tier markers */}
+        {IMPACT_TIERS.map((tier) => {
+          const tierPos = (tier.amount / 500000) * 100
+          return (
+            <div
+              key={tier.id}
+              className="absolute top-1/2 -translate-y-1/2"
+              style={{ left: `${tierPos}%` }}
+            >
+              <div
+                className="w-0.5 h-4 -translate-x-1/2"
+                style={{ backgroundColor: value >= tier.amount ? tier.color + '60' : 'rgba(255,255,255,0.08)' }}
+              />
+            </div>
+          )
+        })}
+
+        {/* Thumb */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full transition-all duration-150"
+          style={{
+            left: `${percentage}%`,
+            backgroundColor: activeColor,
+            boxShadow: `0 0 20px ${activeColor}40, 0 0 6px ${activeColor}60`,
+            transform: `translate(-50%, -50%) scale(${isDragging ? 1.3 : 1})`,
+          }}
+        />
+      </div>
+
+      {/* Current value display */}
+      <div className="flex justify-between items-center mt-4">
+        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}>
+          0 MAD
+        </span>
+        <div
+          className="text-2xl font-bold"
+          style={{ color: activeColor, fontFamily: playfair.style.fontFamily }}
+        >
+          {value.toLocaleString('fr-FR')} MAD
+        </div>
+        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}>
+          500 000 MAD
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VISUAL IMPACT OVERLAY
+// ═══════════════════════════════════════════════════════════════
+
+function ImpactVisualization({ amount }: { amount: number }) {
+  const currentTier = [...IMPACT_TIERS].reverse().find(t => amount >= t.amount)
+  const tierIndex = currentTier ? IMPACT_TIERS.indexOf(currentTier) : -1
+  const progress = currentTier ? Math.min(amount / currentTier.amount, 2) : 0
+
+  // SVG building that lights up based on tier
+  const windowCount = 14
+  const litWindows = Math.round((tierIndex + 1) / IMPACT_TIERS.length * windowCount)
+
+  return (
+    <div className="relative w-full h-48 md:h-64 flex items-center justify-center">
+      <svg viewBox="0 0 800 300" className="w-full h-full" style={{ maxHeight: '300px' }}>
+        {/* Building outline */}
+        <rect x="150" y="60" width="500" height="220" rx="2" fill="none" stroke="rgba(212,168,83,0.15)" strokeWidth="1" />
+        <rect x="170" y="40" width="460" height="20" rx="1" fill="none" stroke="rgba(212,168,83,0.1)" strokeWidth="0.5" />
+
+        {/* Windows row 1 */}
+        {Array.from({ length: 7 }).map((_, i) => (
+          <rect
+            key={`w1-${i}`}
+            x={190 + i * 65}
+            y="90"
+            width="40"
+            height="50"
+            rx="1"
+            fill={i < litWindows ? `rgba(212, 168, 83, ${0.15 + progress * 0.1})` : 'rgba(255,255,255,0.02)'}
+            stroke={i < litWindows ? 'rgba(212,168,83,0.3)' : 'rgba(255,255,255,0.04)'}
+            strokeWidth="0.5"
+          />
+        ))}
+
+        {/* Windows row 2 */}
+        {Array.from({ length: 7 }).map((_, i) => (
+          <rect
+            key={`w2-${i}`}
+            x={190 + i * 65}
+            y="165"
+            width="40"
+            height="50"
+            rx="1"
+            fill={i < litWindows - 7 ? `rgba(212, 168, 83, ${0.15 + progress * 0.1})` : 'rgba(255,255,255,0.02)'}
+            stroke={i < litWindows - 7 ? 'rgba(212,168,83,0.3)' : 'rgba(255,255,255,0.04)'}
+            strokeWidth="0.5"
+          />
+        ))}
+
+        {/* Door */}
+        <path d="M360,280 L360,270 A40,40 0 0,1 440,270 L440,280 Z" fill="none" stroke={currentTier ? currentTier.color + '40' : 'rgba(212,168,83,0.1)'} strokeWidth="1" />
+
+        {/* Glow above lit windows */}
+        {currentTier && (
+          <ellipse
+            cx="400"
+            cy="60"
+            rx="250"
+            ry="40"
+            fill={`url(#buildingGlow)`}
+            opacity={progress * 0.3}
+          />
+        )}
+
+        <defs>
+          <radialGradient id="buildingGlow" cx="50%" cy="100%" r="80%">
+            <stop offset="0%" stopColor={currentTier?.color || COLORS.gold} stopOpacity="0.4" />
+            <stop offset="100%" stopColor={currentTier?.color || COLORS.gold} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
   )
 }
 
@@ -670,785 +642,291 @@ function AnimatedConnector({ isInView, delay = 0 }: { isInView: boolean; delay?:
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════
 
-export default function LandingPage() {
-  const howItWorksRef = useRef(null)
-  const howItWorksInView = useInView(howItWorksRef, { once: true, margin: '-100px' })
+export default function CouleurDeLEspoirImpact() {
+  const [activeTier, setActiveTier] = useState<string | null>(null)
+  const [sliderValue, setSliderValue] = useState(0)
+
+  // Auto-activate first tier on load
+  const initialized = useRef(false)
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true
+      setTimeout(() => setActiveTier('supplies'), 800)
+    }
+  }, [])
+
+  const currentSliderTier = [...IMPACT_TIERS].reverse().find(t => sliderValue >= t.amount)
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0F0F12]">
-      <Navbar />
+    <div
+      className={`min-h-screen flex flex-col ${playfair.variable} ${cormorant.variable} ${inter.variable}`}
+      style={{ backgroundColor: COLORS.bgDark, color: COLORS.textPrimary }}
+    >
+      <FloatingParticles />
 
-      {/* ═══════════════════════════════════════════════════════════
-          HERO SECTION
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-        {/* Animated Graph Background */}
-        <div className="absolute inset-0 opacity-[0.35] pointer-events-none">
-          <AnimatedGraphBackground />
+      {/* ═══ HEADER ═══ */}
+      <header className="relative z-10 w-full" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <polygon points="14,1 27,8 27,20 14,27 1,20 1,8" fill="none" stroke={COLORS.gold} strokeWidth="0.8" opacity="0.6" />
+              <polygon points="14,5 23,10 23,18 14,23 5,18 5,10" fill="none" stroke={COLORS.gold} strokeWidth="0.4" opacity="0.3" />
+            </svg>
+            <span
+              className="text-xs tracking-[0.3em] uppercase"
+              style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }}
+            >
+              Fondation TGCC
+            </span>
+          </div>
+          <div
+            className="text-xs tracking-[0.2em] uppercase"
+            style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+          >
+            1er Juillet 2025
+          </div>
         </div>
+      </header>
 
-        {/* Gradient overlays for readability */}
-        <div
-          className="absolute inset-0 pointer-events-none hero-gradient-overlay"
-        />
-        <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none hero-gradient-bottom"
-        />
-
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-          <div className="max-w-3xl">
-            {/* Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-              className="text-5xl sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight leading-[1.05] text-[#0F172A] dark:text-[#FAFAFA]"
+      {/* ═══ HERO ═══ */}
+      <main className="relative z-10 flex-1">
+        <section className="max-w-7xl mx-auto px-6 md:px-12 pt-16 md:pt-24 pb-8 md:pb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center"
+          >
+            <div
+              className="text-xs tracking-[0.35em] uppercase mb-6"
+              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
             >
-              Your Team&apos;s Memory,{' '}
-              <span className="gradient-text-hero">Alive.</span>
-            </motion.h1>
-
-            {/* Subheadline */}
-            <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.25, 0.4, 0.25, 1] }}
-              className="mt-6 text-lg sm:text-xl text-[#475569] dark:text-[#A1A1AA] leading-relaxed max-w-xl"
+              Calculateur d&apos;impact
+            </div>
+            <h1
+              className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6"
+              style={{ fontFamily: playfair.style.fontFamily }}
             >
-              Lore gives your team a shared memory that&apos;s structured, always consistent, and available everywhere. Powered by Aurora DSQL&apos;s multi-region architecture for zero-data-drift knowledge management.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
-              className="mt-8 flex flex-col sm:flex-row gap-4"
+              <span style={{ color: COLORS.cream }}>Votre geste,</span>
+              <br />
+              <span style={{
+                background: `linear-gradient(135deg, ${COLORS.gold}, ${COLORS.terracotta}, ${COLORS.hopeRose})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                leur avenir
+              </span>
+            </h1>
+            <p
+              className="text-base md:text-lg max-w-2xl mx-auto leading-relaxed"
+              style={{ color: COLORS.textSecondary, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.03em' }}
             >
-              <Link href="/signup" className="btn-primary text-[15px] h-12 px-8 justify-center">
-                Get Started Free
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a href="#how-it-works" className="btn-secondary text-[15px] h-12 px-8 justify-center">
-                See How It Works
-                <ChevronDown className="w-4 h-4" />
-              </a>
-            </motion.div>
+              Chaque contribution finance directement la construction d&apos;un pensionnat pour les jeunes filles de 12 a 20 ans a Casablanca. Decouvrez ce que votre generosite rend possible.
+            </p>
+          </motion.div>
+        </section>
 
-            {/* Trust indicators */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.55, ease: [0.25, 0.4, 0.25, 1] }}
-              className="mt-8 flex flex-wrap gap-6"
+        {/* ═══ PROGRESS SECTION ═══ */}
+        <section className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-lg p-8 md:p-10"
+            style={{
+              backgroundColor: COLORS.bgCard,
+              border: `1px solid ${COLORS.border}`,
+            }}
+          >
+            <div
+              className="text-xs tracking-[0.25em] uppercase mb-6"
+              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
             >
-              {[
-                { text: 'Multi-region consistent', icon: Shield },
-                { text: 'Real-time sync', icon: Zap },
-                { text: 'Zero config', icon: Cloud },
-              ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2 text-[13px] text-[#475569] dark:text-[#A1A1AA] font-medium">
-                  <Check className="w-4 h-4 text-emerald-500" strokeWidth={3} />
-                  {item.text}
-                </div>
-              ))}
-            </motion.div>
+              Etat des collectes
+            </div>
+            <ImpactProgress amount={320000} total={500000} />
+          </motion.div>
+        </section>
 
-            {/* Floating stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
-              className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-6"
+        <GoldDivider />
+
+        {/* ═══ INTERACTIVE SLIDER ═══ */}
+        <section className="max-w-4xl mx-auto px-6 md:px-12 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div
+              className="text-xs tracking-[0.25em] uppercase mb-8 text-center"
+              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
             >
-              {[
-                { value: 2847, suffix: '+', label: 'Knowledge Nodes', icon: Network },
-                { value: 12500, suffix: '+', label: 'Connections', icon: Link2 },
-                { value: 99.9, suffix: '%', label: 'Uptime', icon: Shield },
-                { value: 150, suffix: 'ms', label: 'Avg Query', icon: Zap },
-              ].map((stat, i) => (
+              Simulez votre contribution
+            </div>
+
+            <ImpactSlider value={sliderValue} onChange={setSliderValue} />
+
+            {/* Result display */}
+            <AnimatePresence mode="wait">
+              {currentSliderTier && sliderValue > 0 && (
                 <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={currentSliderTier.id}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.8 + i * 0.1 }}
-                  className="group"
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="mt-8 text-center"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <stat.icon className="w-4 h-4 text-emerald-500" />
-                    <span
-                      className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-[#FAFAFA]"
-                      style={{ fontVariantNumeric: 'tabular-nums' }}
-                    >
-                      <AnimatedCounter
-                        target={stat.value}
-                        suffix={stat.suffix}
-                        duration={2.5}
-                      />
-                    </span>
-                  </div>
-                  <span className="text-xs font-medium text-[#71717A] dark:text-[#A1A1AA] tracking-wide uppercase">
-                    {stat.label}
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          SOCIAL PROOF BAR
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-10 border-y border-gray-100 dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <p className="text-center text-sm font-medium text-[#71717A] dark:text-[#A1A1AA] mb-6">
-              Trusted by <span className="text-emerald-600 dark:text-emerald-400 font-bold">2,000+</span> knowledge workers at
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <div className="marquee-track relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-16 z-10 marquee-fade-left" />
-              <div className="absolute right-0 top-0 bottom-0 w-16 z-10 marquee-fade-right" />
-              <div className="marquee-content">
-                {[...companies, ...companies].map((name, i) => (
                   <div
-                    key={`${name}-${i}`}
-                    className="flex items-center gap-2 mx-8 shrink-0"
+                    className="text-xl md:text-2xl font-semibold"
+                    style={{ color: currentSliderTier.color, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.04em' }}
                   >
-                    <div className="w-7 h-7 rounded-lg bg-white dark:bg-[#0F0F12] border border-gray-200 dark:border-[rgba(255,255,255,0.08)] flex items-center justify-center shadow-sm">
-                      <span className="text-[10px] font-bold text-emerald-600">{name[0]}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-[#A1A1AA] dark:text-[#71717A] whitespace-nowrap tracking-wide">
-                      {name}
-                    </span>
+                    {currentSliderTier.label}
                   </div>
-                ))}
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          COMPARISON SECTION — "Why Lore Wins"
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <FadeIn>
-              <p className="section-label mb-6">Why Lore Wins</p>
-            </FadeIn>
-            <FadeIn delay={0.06}>
-              <h2 className="section-title mb-6">
-                The only tool built for <span className="gradient-text">team memory.</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.12}>
-              <p className="section-subtitle">
-                Others take notes. Lore builds memory — structured, connected, and always consistent across regions.
-              </p>
-            </FadeIn>
-          </div>
-
-          {/* Comparison table */}
-          <FadeIn delay={0.15}>
-            <div className="overflow-x-auto -mx-4 px-4">
-              <table className="w-full min-w-[600px] border-collapse">
-                <thead>
-                  <tr>
-                    <th className="text-left p-4 w-[200px]">
-                      <span className="text-xs font-bold tracking-wider uppercase text-[#A1A1AA] dark:text-[#71717A]">Feature</span>
-                    </th>
-                    <th className="p-4 text-center">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] border border-emerald-200 dark:border-[rgba(16,185,129,0.20)]">
-                        <Brain className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Lore</span>
-                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-100 dark:bg-[rgba(16,185,129,0.15)] px-2 py-0.5 rounded-full">YOU</span>
-                      </div>
-                    </th>
-                    <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Obsidian</span>
-                    </th>
-                    <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Notion</span>
-                    </th>
-                    <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Mem.ai</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonRows.map((row, i) => (
-                    <tr
-                      key={row.feature}
-                      className={i < comparisonRows.length - 1 ? 'border-b border-gray-100 dark:border-[rgba(255,255,255,0.08)]' : ''}
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-2.5">
-                          <row.icon className="w-4 h-4 text-emerald-500" />
-                          <span className="text-sm font-semibold text-[#0F172A] dark:text-[#FAFAFA]">{row.feature}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 bg-emerald-50/40 dark:bg-[rgba(16,185,129,0.06)]">
-                        <ComparisonCell status={row.lore} />
-                      </td>
-                      <td className="p-4 text-center">
-                        <ComparisonCell status={row.obsidian} />
-                      </td>
-                      <td className="p-4 text-center">
-                        <ComparisonCell status={row.notion} />
-                      </td>
-                      <td className="p-4 text-center">
-                        <ComparisonCell status={row.memai} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          FEATURES SECTION
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]" id="features">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <FadeIn>
-              <p className="section-label mb-6">Features</p>
-            </FadeIn>
-            <FadeIn delay={0.06}>
-              <h2 className="section-title mb-6">
-                Everything your team needs to <span className="gradient-text">never forget.</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.12}>
-              <p className="section-subtitle">
-                From automatic capture to AI-powered recall, Lore handles the entire lifecycle of team knowledge.
-              </p>
-            </FadeIn>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {features.map((feature, i) => (
-              <FadeIn key={feature.title} delay={i * 0.08}>
-                <motion.div
-                  className="feature-card h-full relative overflow-hidden"
-                  whileHover={{
-                    boxShadow: `0 0 40px ${feature.glowColor}, 0 12px 40px -12px rgba(5,150,105,0.1)`,
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Hover glow overlay */}
-                  <div
-                    className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                    style={{
-                      background: `radial-gradient(circle at 50% 50%, ${feature.glowColor}, transparent 70%)`,
-                    }}
-                  />
-                  <div className="relative z-10">
-                    <div className="flex items-start gap-4 mb-4">
-                      <motion.div
-                        className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: feature.glowColor }}
-                        animate={{
-                          rotate: [0, 3, -3, 0],
-                          scale: [1, 1.05, 1],
-                        }}
-                        transition={{
-                          duration: 4,
-                          repeat: Infinity,
-                          ease: 'easeInOut',
-                          delay: i * 0.5,
-                        }}
-                      >
-                        <feature.icon className="w-5 h-5" style={{ color: feature.color }} />
-                      </motion.div>
-                      <div>
-                        <h3 className="text-lg font-bold text-[#0F172A] dark:text-[#FAFAFA]">{feature.title}</h3>
-                        <p className="text-sm font-medium" style={{ color: feature.color }}>
-                          {feature.subtitle}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed mb-4">{feature.desc}</p>
-                    <div className="rounded-xl bg-[#F9FAFB] dark:bg-[#09090B] border border-gray-100 dark:border-[rgba(255,255,255,0.08)] p-3 mt-2">
-                      {featureSVGs[i]}
-                    </div>
-                  </div>
+                  <p
+                    className="text-sm mt-2 max-w-lg mx-auto"
+                    style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily, lineHeight: '1.7' }}
+                  >
+                    {currentSliderTier.subtitle}
+                  </p>
                 </motion.div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
+              )}
+            </AnimatePresence>
 
-      {/* ═══════════════════════════════════════════════════════════
-          TESTIMONIALS
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <FadeIn>
-              <p className="section-label mb-6">Testimonials</p>
-            </FadeIn>
-            <FadeIn delay={0.06}>
-              <h2 className="section-title mb-6">
-                Teams that <span className="gradient-text">remember, win.</span>
-              </h2>
-            </FadeIn>
-          </div>
+            {/* Building visualization */}
+            <ImpactVisualization amount={sliderValue} />
+          </motion.div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => {
-              const directions: Array<'left' | 'right' | 'up'> = ['left', 'up', 'right']
-              return (
-                <FadeIn key={t.name} delay={i * 0.12} direction={directions[i]}>
-                  <div className="feature-card h-full flex flex-col">
-                    {/* Stars */}
-                    <div className="flex gap-1 mb-4">
-                      {Array.from({ length: 5 }).map((_, si) => (
-                        <Star
-                          key={si}
-                          className="w-4 h-4 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                    </div>
-                    {/* Quote */}
-                    <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed flex-1 mb-6">
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    {/* Author */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100 dark:border-[rgba(255,255,255,0.08)]">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: t.bgColor }}
-                      >
-                        <span
-                          className="text-xs font-bold"
-                          style={{ color: t.color }}
-                        >
-                          {t.initials}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#0F172A] dark:text-[#FAFAFA]">{t.name}</p>
-                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">
-                          {t.title}, {t.company}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </FadeIn>
-              )
-            })}
-          </div>
-        </div>
-      </section>
+        <GoldDivider />
 
-      {/* ═══════════════════════════════════════════════════════════
-          HOW IT WORKS
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]" id="how-it-works" ref={howItWorksRef}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <FadeIn>
-              <p className="section-label mb-6">How It Works</p>
-            </FadeIn>
-            <FadeIn delay={0.06}>
-              <h2 className="section-title mb-6">
-                Three steps to <span className="gradient-text">perfect memory.</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.12}>
-              <p className="section-subtitle">
-                Getting started with Lore takes minutes, not months. Connect your tools, and Lore starts building your team&apos;s memory immediately.
-              </p>
-            </FadeIn>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {steps.map((step, i) => (
-              <FadeIn key={step.step} delay={i * 0.12}>
-                <div className="feature-card text-center relative">
-                  {/* Step number */}
-                  <span className="absolute top-4 right-4 text-xs font-mono text-gray-300 dark:text-gray-600 font-bold">
-                    {step.step}
-                  </span>
-                  <motion.div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                    style={{ background: `${step.color}14` }}
-                    animate={{ scale: [1, 1.08, 1] }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: i * 0.8,
-                    }}
-                  >
-                    <step.icon className="w-6 h-6" style={{ color: step.color }} />
-                  </motion.div>
-                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-[#FAFAFA] mb-3">{step.title}</h3>
-                  <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed">{step.desc}</p>
-                  {/* Animated connector */}
-                  {i < 2 && (
-                    <AnimatedConnector
-                      isInView={howItWorksInView}
-                      delay={0.5 + i * 0.4}
-                    />
-                  )}
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          ARCHITECTURE SECTION
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Diagram */}
-            <FadeIn>
-              <div className="mockup-window">
-                <div className="mockup-titlebar">
-                  <div className="mockup-dot bg-red-400" />
-                  <div className="mockup-dot bg-yellow-400" />
-                  <div className="mockup-dot bg-green-400" />
-                  <span className="text-xs text-gray-400 ml-2 font-medium">
-                    Architecture — Aurora DSQL
-                  </span>
-                </div>
-                <div className="p-6 bg-white dark:bg-[#0F0F12]">
-                  <svg
-                    viewBox="0 0 400 220"
-                    className="w-full h-auto"
-                    fill="none"
-                  >
-                    {/* Client Layer */}
-                    <rect x="10" y="10" width="380" height="45" rx="8" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-                    <text x="200" y="28" textAnchor="middle" fill="#059669" fontSize="11" fontWeight="600">
-                      Client Layer
-                    </text>
-                    <text x="80" y="42" textAnchor="middle" fill="#475569" fontSize="9">
-                      Web App
-                    </text>
-                    <text x="200" y="42" textAnchor="middle" fill="#475569" fontSize="9">
-                      Mobile
-                    </text>
-                    <text x="320" y="42" textAnchor="middle" fill="#475569" fontSize="9">
-                      API
-                    </text>
-
-                    {/* Arrow with pulse */}
-                    <line x1="200" y1="55" x2="200" y2="75" stroke="#A7F3D0" strokeWidth="2" />
-                    <polygon points="195,73 200,80 205,73" fill="#A7F3D0" />
-                    <circle r="3" fill="#34D399" opacity="0.8">
-                      <animateMotion dur="1.5s" repeatCount="indefinite" path="M200,55 L200,75" />
-                    </circle>
-
-                    {/* Next.js API */}
-                    <rect x="130" y="80" width="140" height="35" rx="8" fill="#F0FDF4" stroke="#10B981" strokeWidth="1.5" />
-                    <text x="200" y="102" textAnchor="middle" fill="#059669" fontSize="11" fontWeight="600">
-                      Next.js API Layer
-                    </text>
-
-                    {/* Arrow with pulse */}
-                    <line x1="200" y1="115" x2="200" y2="135" stroke="#A7F3D0" strokeWidth="2" />
-                    <polygon points="195,133 200,140 205,133" fill="#A7F3D0" />
-                    <circle r="3" fill="#34D399" opacity="0.8">
-                      <animateMotion dur="1.8s" repeatCount="indefinite" path="M200,115 L200,135" />
-                    </circle>
-
-                    {/* Aurora DSQL */}
-                    <rect
-                      x="60"
-                      y="140"
-                      width="280"
-                      height="40"
-                      rx="10"
-                      fill="#059669"
-                      opacity="0.1"
-                      stroke="#059669"
-                      strokeWidth="2"
-                    >
-                      <animate
-                        attributeName="opacity"
-                        values="0.1;0.18;0.1"
-                        dur="3s"
-                        repeatCount="indefinite"
-                      />
-                    </rect>
-                    <text x="200" y="163" textAnchor="middle" fill="#059669" fontSize="13" fontWeight="700">
-                      Aurora DSQL
-                    </text>
-                    <text x="200" y="175" textAnchor="middle" fill="#047857" fontSize="8">
-                      Multi-Region · Serializable Isolation
-                    </text>
-
-                    {/* Regions */}
-                    <rect x="60" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-                    <text x="105" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">
-                      US-East-1
-                    </text>
-                    <rect x="155" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-                    <text x="200" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">
-                      EU-West-1
-                    </text>
-                    <rect x="250" y="190" width="90" height="25" rx="6" fill="#ECFDF5" stroke="#A7F3D0" strokeWidth="1" />
-                    <text x="295" y="206" textAnchor="middle" fill="#059669" fontSize="9" fontWeight="500">
-                      AP-South-1
-                    </text>
-
-                    {/* Pulse dots flowing from DSQL to regions */}
-                    <circle r="2.5" fill="#34D399" opacity="0.7">
-                      <animateMotion dur="2s" repeatCount="indefinite" path="M140,180 L105,190" />
-                    </circle>
-                    <circle r="2.5" fill="#34D399" opacity="0.7">
-                      <animateMotion dur="2.2s" repeatCount="indefinite" path="M200,180 L200,190" />
-                    </circle>
-                    <circle r="2.5" fill="#34D399" opacity="0.7">
-                      <animateMotion dur="2.4s" repeatCount="indefinite" path="M260,180 L295,190" />
-                    </circle>
-
-                    {/* Connection lines */}
-                    <line x1="140" y1="180" x2="105" y2="190" stroke="#A7F3D0" strokeWidth="1" />
-                    <line x1="200" y1="180" x2="200" y2="190" stroke="#A7F3D0" strokeWidth="1" />
-                    <line x1="260" y1="180" x2="295" y2="190" stroke="#A7F3D0" strokeWidth="1" />
-                  </svg>
-                </div>
-              </div>
-            </FadeIn>
-
-            {/* Text */}
-            <div className="space-y-6">
-              <FadeIn>
-                <p className="section-label">Architecture</p>
-              </FadeIn>
-              <FadeIn delay={0.06}>
-                <h2 className="section-title">
-                  Built on <span className="gradient-text">Aurora DSQL.</span>
-                </h2>
-              </FadeIn>
-              <FadeIn delay={0.12}>
-                <p className="text-lg text-[#475569] dark:text-[#A1A1AA] leading-relaxed">
-                  Aurora DSQL provides serializable isolation across multiple regions — meaning your team&apos;s memory is identical everywhere. No stale caches, no conflicts, no data drift. Consistency is non-negotiable.
-                </p>
-              </FadeIn>
-              <FadeIn delay={0.18}>
-                <div className="space-y-4 pt-2">
-                  {[
-                    {
-                      icon: Shield,
-                      text: 'Serializable isolation — every read sees the latest write',
-                    },
-                    {
-                      icon: Zap,
-                      text: '<50ms read latency with multi-region replication',
-                    },
-                    {
-                      icon: Server,
-                      text: 'Zero conflicts — distributed SQL done right',
-                    },
-                  ].map((item) => (
-                    <div key={item.text} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center shrink-0">
-                        <item.icon className="w-4 h-4 text-emerald-600" />
-                      </div>
-                      <span className="text-sm text-[#475569] dark:text-[#A1A1AA] font-medium">
-                        {item.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </FadeIn>
+        {/* ═══ IMPACT TIERS GRID ═══ */}
+        <section className="max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-12"
+          >
+            <div
+              className="text-xs tracking-[0.25em] uppercase mb-4"
+              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+            >
+              Ce que chaque montant rend possible
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          TRUST / SECURITY BADGES
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-10 border-y border-gray-100 dark:border-[rgba(255,255,255,0.08)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-              {[
-                { icon: Shield, label: 'SOC 2 Compliant' },
-                { icon: Lock, label: 'GDPR Ready' },
-                { icon: Activity, label: '99.9% Uptime' },
-                { icon: Key, label: '256-bit Encryption' },
-              ].map((badge) => (
-                <div key={badge.label} className="flex items-center gap-2 text-gray-400">
-                  <badge.icon className="w-4 h-4" />
-                  <span className="text-xs font-medium tracking-wide uppercase">
-                    {badge.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          PRICING TEASER
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <FadeIn>
-              <p className="section-label mb-6">Pricing</p>
-            </FadeIn>
-            <FadeIn delay={0.06}>
-              <h2 className="section-title mb-6">
-                Start free, scale when <span className="gradient-text">you&apos;re ready.</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.12}>
-              <p className="section-subtitle">
-                No credit card required. Upgrade only when your team needs more power.
-              </p>
-            </FadeIn>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 items-start">
-            {pricingTiers.map((tier, i) => (
-              <FadeIn key={tier.name} delay={i * 0.1}>
-                <div
-                  className={`pricing-card ${tier.featured ? 'pricing-card-featured' : ''}`}
-                >
-                  {/* Badge for featured */}
-                  {tier.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
-                        <Crown className="w-3 h-3" />
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-6">
-                    <h3 className="text-lg font-bold text-[#0F172A] dark:text-[#FAFAFA] mb-1">{tier.name}</h3>
-                    <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] mb-4">{tier.desc}</p>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-extrabold text-[#0F172A] dark:text-[#FAFAFA]">
-                        {tier.price}
-                      </span>
-                      {tier.period !== 'forever' && tier.period !== 'tailored pricing' && (
-                        <span className="text-sm text-[#71717A] dark:text-[#A1A1AA]">/{tier.period}</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-[#A1A1AA] dark:text-[#71717A] mt-1">
-                      {tier.period === 'forever' ? 'Free forever' : tier.period === 'tailored pricing' ? 'Tailored to your needs' : `Billed ${tier.period}`}
-                    </p>
-                  </div>
-
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" strokeWidth={3} />
-                        <span className="text-sm text-[#475569] dark:text-[#A1A1AA]">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href="/signup"
-                    className={`w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold transition-all ${
-                      tier.featured
-                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5'
-                        : 'bg-white dark:bg-[#0F0F12] text-[#0F172A] dark:text-[#FAFAFA] border border-gray-200 dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-md hover:-translate-y-0.5'
-                    }`}
-                  >
-                    {tier.cta}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════
-          FINAL CTA
-          ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 emerald-section relative overflow-hidden">
-        {/* Animated background dots */}
-        <div className="absolute inset-0 pointer-events-none">
-          <svg className="w-full h-full" viewBox="0 0 800 400" fill="none" preserveAspectRatio="xMidYMid slice">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <circle
-                key={i}
-                cx={100 + (i * 73) % 700}
-                cy={50 + (i * 47) % 350}
-                r={2 + (i % 3)}
-                fill="white"
-                opacity={0.08 + 0.04 * Math.sin(i)}
-              >
-                <animate
-                  attributeName="opacity"
-                  values={`${0.06 + 0.03 * Math.sin(i)};${0.12 + 0.04 * Math.sin(i)};${0.06 + 0.03 * Math.sin(i)}`}
-                  dur={`${3 + (i % 4)}s`}
-                  repeatCount="indefinite"
-                />
-                <animate
-                  attributeName="cy"
-                  values={`${50 + (i * 47) % 350};${55 + (i * 47) % 350};${50 + (i * 47) % 350}`}
-                  dur={`${5 + (i % 3)}s`}
-                  repeatCount="indefinite"
-                />
-              </circle>
-            ))}
-          </svg>
-        </div>
-
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <FadeIn>
-            <p className="text-xs font-bold tracking-widest uppercase text-white/60 mb-6">
-              Ready to start?
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.06}>
-            <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-              Give your team the memory it deserves.
+            <h2
+              className="text-3xl md:text-4xl font-bold"
+              style={{ fontFamily: playfair.style.fontFamily, color: COLORS.cream }}
+            >
+              L&apos;impact en detail
             </h2>
-          </FadeIn>
-          <FadeIn delay={0.12}>
-            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-xl mx-auto">
-              Stop losing knowledge. Start building a shared memory that grows with your team. Free to start, no credit card required.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.18}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 text-[15px] font-semibold bg-white text-emerald-700 rounded-xl shadow-lg hover:bg-gray-50 transition-colors"
-              >
-                Get Started Free
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 text-[15px] font-semibold bg-white/10 text-white border border-white/20 rounded-xl hover:bg-white/20 transition-colors"
-              >
-                Learn More
-              </a>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
+          </motion.div>
 
-      <Footer />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+            {IMPACT_TIERS.map((tier, index) => (
+              <ImpactCard
+                key={tier.id}
+                tier={tier}
+                index={index}
+                isActive={activeTier === tier.id}
+                onClick={() => setActiveTier(activeTier === tier.id ? null : tier.id)}
+              />
+            ))}
+          </div>
+        </section>
+
+        <GoldDivider />
+
+        {/* ═══ KEY NUMBERS ═══ */}
+        <section className="max-w-5xl mx-auto px-6 md:px-12 py-12 md:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: 60, suffix: '', label: 'Filles hebergees', color: COLORS.gold },
+              { value: 12, suffix: '-20', label: 'Ans', color: COLORS.hopeEmerald },
+              { value: 1, suffix: '', label: 'Pensionnat', color: COLORS.hopeViolet },
+              { value: 1, suffix: '', label: 'Objectif commun', color: COLORS.hopeRose },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div
+                  className="text-4xl md:text-5xl font-bold mb-2"
+                  style={{ color: stat.color, fontFamily: playfair.style.fontFamily }}
+                >
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                </div>
+                <div
+                  className="text-xs tracking-[0.2em] uppercase"
+                  style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }}
+                >
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        <GoldDivider />
+
+        {/* ═══ ABOUT / CONTEXT ═══ */}
+        <section className="max-w-4xl mx-auto px-6 md:px-12 py-12 md:py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center"
+          >
+            <div
+              className="text-xs tracking-[0.25em] uppercase mb-6"
+              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+            >
+              A propos
+            </div>
+            <h2
+              className="text-2xl md:text-3xl font-bold mb-8"
+              style={{ fontFamily: playfair.style.fontFamily, color: COLORS.cream }}
+            >
+              Couleur de l&apos;Espoir
+            </h2>
+            <p
+              className="text-base leading-[1.9] max-w-2xl mx-auto"
+              style={{ color: COLORS.textSecondary, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.02em' }}
+            >
+              Le 1er juillet 2025, la Fondation TGCC organise a Casablanca une vente aux encheres caritative au profit de la construction d&apos;un pensionnat pour jeunes filles. Des artistes engagees offrent leurs oeuvres pour que chaque enchere devienne une pierre de cet edifice. Un lieu d&apos;accueil, d&apos;apprentissage et d&apos;emancipation pour celles qui n&apos;ont pas acces a l&apos;education qu&apos;elles meritent.
+            </p>
+          </motion.div>
+        </section>
+      </main>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer
+        className="relative z-10 mt-auto"
+        style={{ borderTop: `1px solid ${COLORS.border}` }}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 28 28">
+              <polygon points="14,1 27,8 27,20 14,27 1,20 1,8" fill="none" stroke={COLORS.gold} strokeWidth="0.8" opacity="0.4" />
+            </svg>
+            <span
+              className="text-xs tracking-[0.2em]"
+              style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+            >
+              Fondation TGCC — Couleur de l&apos;Espoir
+            </span>
+          </div>
+          <span
+            className="text-xs tracking-[0.15em]"
+            style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+          >
+            fondationtgcc.com
+          </span>
+        </div>
+      </footer>
     </div>
   )
 }

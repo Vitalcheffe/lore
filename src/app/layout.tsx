@@ -18,25 +18,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LORE — Your Team's Memory, Alive",
-  description: "Lore gives your team a shared memory that's structured, always consistent, and available everywhere. Powered by Aurora DSQL's multi-region architecture.",
-  keywords: ["Lore", "team memory", "knowledge management", "Aurora DSQL", "AWS", "knowledge graph", "AI", "multi-region"],
-  authors: [{ name: "Lore Team" }],
-  manifest: "/manifest.json",
+  title: "Couleur de l'Espoir — Fondation TGCC",
+  description: "Vente aux enchères caritative pour la construction d'un pensionnat pour jeunes filles. 1er juillet 2025, Casablanca.",
+  keywords: ["Fondation TGCC", "Couleur de l'Espoir", "charité", "enchères", "pensionnat", "Casablanca", "Maroc"],
+  authors: [{ name: "Fondation TGCC" }],
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
   },
   openGraph: {
-    title: "LORE — Your Team's Memory, Alive",
-    description: "Inconsistent memory is misinformation. Lore gives your team a memory that's always consistent, everywhere.",
+    title: "Couleur de l'Espoir — Fondation TGCC",
+    description: "Vente aux enchères caritative pour la construction d'un pensionnat pour jeunes filles.",
     type: "website",
-    images: [{ url: "/og-image.png", width: 1344, height: 768 }],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#059669",
+  themeColor: "#0D0A07",
 };
 
 export default function RootLayout({
@@ -45,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
         style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif" }}
