@@ -4,16 +4,14 @@
 #  ║   THAT MAKES PEOPLE SAY "THIS IS THE FUTURE"               ║
 #  ╚══════════════════════════════════════════════════════════════╝
 #
-#  Version 3.0 — v2 had no audio enforcement and weak MP4 output.
-#               v3 fixes both. No more silent HTML5 "videos".
-#
+#  Version 2.0 — Rewritten from scratch after honest self-critique.
 #  This is universal. Works for ANY product. ANY industry. ANY agent.
 #
+#  OUTPUT: MP4, 1920x1080, 60fps, minimum 3 minutes, target 4:18.
+#
 #  WHAT THIS ISN'T: A slide deck. A screen recording. A demo.
-#                    An HTML animation. A silent video.
 #  WHAT THIS IS: A film. Apple WWDC quality. Tesla launch energy.
 #                 The kind of video that makes jaws drop.
-#                 WITH SOUND. IN MP4 FORMAT.
 #
 #  ═══════════════════════════════════════════════════════════════
 #  HOW TO USE THIS DOCUMENT
@@ -34,84 +32,6 @@
 #    - Stripe Sessions 2024 opening
 #    - Notion 2023 redo video
 #    - Linear's homepage animation
-#
-#══════════════════════════════════════════════════════════════════
-#  SECTION 0: OUTPUT FORMAT — READ THIS FIRST OR YOU WILL FAIL
-#══════════════════════════════════════════════════════════════════
-#
-#  ┌─────────────────────────────────────────────────────────────────┐
-#  │              THE FINAL DELIVERABLE IS AN MP4 FILE              │
-#  │                    THIS IS [P0] — NON-NEGOTIABLE               │
-#  └─────────────────────────────────────────────────────────────────┘
-#
-#  FORMAT REQUIREMENTS [P0 — ALL of these are mandatory]:
-#    - Container:  MP4 (.mp4)
-#    - Video codec: H.264
-#    - Resolution:  1920×1080 (Full HD)
-#    - Frame rate:  60fps (30fps is acceptable but not preferred)
-#    - Duration:    minimum 3 minutes, target 4:18
-#    - Audio codec: AAC
-#    - Audio:       MUST HAVE A SOUNDTRACK (see Section 7)
-#    - File size:   expect 50-150MB for a 4-min video
-#
-#  ╔═══════════════════════════════════════════════════════════════╗
-#  ║  WHAT IS NOT ACCEPTABLE AS FINAL OUTPUT:                     ║
-#  ║                                                               ║
-#  ║  ❌ An HTML5 file (no matter how beautiful the animation)     ║
-#  ║  ❌ A URL to a web page with animations                       ║
-#  ║  ❌ Instructions to "open in browser and screen-record"       ║
-#  ║  ❌ A silent video (no audio track)                           ║
-#  ║  ❌ A GIF or WebM                                            ║
-#  ║  ❌ A directory of PNG frames                                 ║
-#  ║                                                               ║
-#  ║  THE ONLY ACCEPTABLE OUTPUT IS: product-launch.mp4           ║
-#  ║  WITH VIDEO + AUDIO COMBINED IN A SINGLE FILE.               ║
-#  ╚═══════════════════════════════════════════════════════════════╝
-#
-#  TECHNICAL APPROACH — How to actually produce the MP4:
-#
-#  Step 1: Create the HTML5 animation (Canvas/CSS/GSAP/SVG).
-#          This is your RENDER SOURCE, not your deliverable.
-#
-#  Step 2: Capture the animation as video frames.
-#          RECOMMENDED: Use Playwright or Puppeteer to:
-#            a) Open the HTML file in a headless browser at 1920×1080
-#            b) Use page.video.startRecording() or equivalent
-#            c) Record the full animation duration at 60fps
-#          Example (Playwright):
-#            const browser = await chromium.launch();
-#            const context = await browser.newContext({
-#              recordVideo: { dir: 'output/', size: { width: 1920, height: 1080 } }
-#            });
-#            const page = await context.newPage();
-#            await page.goto('file:///path/to/animation.html');
-#            await page.waitForTimeout(totalDurationMs + 2000); // wait for animation to finish
-#            await context.close(); // saves the video
-#            await browser.close();
-#
-#  Step 3: Generate or obtain the audio track.
-#          See Section 7 (Sound Design) for full details.
-#          Options:
-#            a) Use Web Audio API in the HTML itself (Playwright captures it)
-#            b) Generate audio separately and merge with FFmpeg
-#            c) Use TTS/music generation APIs for narration + music
-#
-#  Step 4: Combine video + audio using FFmpeg.
-#          ffmpeg -i video.webm -i audio.mp3 -c:v libx264 -preset slow \
-#                 -crf 18 -c:a aac -b:a 192k -pix_fmt yuv420p \
-#                 -movflags +faststart product-launch.mp4
-#
-#  FFmpeg quality flags explained:
-#    -preset slow   → better compression (worth the wait)
-#    -crf 18        → visually lossless quality (lower = better, 0-51)
-#    -b:a 192k      → high quality audio
-#    -pix_fmt yuv420p → maximum compatibility
-#    -movflags +faststart → streaming-friendly MP4
-#
-#  IF YOU CANNOT PRODUCE AN MP4: Produce the best video you can
-#  AND clearly state what additional step is needed to get to MP4.
-#  But your PRIMARY goal is to produce the MP4 file directly.
-#  An HTML file alone is a FAILED deliverable.
 #
 #══════════════════════════════════════════════════════════════════
 #  SECTION 1: THE PSYCHOLOGY — WHY SOME VIDEOS HIT AND OTHERS DON'T
@@ -527,21 +447,6 @@ Here are the 5 laws that govern this transformation:
 #     The video just... stops. Or fades out with no punch.
 #     FIX: The last 10 seconds must be the MOST emotionally
 #          charged moment. End on a HIGH, not a fade.
-#
-# 11. NO AUDIO / SILENT VIDEO
-#     The MP4 has no audio track at all. Just visuals.
-#     FIX: Sound is 50% of the experience. Every visual event needs sound.
-#          Background music is MANDATORY. SFX for key moments.
-#          A silent video is a SCREENSAVER, not a film.
-#          See Section 7 for the full sound design spec.
-#
-# 12. DELIVERING HTML INSTEAD OF MP4
-#     The "video" is actually an HTML file with animations.
-#     The user is told to "open in browser and screen-record."
-#     FIX: HTML is the RENDER SOURCE, not the deliverable.
-#          Use Playwright/Puppeteer to capture video, then FFmpeg
-#          to encode as MP4 with audio. See Section 0 for the pipeline.
-#          An HTML file alone is a FAILED deliverable.
 
 
 #══════════════════════════════════════════════════════════════════
@@ -1129,59 +1034,10 @@ Here are the 5 laws that govern this transformation:
 
 
 #══════════════════════════════════════════════════════════════════
-#  SECTION 7: SOUND DESIGN — [P0] MANDATORY, NOT OPTIONAL
+#  SECTION 7: SOUND DESIGN (if audio is supported)
 #══════════════════════════════════════════════════════════════════
 #
-#  ┌─────────────────────────────────────────────────────────────────┐
-#  │  A VIDEO WITHOUT SOUND IS NOT A FILM. IT IS A SCREENSAVER.    │
-#  │  SOUND IS [P0]. NO EXCEPTIONS. NO "IF AUDIO IS SUPPORTED."    │
-#  │  EVERY MP4 MUST CONTAIN AN AUDIO TRACK.                        │
-#  └─────────────────────────────────────────────────────────────────┘
-#
-#  WHY THIS MATTERS:
-#    - Apple never ships a silent keynote. NEVER.
-#    - Sound creates 50% of the emotional impact.
-#    - A "beautiful silent video" is an oxymoron at this quality level.
-#    - The reveal without a bass swell is just a logo appearing.
-#    - The shatter without glass sound is just shapes moving.
-#    - WITHOUT SOUND, EVERYTHING IN SECTIONS 1-5 LOSES 50% OF ITS POWER.
-#
-#  SOUND IS NOT A POST-PRODUCTION AFTERTHOUGHT.
-#  SOUND IS A FIRST-CLASS CITIZEN OF THE FILM.
-#  PLAN FOR IT FROM THE START.
-#
-#  ─── HOW TO ADD AUDIO — TECHNICAL APPROACHES ─────────────────
-#
-#  APPROACH A: Web Audio API in the HTML (RECOMMENDED for Playwright)
-#    - Build the audio directly into the HTML animation using
-#      AudioContext, OscillatorNode, GainNode, etc.
-#    - Synchronize sound events with GSAP timeline callbacks.
-#    - Playwright's recordVideo captures the audio alongside video.
-#    - This is the cleanest approach — one file, sync is automatic.
-#
-#  APPROACH B: Generate audio file separately, merge with FFmpeg
-#    - Create a music/soundtrack file (MP3/WAV) using:
-#      * TTS API for narration
-#      * Music generation API for background score
-#      * Pre-recorded sound effects library
-#    - Merge with video using FFmpeg:
-#      ffmpeg -i video.webm -i soundtrack.mp3 \
-#             -c:v libx264 -c:a aac -shortest \
-#             product-launch.mp4
-#
-#  APPROACH C: Combine both
-#    - Web Audio API for sound effects (synced to animation)
-#    - Background music as separate file, mixed in with FFmpeg
-#    - ffmpeg -i video_with_sfx.webm -i music.mp3 \
-#             -filter_complex "[1:a]volume=0.3[music];[0:a][music]amix=inputs=2:duration=longest[a]" \
-#             -map 0:v -map "[a]" -c:v libx264 -c:a aac \
-#             product-launch.mp4
-#
-#  ─── SOUND EFFECTS [P0] ──────────────────────────────────────
-#
-#  EVERY major visual event MUST have a corresponding sound.
-#  This is the audio-visual contract. Break it = break immersion.
-#
+#  SOUND EFFECTS:
 #  ┌────────────────────────┬───────────────────────────────────┐
 #  │ Moment                 │ Sound                             │
 #  ├────────────────────────┼───────────────────────────────────┤
@@ -1190,69 +1046,29 @@ Here are the 5 laws that govern this transformation:
 #  │ Network shattering     │ Glass break, reversed, lowpassed  │
 #  │ Stat counters          │ Subtle digital tick per increment │
 #  │ Product logo reveal    │ Deep resonant bass swell          │
-#  │ Product name reveal    │ Subtle impact + reverb            │
 #  │ Text typing            │ Soft key clicks, very muted       │
 #  │ AI streaming           │ Gentle electronic hum             │
-#  │ Cursor hover           │ Micro "whoosh" (barely audible)   │
-#  │ Card pop-in            │ Soft "thud" with spring tail      │
-#  │ Particle bursts        │ Gentle sparkle/shimmer            │
-#  │ Transitions (zoom)     │ Subtle rushing air / whoosh       │
 #  │ Comparison checkmarks  │ Satisfying "ding"                 │
-#  │ Stats shattering       │ Glass crack + deep impact         │
 #  │ Closing CTA            │ Uplifting chord, major key        │
-#  │ Final dot fade         │ Soft reverb tail, fading to silence│
 #  └────────────────────────┴───────────────────────────────────┘
 #
-#  Sound effect principles:
-#    - SOUNDS ARE FELT, NOT HEARD. If any SFX is jarring, it's 3x too loud.
-#    - Every SFX should be at 30-50% of what you think it should be.
-#    - Layer: background music (loudest) → SFX (medium) → silence (rest).
-#    - NEVER use stock "corporate" sounds. Generate or curate carefully.
-#
-#  ─── BACKGROUND MUSIC [P0] ───────────────────────────────────
-#
-#  The music IS the emotional arc. It's not decoration.
-#  The energy waveform in Section 1 applies to MUSIC too.
-#
+#  BACKGROUND MUSIC:
 #  Ambient electronic. Arc follows the energy waveform:
 #    - Scenes 1-3: Minimal, dark, tension-building. Low drones.
-#                   Sparse piano. Reverb-heavy. BREATHING.
-#    - Scene 4:    Bass swell → hopeful emergence. First melody.
-#                   THE TRANSFORMATION MOMENT in audio form.
+#    - Scene 4: Bass swell → hopeful emergence. First melody.
 #    - Scenes 5-9: Warm, rhythmic, optimistic. Full arrangement.
-#                   Percussion enters. Energy sustained.
-#    - Scene 10:   Drops to minimal. Comparison = serious moment.
-#                   Music pulls back. Let the data speak.
-#    - Scenes 11-14: Building again. Energy rising. Layers added.
-#    - Scene 15:   FULL POWER. Emotional peak. All instruments.
-#                   Then 2s of silence. Then the final note.
-#                   The silence before the end is CRUCIAL.
+#    - Scene 10: Drops to minimal. Comparison = serious moment.
+#    - Scenes 11-14: Building again. Energy rising.
+#    - Scene 15: FULL POWER. Emotional peak. Then silence. Then end.
 #
 #  Reference artists: Jon Hopkins, Olafur Arnalds, Nils Frahm,
 #  Max Richter, Hania Rani.
-#
-#  Music mixing rules:
-#    - Music should be at -20dB to -15dB during narration/text
-#    - Music can swell to -10dB during pure visual moments
-#    - Music DUCKS when SFX play (sidechain compression)
-#    - The mix should feel like ONE unified sound, not layers
-#
-#  ─── OPTIONAL: VOICEOVER / NARRATION [P2] ────────────────────
-#
-#  If you choose to add voiceover:
-#    - Use TTS with a calm, confident, slightly warm voice
-#    - Speak ONLY during Scene 4 (reveal) and Scene 15 (finale)
-#    - 3-5 words maximum. e.g. "This changes everything."
-#    - Volume: below music. The voice SUPPORTS the visuals, not vice versa.
-#    - NEVER narrate the entire video. This isn't a tutorial.
 
 
 #══════════════════════════════════════════════════════════════════
 #  SECTION 8: THE ABSOLUTE DON'TS
 #══════════════════════════════════════════════════════════════════
 #
-#  [P0] NEVER deliver HTML instead of MP4. The output is an MP4 FILE.
-#  [P0] NEVER deliver a silent video. Audio track is MANDATORY.
 #  [P0] NEVER use hard cuts between scenes. ALWAYS smooth transitions.
 #  [P0] NEVER have a static frame with zero motion for >0.5s.
 #  [P0] NEVER use linear easing on UI elements. EVER.
@@ -1285,12 +1101,7 @@ Here are the 5 laws that govern this transformation:
 #  Before delivering, verify EVERY item. No exceptions.
 #
 #  [P0] MUST-HAVE (missing = failure):
-#  □ Output is an MP4 file (not HTML, not WebM, not GIF).
-#  □ MP4 contains both video AND audio tracks.
-#  □ Audio track has background music (not silent).
-#  □ Audio track has sound effects for major visual events.
 #  □ Video is minimum 3 minutes (180s). Target: 4:18+.
-#  □ Resolution is 1920×1080 (Full HD).
 #  □ Every frame has at least ONE ambient animation.
 #  □ All scene transitions are smooth (no hard cuts).
 #  □ Primary accent color is consistent (never random colors).
@@ -1310,7 +1121,7 @@ Here are the 5 laws that govern this transformation:
 #  □ Comparison scene makes product look undeniable.
 #  □ Scene 4 (reveal) is the emotional FIRST peak.
 #  □ Scene 15 (finale) is the emotional HIGHEST peak.
-#  □ Sound design matches visual energy (music arc = visual arc).
+#  □ Sound design matches visual energy.
 #  □ Cursor movements are bezier curves, never linear.
 #  □ At least 2 different transition types used.
 #
