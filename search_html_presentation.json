@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=PrQeeUt49f4",
+    "name": "Mastering Scroll Animations with GSAP ScrollTrigger - YouTube",
+    "snippet": "https://bit.ly/3JZJcWI Design & code like me. Use \"UI2023\" for 23% Off! https://designcourse.com/af My upcoming \"Advanced Frontends\" ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://university.webflow.com/videos/create-a-gsap-powered-timeline-animation",
+    "name": "Create a GSAP-powered timeline animation - Webflow University",
+    "snippet": "We're building a GSAP-powered animation sequence — and here's what it looks like in slo-mo. When the page loads, the heading fades and slides in, followed by ...",
+    "host_name": "university.webflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/37533-video-interaction-on-scroll-clip-path-animation",
+    "name": "Video interaction on scroll + clip path animation - GSAP",
+    "snippet": "I have created a codepen with the interaction on the video in the scroll and a simple animation with clip path also with scroll trigger.",
+    "host_name": "gsap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=-qQhTxTtpeQ",
+    "name": "Scroll Trigger Tutorial - 6 - Timeline - YouTube",
+    "snippet": "Learn how to create scroll-based animations with GreenSock's ScrollTrigger plugin. This video is the sixth part of a series.",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://frontend.horse/articles/amazing-animation-techniques-with-gsap",
+    "name": "Amazing Animation Techniques with GSAP - Frontend Horse",
+    "snippet": "Pete Barr teaches us how he creates beautiful animations with SVG and GSAP. We pick up a few techniques like text splitting and infinite scroll.",
+    "host_name": "frontend.horse",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/webdev/comments/13rbr14/how_we_call_this_kind_of_animation_how_we_can",
+    "name": "How we call this kind of animation ? How we can recreate it - Reddit",
+    "snippet": "1.6K votes, 88 comments. That's some great visual work and coding. I would recreate the sequence with a Gsap timeline that gets triggered ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=m6PDUIF24v4",
+    "name": "Learn GSAP In 23 Minutes - YouTube",
+    "snippet": "Creating complex animation in CSS is difficult. Lining up timings is brittle and reversing an animation is nearly impossible to do properly.",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.bitsrc.io/practical-guide-to-getting-started-with-gsap-greensock-animation-platform-21ff9638ea70",
+    "name": "Getting Started with GSAP: A Practical Guide | by Joseph Olabisi",
+    "snippet": "ScrollTrigger allows us create scroll based animations with minimal code. You can check out all the GSAP plugins here. ScrollTrigger can perform ...",
+    "host_name": "blog.bitsrc.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/playlist?list=PLA8zdTzJJkaYmK6IZIufA93aFU9aY0a99",
+    "name": "GSAP Animation Tutorials - YouTube",
+    "snippet": "GSAP Animations Tutorials 01 · Creating a Parallax MouseMove Effect with JavaScript and GSAP ScrollTrigger | Image scrolling Effect · Scroll Animation and Using ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2025/09/03/7-must-know-gsap-animation-tips-for-creative-developers",
+    "name": "7 Must-Know GSAP Animation Tips for Creative Developers - Codrops",
+    "snippet": "Discover seven practical GSAP tips that will help you create smoother, smarter, and more creative web animations with less code.",
+    "host_name": "tympanus.net",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

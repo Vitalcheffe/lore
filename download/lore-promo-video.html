@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lore — Your Team's Memory, Alive.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --emerald-700:#047857;--emerald-600:#059669;--emerald-500:#10B981;
+  --emerald-400:#34D399;--emerald-300:#6EE7B7;--emerald-200:#A7F3D0;
+  --dark-bg:#09090B;--surface:#0F0F12;--surface-2:#18181B;--surface-3:#27272A;
+  --text-primary:#FAFAFA;--text-secondary:#A1A1AA;--text-muted:#71717A;
+  --blue:#3B82F6;--violet:#8B5CF6;--orange:#F59E0B;--pink:#EC4899;
+  --ease-smooth:cubic-bezier(0.25,0.46,0.45,0.94);
+  --ease-out-expo:cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out:cubic-bezier(0.65,0,0.35,1);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--dark-bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text-primary);-webkit-font-smoothing:antialiased}
+
+#video-container{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--dark-bg)}
+#progress-bar{position:fixed;bottom:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-400),var(--emerald-300));z-index:1000;box-shadow:0 0 12px rgba(16,185,129,0.6);will-change:width}
+#time-display{position:fixed;top:20px;right:24px;font-size:12px;color:rgba(255,255,255,0.3);font-weight:500;z-index:1000;font-variant-numeric:tabular-nums}
+
+.scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;overflow:hidden;will-change:opacity,transform}
+
+/* Typography */
+.headline-xl{font-size:clamp(48px,7vw,96px);font-weight:800;line-height:1.05;letter-spacing:-0.03em}
+.headline-lg{font-size:clamp(36px,5vw,72px);font-weight:700;line-height:1.1;letter-spacing:-0.02em}
+.headline-md{font-size:clamp(28px,4vw,56px);font-weight:700;line-height:1.15;letter-spacing:-0.02em}
+.headline-sm{font-size:clamp(22px,3vw,40px);font-weight:700;line-height:1.2;letter-spacing:-0.01em}
+.subhead-lg{font-size:clamp(20px,2.5vw,32px);font-weight:400;line-height:1.4;color:var(--text-secondary)}
+.subhead-md{font-size:clamp(16px,1.8vw,22px);font-weight:400;line-height:1.5;color:var(--text-secondary)}
+.body-text{font-size:clamp(15px,1.6vw,20px);font-weight:400;line-height:1.6}
+
+.stat-number{font-size:clamp(56px,8vw,110px);font-weight:900;line-height:1;letter-spacing:-0.04em;background:linear-gradient(135deg,var(--emerald-400),var(--emerald-500));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.emerald-text{color:var(--emerald-400)}
+.emerald-glow{text-shadow:0 0 40px rgba(16,185,129,0.3)}
+
+/* Glass */
+.glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.06);border-radius:16px}
+.glass-dark{background:rgba(0,0,0,0.5);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,0.05);border-radius:20px}
+.glass-emerald{background:rgba(16,185,129,0.06);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(16,185,129,0.12);border-radius:16px}
+
+/* Dot grid */
+.dot-grid{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(16,185,129,0.06) 1px,transparent 1px);background-size:40px 40px}
+
+/* Graph nodes */
+.graph-node{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);will-change:transform,opacity}
+.graph-edge{position:absolute;height:2px;transform-origin:left center;will-change:opacity}
+.node-concept{background:var(--emerald-600);color:white}
+.node-person{background:var(--blue);color:white}
+.node-project{background:var(--violet);color:white}
+.node-resource{background:var(--orange);color:white}
+.node-idea{background:var(--pink);color:white}
+
+/* Scene-specific styles */
+.manifesto-word{display:inline-block;opacity:0;transform:translateY(20px);margin:0 0.15em}
+.network-dot{position:absolute;width:6px;height:6px;background:var(--emerald-500);border-radius:50%;box-shadow:0 0 10px rgba(16,185,129,0.5)}
+.network-line{position:absolute;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.3),transparent);transform-origin:left center}
+
+.fragment{position:absolute;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.fragment-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+.stat-block{text-align:center;opacity:0;transform:translateY(40px)}
+.stat-label{font-size:clamp(15px,1.6vw,20px);color:var(--text-secondary);margin-top:8px;font-weight:400}
+
+/* Chat */
+.chat-message{padding:16px 20px;border-radius:16px;margin-bottom:12px;max-width:80%;font-size:15px;line-height:1.5}
+.msg-user{background:var(--emerald-600);margin-left:auto;border-bottom-right-radius:4px}
+.msg-ai{background:var(--surface-2);border:1px solid rgba(255,255,255,0.06);border-bottom-left-radius:4px}
+.source-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--emerald-400);margin-right:6px;margin-top:8px}
+.typing-cursor{display:inline-block;width:2px;height:18px;background:var(--emerald-400);margin-left:2px;animation:blink 1s infinite;vertical-align:text-bottom}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+/* Notes */
+.notes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:700px;width:90vw}
+.note-card{padding:20px;border-radius:14px;border:1px solid rgba(255,255,255,0.06)}
+.note-type{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+.note-title{font-size:14px;font-weight:600;margin-bottom:6px}
+.note-preview{font-size:12px;color:var(--text-muted);line-height:1.4}
+.note-tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:500;margin-top:10px;margin-right:4px}
+.type-note{background:rgba(16,185,129,0.08)}.type-note .note-type{color:var(--emerald-400)}.type-note .note-tag{background:rgba(16,185,129,0.15);color:var(--emerald-400)}
+.type-bookmark{background:rgba(59,130,246,0.08)}.type-bookmark .note-type{color:var(--blue)}.type-bookmark .note-tag{background:rgba(59,130,246,0.15);color:var(--blue)}
+.type-insight{background:rgba(139,92,246,0.08)}.type-insight .note-type{color:var(--violet)}.type-insight .note-tag{background:rgba(139,92,246,0.15);color:var(--violet)}
+.type-snippet{background:rgba(245,158,11,0.08)}.type-snippet .note-type{color:var(--orange)}.type-snippet .note-tag{background:rgba(245,158,11,0.15);color:var(--orange)}
+.type-meeting{background:rgba(236,72,153,0.08)}.type-meeting .note-type{color:var(--pink)}.type-meeting .note-tag{background:rgba(236,72,153,0.15);color:var(--pink)}
+.type-idea{background:rgba(16,185,129,0.06)}.type-idea .note-type{color:var(--emerald-300)}.type-idea .note-tag{background:rgba(16,185,129,0.12);color:var(--emerald-300)}
+
+/* Health */
+.gauge-container{position:relative;width:200px;height:200px}
+.gauge-ring{position:absolute;inset:0;border-radius:50%;border:8px solid var(--surface-3)}
+.gauge-score{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:800}
+.health-stat-bar{width:200px;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+.health-stat-fill{height:100%;border-radius:3px;width:0%}
+
+/* Comparison */
+.comparison{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);width:min(800px,92vw)}
+.comp-header{padding:16px 20px;font-weight:700;font-size:15px;background:var(--surface-2);border-bottom:1px solid rgba(255,255,255,0.06)}
+.comp-cell{padding:14px 20px;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(15,15,18,0.5)}
+.check{color:var(--emerald-400)}.cross{color:var(--text-muted)}.partial{color:var(--orange)}
+
+/* Pricing */
+.pricing-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:800px;width:92vw}
+.price-card{padding:32px 28px;border-radius:20px;border:1px solid rgba(255,255,255,0.06);position:relative;background:var(--surface)}
+.price-card.featured{border-color:var(--emerald-600);box-shadow:0 0 40px rgba(5,150,105,0.15)}
+.popular-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:4px 16px;background:linear-gradient(135deg,var(--emerald-500),var(--emerald-600));border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.price-tier{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px}
+.price-amount{font-size:42px;font-weight:800;margin-bottom:4px}
+.price-period{font-size:14px;color:var(--text-muted);margin-bottom:24px}
+.price-features{list-style:none;margin-bottom:28px}
+.price-features li{font-size:14px;color:var(--text-secondary);padding:6px 0;display:flex;align-items:center;gap:8px}
+.price-features li::before{content:'✓';color:var(--emerald-400);font-weight:700}
+.cta-button{display:block;width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;text-align:center;border:none;cursor:pointer}
+.cta-primary{background:linear-gradient(135deg,var(--emerald-500),var(--emerald-600));color:white}
+.cta-secondary{background:var(--surface-2);color:var(--text-primary);border:1px solid rgba(255,255,255,0.08)}
+
+/* Testimonials */
+.testimonial{padding:28px;border-radius:16px}
+.testimonial-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.testimonial-name{font-weight:600;font-size:15px}
+.testimonial-role{font-size:13px;color:var(--text-muted)}
+.testimonial-quote{font-size:16px;line-height:1.6;color:var(--text-secondary);font-style:italic}
+.stars{color:var(--orange);font-size:16px;margin-bottom:12px}
+.logo-placeholder{font-size:14px;font-weight:700;color:var(--text-muted);letter-spacing:0.1em;opacity:0.6}
+
+/* Closing */
+.cta-final{display:inline-flex;align-items:center;gap:8px;padding:16px 36px;background:linear-gradient(135deg,var(--emerald-500),var(--emerald-600));border-radius:14px;font-size:18px;font-weight:700;color:white;text-decoration:none;box-shadow:0 8px 30px rgba(5,150,105,0.3)}
+
+/* Ambient */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(16,185,129,0.3)}50%{box-shadow:0 0 40px rgba(16,185,129,0.6)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes particle-drift{0%{transform:translateY(0) translateX(0);opacity:0}20%{opacity:0.6}80%{opacity:0.4}100%{transform:translateY(-100vh) translateX(30px);opacity:0}}
+
+.ambient-particle{position:absolute;width:2px;height:2px;background:var(--emerald-400);border-radius:50%;opacity:0;animation:particle-drift linear infinite}
+
+@media(max-width:768px){
+  .pricing-cards{grid-template-columns:1fr;max-width:400px}
+  .notes-grid{grid-template-columns:repeat(2,1fr)}
+  .comparison{font-size:12px;grid-template-columns:1.5fr 1fr 1fr 1fr}
+}
+@media(max-width:480px){
+  .notes-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="video-container">
+  <div id="progress-bar"></div>
+  <div id="time-display"></div>
+
+  <!-- Scene 1: Cold Open -->
+  <div class="scene" id="scene1">
+    <div id="s1-network" style="position:absolute;inset:0;z-index:1;"></div>
+    <div style="text-align:center;position:relative;z-index:10;margin-top:15vh;">
+      <div class="headline-lg" id="s1-manifesto" style="margin-bottom:28px;">
+        <span class="manifesto-word">Inconsistent</span>
+        <span class="manifesto-word">memory</span>
+        <span class="manifesto-word">is</span>
+        <span class="manifesto-word">misinformation.</span>
+      </div>
+      <div class="subhead-lg emerald-text" id="s1-tagline" style="opacity:0;">
+        Lore — Your Team's Memory, Alive.
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 2: The Problem -->
+  <div class="scene" id="scene2">
+    <div id="s2-fragments" style="position:absolute;inset:0;">
+      <div class="fragment glass" style="top:18%;left:8%;"><div class="fragment-icon" style="background:rgba(59,130,246,0.2);color:#3B82F6;">N</div>Notes</div>
+      <div class="fragment glass" style="top:12%;left:52%;"><div class="fragment-icon" style="background:rgba(139,92,246,0.2);color:#8B5CF6;">D</div>Docs</div>
+      <div class="fragment glass" style="top:42%;left:6%;"><div class="fragment-icon" style="background:rgba(16,185,129,0.2);color:#10B981;">C</div>Chats</div>
+      <div class="fragment glass" style="top:48%;left:62%;"><div class="fragment-icon" style="background:rgba(245,158,11,0.2);color:#F59E0B;">M</div>Meetings</div>
+      <div class="fragment glass" style="top:68%;left:28%;"><div class="fragment-icon" style="background:rgba(236,72,153,0.2);color:#EC4899;">E</div>Emails</div>
+      <div class="fragment glass" style="top:28%;left:76%;"><div class="fragment-icon" style="background:rgba(16,185,129,0.2);color:#10B981;">W</div>Wiki</div>
+      <div class="fragment glass" style="top:72%;left:68%;"><div class="fragment-icon" style="background:rgba(59,130,246,0.2);color:#3B82F6;">S</div>Slack</div>
+      <div class="fragment glass" style="top:58%;left:42%;"><div class="fragment-icon" style="background:rgba(139,92,246,0.2);color:#8B5CF6;">T</div>Tasks</div>
+    </div>
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s2-headline" style="opacity:0;">Your team's knowledge is scattered across <span class="emerald-text">12+ tools</span></div>
+    </div>
+  </div>
+
+  <!-- Scene 3: The Cost -->
+  <div class="scene" id="scene3">
+    <div id="s3-particles" style="position:absolute;inset:0;overflow:hidden;"></div>
+    <div style="display:flex;gap:clamp(30px,5vw,80px);align-items:center;flex-wrap:wrap;justify-content:center;position:relative;z-index:10;">
+      <div class="stat-block">
+        <div class="stat-number" id="s3-stat1">0</div>
+        <div style="font-size:18px;color:var(--text-secondary);margin-top:4px;">minutes</div>
+        <div class="stat-label">wasted daily searching for information</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number" id="s3-stat2">0</div>
+        <div style="font-size:18px;color:var(--text-secondary);margin-top:4px;">%</div>
+        <div class="stat-label">of knowledge lost when people leave</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number" id="s3-stat3">$0</div>
+        <div class="stat-label">annual cost of knowledge fragmentation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 4: Introducing Lore -->
+  <div class="scene" id="scene4">
+    <div class="dot-grid" id="s4-grid" style="opacity:0;"></div>
+    <div class="light-sweep" id="s4-sweep" style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.12),transparent);pointer-events:none;z-index:5;"></div>
+    <div style="text-align:center;position:relative;z-index:10;">
+      <div style="margin:0 auto 32px;width:120px;height:120px;" id="s4-logo">
+        <svg viewBox="0 0 120 120" fill="none" style="width:100%;height:100%;">
+          <circle cx="60" cy="60" r="56" fill="#059669" opacity="0" id="s4-logo-circle"/>
+          <path id="s4-logo-path1" d="M45 35 C45 35, 35 45, 38 60 C40 70, 45 75, 50 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-dasharray="100" stroke-dashoffset="100"/>
+          <path id="s4-logo-path2" d="M75 35 C75 35, 85 45, 82 60 C80 70, 75 75, 70 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-dasharray="100" stroke-dashoffset="100"/>
+          <path id="s4-logo-path3" d="M50 78 C53 82, 57 84, 60 84 C63 84, 67 82, 70 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" stroke-dasharray="60" stroke-dashoffset="60"/>
+          <circle cx="42" cy="48" r="3" fill="white" opacity="0" id="s4-dot1"/>
+          <circle cx="55" cy="42" r="3" fill="white" opacity="0" id="s4-dot2"/>
+          <circle cx="68" cy="42" r="3" fill="white" opacity="0" id="s4-dot3"/>
+          <circle cx="78" cy="48" r="3" fill="white" opacity="0" id="s4-dot4"/>
+          <line x1="42" y1="48" x2="55" y2="42" stroke="white" stroke-width="1" opacity="0" id="s4-line1"/>
+          <line x1="55" y1="42" x2="68" y2="42" stroke="white" stroke-width="1" opacity="0" id="s4-line2"/>
+          <line x1="68" y1="42" x2="78" y2="48" stroke="white" stroke-width="1" opacity="0" id="s4-line3"/>
+        </svg>
+      </div>
+      <div class="headline-xl" id="s4-text" style="opacity:0;letter-spacing:-0.05em;">LORE</div>
+      <div class="subhead-lg" id="s4-subtitle" style="opacity:0;margin-top:16px;">Your Team's Memory, Alive.</div>
+    </div>
+  </div>
+
+  <!-- Scene 5: Knowledge Graph -->
+  <div class="scene" id="scene5">
+    <div id="s5-graph" style="position:relative;width:80vw;height:55vh;max-width:900px;max-height:480px;"></div>
+    <div style="position:relative;z-index:10;text-align:center;margin-top:16px;">
+      <div class="headline-md" id="s5-headline" style="opacity:0;">Your knowledge, <span class="emerald-text">connected.</span></div>
+      <div class="subhead-md" id="s5-subtext" style="opacity:0;margin-top:10px;">See relationships you never knew existed.</div>
+    </div>
+  </div>
+
+  <!-- Scene 6: Morning Digest -->
+  <div class="scene" id="scene6">
+    <div id="s6-sunrise" style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,rgba(245,158,11,0.06),transparent);opacity:0;"></div>
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s6-headline" style="opacity:0;margin-bottom:28px;">Start every day with <span class="emerald-text">clarity.</span></div>
+      <div class="glass-dark" id="s6-card" style="width:min(480px,85vw);padding:28px;opacity:0;transform:translateY(50px);margin:0 auto;">
+        <div style="font-size:13px;font-weight:600;color:var(--emerald-400);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.06em;">Morning Digest — March 4</div>
+        <div id="s6-lines">
+          <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;margin-bottom:8px;overflow:hidden;"><div class="s6-fill" style="height:100%;background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));border-radius:5px;width:0%;"></div></div>
+          <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;margin-bottom:8px;overflow:hidden;"><div class="s6-fill" style="height:100%;background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));border-radius:5px;width:0%;"></div></div>
+          <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;width:70%;overflow:hidden;"><div class="s6-fill" style="height:100%;background:linear-gradient(90deg,var(--emerald-500),var(--emerald-400));border-radius:5px;width:0%;"></div></div>
+        </div>
+        <div id="s6-insights" style="margin-top:14px;">
+          <div class="s6-insight glass-emerald" style="padding:14px;border-radius:12px;opacity:0;transform:translateX(30px);margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:600;color:var(--emerald-400);margin-bottom:3px;">Key Insight</div>
+            <div style="font-size:13px;color:var(--text-secondary);">API redesign discussion reached consensus</div>
+          </div>
+          <div class="s6-insight" style="padding:14px;border-radius:12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.12);opacity:0;transform:translateX(30px);">
+            <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:3px;">Action Needed</div>
+            <div style="font-size:13px;color:var(--text-secondary);">Review Sarah's architecture proposal</div>
+          </div>
+        </div>
+      </div>
+      <div class="subhead-md" id="s6-subtext" style="opacity:0;margin-top:18px;">AI-powered morning digest, tailored to you.</div>
+    </div>
+  </div>
+
+  <!-- Scene 7: AI Chat -->
+  <div class="scene" id="scene7">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s7-headline" style="opacity:0;margin-bottom:28px;">Ask anything. <span class="emerald-text">Lore knows.</span></div>
+      <div id="s7-chat" style="width:min(560px,88vw);opacity:0;margin:0 auto;">
+        <div class="chat-message msg-user" id="s7-msg1" style="opacity:0;">
+          What's our current API rate limiting strategy?
+        </div>
+        <div class="chat-message msg-ai" id="s7-msg2" style="opacity:0;">
+          <span id="s7-ai-text"></span><span class="typing-cursor" id="s7-cursor"></span>
+          <div id="s7-sources" style="margin-top:8px;"></div>
+        </div>
+      </div>
+      <div class="subhead-md" id="s7-subtext" style="opacity:0;margin-top:18px;">Your knowledge base, conversational.</div>
+    </div>
+  </div>
+
+  <!-- Scene 8: Memory & Notes -->
+  <div class="scene" id="scene8">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s8-headline" style="opacity:0;margin-bottom:6px;">Capture everything. <span class="emerald-text">Forget nothing.</span></div>
+      <div class="subhead-md" id="s8-subtext" style="opacity:0;margin-bottom:28px;">6 note types, smart categorization, instant search.</div>
+      <div class="notes-grid" id="s8-grid" style="margin:0 auto;">
+        <div class="note-card type-note" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Note</div><div class="note-title">API Rate Limiting</div><div class="note-preview">Current strategy uses token bucket...</div><div class="note-tag">backend</div>
+        </div>
+        <div class="note-card type-bookmark" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Bookmark</div><div class="note-title">REST Best Practices</div><div class="note-preview">Microsoft API design guide...</div><div class="note-tag">reference</div>
+        </div>
+        <div class="note-card type-insight" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Insight</div><div class="note-title">Token Bucket vs Leaky</div><div class="note-preview">Token bucket allows bursts...</div><div class="note-tag">architecture</div>
+        </div>
+        <div class="note-card type-snippet" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Snippet</div><div class="note-title">Rate Limiter Middleware</div><div class="note-preview">const limiter = rateLimit({...});</div><div class="note-tag">code</div>
+        </div>
+        <div class="note-card type-meeting" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Meeting</div><div class="note-title">Backend Sync — Feb 28</div><div class="note-preview">Decided on sliding window...</div><div class="note-tag">team</div>
+        </div>
+        <div class="note-card type-idea" style="opacity:0;transform:perspective(800px) rotateY(90deg);">
+          <div class="note-type">Idea</div><div class="note-title">Adaptive Rate Limits</div><div class="note-preview">Adjust limits based on load...</div><div class="note-tag">exploration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 9: Knowledge Health -->
+  <div class="scene" id="scene9">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s9-headline" style="opacity:0;margin-bottom:36px;">Measure <span class="emerald-text">what matters.</span></div>
+      <div id="s9-health" style="display:flex;align-items:center;gap:50px;justify-content:center;flex-wrap:wrap;opacity:0;">
+        <div class="gauge-container">
+          <div class="gauge-ring"></div>
+          <svg viewBox="0 0 200 200" style="position:absolute;inset:0;transform:rotate(-90deg);">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="s9-gauge-circle"/>
+            <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#10B981"/><stop offset="100%" style="stop-color:#34D399"/></linearGradient></defs>
+          </svg>
+          <div class="gauge-score" id="s9-score">0</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div class="s9-stat" style="opacity:0;transform:translateX(25px);">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Nodes</div>
+            <div class="health-stat-bar"><div class="health-stat-fill" style="background:var(--emerald-500);" data-w="82%"></div></div>
+          </div>
+          <div class="s9-stat" style="opacity:0;transform:translateX(25px);">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Connections</div>
+            <div class="health-stat-bar"><div class="health-stat-fill" style="background:var(--blue);" data-w="68%"></div></div>
+          </div>
+          <div class="s9-stat" style="opacity:0;transform:translateX(25px);">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Diversity</div>
+            <div class="health-stat-bar"><div class="health-stat-fill" style="background:var(--violet);" data-w="75%"></div></div>
+          </div>
+          <div class="s9-stat" style="opacity:0;transform:translateX(25px);">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Activity</div>
+            <div class="health-stat-bar"><div class="health-stat-fill" style="background:var(--orange);" data-w="91%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="subhead-md" id="s9-subtext" style="opacity:0;margin-top:28px;">Knowledge Health Score — your team's memory, quantified.</div>
+    </div>
+  </div>
+
+  <!-- Scene 10: Competitive Advantage -->
+  <div class="scene" id="scene10">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s10-headline" style="opacity:0;margin-bottom:28px;">Not just another <span class="emerald-text">note app.</span></div>
+      <div class="comparison" id="s10-table" style="opacity:0;margin:0 auto;">
+        <div class="comp-header" style="opacity:0;"></div>
+        <div class="comp-header" style="opacity:0;color:var(--emerald-400);">Lore</div>
+        <div class="comp-header" style="opacity:0;">Notion</div>
+        <div class="comp-header" style="opacity:0;">Obsidian</div>
+        <div class="s10-row"><div class="comp-cell">Knowledge Graph</div><div class="comp-cell check" style="color:var(--emerald-400);font-weight:600;">✓</div><div class="comp-cell cross">✗</div><div class="comp-cell cross">✗</div></div>
+        <div class="s10-row"><div class="comp-cell">AI Morning Digest</div><div class="comp-cell check" style="color:var(--emerald-400);font-weight:600;">✓</div><div class="comp-cell cross">✗</div><div class="comp-cell cross">✗</div></div>
+        <div class="s10-row"><div class="comp-cell">Connected AI Chat</div><div class="comp-cell check" style="color:var(--emerald-400);font-weight:600;">✓</div><div class="comp-cell partial">△</div><div class="comp-cell cross">✗</div></div>
+        <div class="s10-row"><div class="comp-cell">Health Score</div><div class="comp-cell check" style="color:var(--emerald-400);font-weight:600;">✓</div><div class="comp-cell cross">✗</div><div class="comp-cell cross">✗</div></div>
+        <div class="s10-row"><div class="comp-cell">Auto-classification</div><div class="comp-cell check" style="color:var(--emerald-400);font-weight:600;">✓</div><div class="comp-cell partial">△</div><div class="comp-cell cross">✗</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 11: Team Collaboration -->
+  <div class="scene" id="scene11">
+    <div id="s11-graph" style="position:relative;width:70vw;height:50vh;max-width:780px;max-height:420px;"></div>
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s11-headline" style="opacity:0;">Built for <span class="emerald-text">teams.</span></div>
+      <div class="subhead-md" id="s11-subtext" style="opacity:0;margin-top:10px;">Shared memory that stays consistent, always.</div>
+    </div>
+  </div>
+
+  <!-- Scene 12: Security -->
+  <div class="scene" id="scene12">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div id="s12-visual" style="position:relative;width:280px;height:280px;margin:0 auto;opacity:0;">
+        <div id="s12-globe" style="position:absolute;width:240px;height:240px;border:1px solid rgba(16,185,129,0.12);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;">
+          <div style="position:absolute;border:1px solid rgba(16,185,129,0.06);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(60deg);width:240px;height:240px;"></div>
+          <div style="position:absolute;border:1px solid rgba(16,185,129,0.06);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(60deg) rotateZ(30deg);width:180px;height:180px;"></div>
+          <div style="position:absolute;border:1px solid rgba(16,185,129,0.06);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%) rotateX(60deg) rotateZ(60deg);width:120px;height:120px;"></div>
+        </div>
+        <div id="s12-shield" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:110px;height:110px;">
+          <svg viewBox="0 0 120 120" fill="none" style="width:100%;height:100%;">
+            <path d="M60 15 L95 35 L95 65 C95 85 75 100 60 105 C45 100 25 85 25 65 L25 35 Z" stroke="#10B981" stroke-width="3" fill="rgba(16,185,129,0.08)" id="s12-shield-path" stroke-dasharray="300" stroke-dashoffset="300"/>
+            <path d="M50 60 L57 67 L72 52" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" id="s12-check-path" stroke-dasharray="40" stroke-dashoffset="40"/>
+          </svg>
+        </div>
+        <div id="s12-channels"></div>
+      </div>
+      <div class="headline-md" id="s12-headline" style="opacity:0;margin-top:20px;">Enterprise-grade. <span class="emerald-text">Zero data drift.</span></div>
+      <div class="subhead-md" id="s12-subtext" style="opacity:0;margin-top:10px;">Multi-region architecture. Your knowledge, always consistent.</div>
+      <div id="s12-aurora" style="opacity:0;margin-top:18px;font-size:14px;font-weight:600;color:var(--emerald-400);letter-spacing:0.05em;">Powered by Aurora DSQL</div>
+    </div>
+  </div>
+
+  <!-- Scene 13: Social Proof -->
+  <div class="scene" id="scene13">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div id="s13-testimonials" style="display:flex;flex-direction:column;gap:20px;width:min(560px,90vw);margin:0 auto;">
+        <div class="testimonial glass-dark" style="opacity:0;transform:translateX(-40px);">
+          <div class="stars s13-star" style="opacity:0;">★★★★★</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+            <div class="testimonial-avatar" style="background:rgba(16,185,129,0.15);color:var(--emerald-400);">SK</div>
+            <div style="text-align:left;"><div class="testimonial-name">Sarah Kim</div><div class="testimonial-role">CTO, Meridian Labs</div></div>
+          </div>
+          <div class="testimonial-quote">"Lore turned our scattered Notion docs into a living knowledge base. Our onboarding time dropped from 3 weeks to 3 days."</div>
+        </div>
+        <div class="testimonial glass-dark" style="opacity:0;transform:translateX(40px);">
+          <div class="stars s13-star" style="opacity:0;">★★★★★</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+            <div class="testimonial-avatar" style="background:rgba(59,130,246,0.15);color:var(--blue);">MR</div>
+            <div style="text-align:left;"><div class="testimonial-name">Marcus Rivera</div><div class="testimonial-role">VP Engineering, Cascade</div></div>
+          </div>
+          <div class="testimonial-quote">"The knowledge graph is a game-changer. I discovered connections between projects I never would have found manually."</div>
+        </div>
+        <div class="testimonial glass-dark" style="opacity:0;transform:translateX(-40px);">
+          <div class="stars s13-star" style="opacity:0;">★★★★★</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+            <div class="testimonial-avatar" style="background:rgba(139,92,246,0.15);color:var(--violet);">AL</div>
+            <div style="text-align:left;"><div class="testimonial-name">Aisha Laurent</div><div class="testimonial-role">Engineering Lead, Prism</div></div>
+          </div>
+          <div class="testimonial-quote">"Morning Digest alone saves me 30 minutes every day. It's like having a research assistant who knows everything."</div>
+        </div>
+      </div>
+      <div id="s13-logos" style="display:flex;align-items:center;justify-content:center;gap:36px;margin-top:36px;opacity:0;">
+        <div class="logo-placeholder">MERIDIAN</div>
+        <div class="logo-placeholder">CASCADE</div>
+        <div class="logo-placeholder">PRISM</div>
+        <div class="logo-placeholder">VERTEX</div>
+        <div class="logo-placeholder">HELIX</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 14: Pricing -->
+  <div class="scene" id="scene14">
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div class="headline-md" id="s14-headline" style="opacity:0;margin-bottom:36px;">Simple, transparent <span class="emerald-text">pricing.</span></div>
+      <div class="pricing-cards" id="s14-cards" style="margin:0 auto;">
+        <div class="price-card" style="opacity:0;transform:translateY(50px);">
+          <div class="price-tier">Free</div>
+          <div class="price-amount">$0</div>
+          <div class="price-period">forever</div>
+          <ul class="price-features">
+            <li style="opacity:0;">Up to 100 nodes</li>
+            <li style="opacity:0;">Basic knowledge graph</li>
+            <li style="opacity:0;">5 notes per day</li>
+            <li style="opacity:0;">Community support</li>
+          </ul>
+          <button class="cta-button cta-secondary" style="opacity:0;">Get Started</button>
+        </div>
+        <div class="price-card featured" style="opacity:0;transform:translateY(50px);">
+          <div class="popular-badge" style="opacity:0;">Most Popular</div>
+          <div class="price-tier" style="color:var(--emerald-400);">Pro</div>
+          <div class="price-amount" style="color:var(--emerald-400);">$12</div>
+          <div class="price-period">per user / month</div>
+          <ul class="price-features">
+            <li style="opacity:0;">Unlimited nodes</li>
+            <li style="opacity:0;">AI Morning Digest</li>
+            <li style="opacity:0;">Connected AI Chat</li>
+            <li style="opacity:0;">Knowledge Health Score</li>
+            <li style="opacity:0;">Priority support</li>
+          </ul>
+          <button class="cta-button cta-primary" style="opacity:0;">Start Free Trial</button>
+        </div>
+        <div class="price-card" style="opacity:0;transform:translateY(50px);">
+          <div class="price-tier">Enterprise</div>
+          <div class="price-amount">Custom</div>
+          <div class="price-period">tailored to your team</div>
+          <ul class="price-features">
+            <li style="opacity:0;">Everything in Pro</li>
+            <li style="opacity:0;">SSO & SAML</li>
+            <li style="opacity:0;">Aurora DSQL multi-region</li>
+            <li style="opacity:0;">Dedicated support</li>
+            <li style="opacity:0;">Custom integrations</li>
+          </ul>
+          <button class="cta-button cta-secondary" style="opacity:0;">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene 15: The Close -->
+  <div class="scene" id="scene15">
+    <div id="s15-graph" style="position:absolute;inset:0;opacity:0;"></div>
+    <div style="position:relative;z-index:10;text-align:center;">
+      <div id="s15-logo" style="width:80px;height:80px;margin:0 auto 28px;opacity:0;">
+        <svg viewBox="0 0 120 120" fill="none" style="width:100%;height:100%;">
+          <circle cx="60" cy="60" r="56" fill="#059669"/>
+          <path d="M45 35 C45 35, 35 45, 38 60 C40 70, 45 75, 50 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M75 35 C75 35, 85 45, 82 60 C80 70, 75 75, 70 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M50 78 C53 82, 57 84, 60 84 C63 84, 67 82, 70 78" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="42" cy="48" r="3" fill="white"/><circle cx="55" cy="42" r="3" fill="white"/>
+          <circle cx="68" cy="42" r="3" fill="white"/><circle cx="78" cy="48" r="3" fill="white"/>
+          <line x1="42" y1="48" x2="55" y2="42" stroke="white" stroke-width="1"/>
+          <line x1="55" y1="42" x2="68" y2="42" stroke="white" stroke-width="1"/>
+          <line x1="68" y1="42" x2="78" y2="48" stroke="white" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="headline-lg" id="s15-line1" style="opacity:0;">Stop losing knowledge.</div>
+      <div class="headline-lg emerald-text" id="s15-line2" style="opacity:0;margin-top:14px;">Start building Lore.</div>
+      <div style="margin-top:36px;">
+        <span class="cta-final" id="s15-cta" style="opacity:0;transform:translateY(20px);display:inline-flex;">Get started free →</span>
+      </div>
+      <div id="s15-url" style="font-size:20px;color:var(--text-muted);margin-top:18px;opacity:0;letter-spacing:0.02em;">lore.app</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+// ============================================
+// LORE PROMO VIDEO — GSAP ENGINE v2
+// ============================================
+
+const TOTAL_DURATION = 270;
+let master;
+
+function init() {
+  // Hide all scenes initially
+  document.querySelectorAll('.scene').forEach(s => { s.style.opacity = 0; s.style.pointerEvents = 'none'; });
+  
+  // Create ambient particles for background
+  createAmbientParticles();
+  
+  master = gsap.timeline({
+    onUpdate: updateProgress,
+    defaults: { ease: 'power3.out' }
+  });
+
+  // Build all scenes with proper timing
+  buildScene1();    // 0-14s
+  buildScene2();    // 14-32s
+  buildScene3();    // 32-52s
+  buildScene4();    // 52-70s
+  buildScene5();    // 70-92s
+  buildScene6();    // 92-110s
+  buildScene7();    // 110-132s
+  buildScene8();    // 132-150s
+  buildScene9();    // 150-168s
+  buildScene10();   // 168-190s
+  buildScene11();   // 190-206s
+  buildScene12();   // 206-222s
+  buildScene13();   // 222-238s
+  buildScene14();   // 238-254s
+  buildScene15();   // 254-270s
+
+  master.play();
+}
+
+function createAmbientParticles() {
+  const container = document.getElementById('video-container');
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'ambient-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.bottom = '-10px';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = Math.random() * 10 + 's';
+    container.appendChild(p);
+  }
+}
+
+function updateProgress() {
+  const p = master.progress();
+  document.getElementById('progress-bar').style.width = (p * 100) + '%';
+  const elapsed = Math.floor(master.time());
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  document.getElementById('time-display').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+}
+
+function activateScene(id) {
+  document.querySelectorAll('.scene').forEach(s => {
+    s.style.pointerEvents = 'none';
+  });
+  const el = document.getElementById(id);
+  el.style.pointerEvents = 'auto';
+  return el;
+}
+
+function crossFade(fromId, toId, duration = 0.7) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  return gsap.timeline()
+    .to(from, { opacity: 0, duration, ease: 'power2.inOut' })
+    .call(() => {
+      from.style.pointerEvents = 'none';
+      to.style.pointerEvents = 'auto';
+    }, [], duration * 0.5)
+    .fromTo(to, { opacity: 0 }, { opacity: 1, duration, ease: 'power2.inOut' }, duration * 0.3);
+}
+
+function animateCounter(id, from, to, dur, prefix='', suffix='') {
+  const obj = { val: from };
+  const el = document.getElementById(id);
+  gsap.to(obj, {
+    val: to,
+    duration: dur,
+    ease: 'power2.out',
+    onUpdate: () => {
+      el.textContent = prefix + (to % 1 !== 0 ? obj.val.toFixed(1) : Math.round(obj.val)) + suffix;
+    }
+  });
+}
+
+// ============================================
+// SCENE 1: COLD OPEN (0-14s)
+// ============================================
+function buildScene1() {
+  const tl = gsap.timeline();
+  const scene = activateScene('scene1');
+  
+  tl.set(scene, { opacity: 0 })
+    .to(scene, { opacity: 1, duration: 0.5 })
+    
+    // Center dot pulses
+    .fromTo('#s1-network', { opacity: 0 }, { opacity: 1, duration: 0.3 })
+    .call(() => {
+      const net = document.getElementById('s1-network');
+      // Central pulse dot
+      const pulse = document.createElement('div');
+      pulse.style.cssText = 'position:absolute;left:50%;top:45%;width:12px;height:12px;background:#10B981;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 30px rgba(16,185,129,0.8),0 0 60px rgba(16,185,129,0.4);';
+      net.appendChild(pulse);
+      gsap.from(pulse, { scale: 0, duration: 1, ease: 'power3.out' });
+      gsap.to(pulse, { scale: 1.5, opacity: 0.6, duration: 0.8, yoyo: true, repeat: 1, ease: 'power2.inOut', delay: 1 });
+    })
+    
+    // Network dots
+    .call(() => {
+      const net = document.getElementById('s1-network');
+      const positions = [
+        {x:'30%',y:'25%'},{x:'70%',y:'20%'},{x:'20%',y:'55%'},{x:'80%',y:'50%'},
+        {x:'45%',y:'70%'},{x:'60%',y:'35%'},{x:'35%',y:'45%'},{x:'65%',y:'65%'},
+        {x:'50%',y:'28%'},{x:'25%',y:'75%'},{x:'75%',y:'75%'},{x:'40%',y:'18%'}
+      ];
+      positions.forEach((pos, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'network-dot';
+        dot.style.left = pos.x; dot.style.top = pos.y;
+        net.appendChild(dot);
+        gsap.to(dot, { opacity: 0.7, duration: 0.4, delay: 1.2 + i * 0.08, ease: 'power2.out' });
+      });
+      // Lines
+      const conns = [[0,1],[0,5],[1,8],[2,6],[3,7],[4,6],[5,8],[6,7],[7,9],[8,10],[9,11],[10,11],[0,8],[3,10]];
+      conns.forEach(([a, b], i) => {
+        const line = document.createElement('div');
+        line.className = 'network-line';
+        const x1=parseFloat(positions[a].x),y1=parseFloat(positions[a].y),x2=parseFloat(positions[b].x),y2=parseFloat(positions[b].y);
+        const len = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+        const ang = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+        line.style.left=positions[a].x; line.style.top=positions[a].y;
+        line.style.width=len+'vw'; line.style.transform=`rotate(${ang}deg)`;
+        net.appendChild(line);
+        gsap.to(line, { opacity: 0.35, duration: 0.5, delay: 2 + i * 0.06, ease: 'power2.out' });
+      });
+    })
+    
+    // Manifesto words
+    .to('.manifesto-word', { opacity: 1, y: 0, duration: 0.5, stagger: 0.22, ease: 'power3.out' }, 2.5)
+    
+    // Tagline
+    .to('#s1-tagline', { opacity: 1, duration: 1, ease: 'power2.out' }, 3.8)
+    
+    // Hold
+    .to({}, { duration: 2.5 })
+    
+    // Cross-fade to scene 2
+    .add(() => crossFade('scene1', 'scene2', 0.7));
+  
+  master.add(tl, 0);
+}
+
+// ============================================
+// SCENE 2: THE PROBLEM (14-32s)
+// ============================================
+function buildScene2() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene2', { opacity: 0 })
+    // Fragments appear
+    .to('.fragment', { opacity: 0.7, duration: 0.5, stagger: 0.1, ease: 'power2.out' })
+    
+    // Chaotic movement
+    .to('.fragment', {
+      x: () => (Math.random()-0.5)*70,
+      y: () => (Math.random()-0.5)*70,
+      rotation: () => (Math.random()-0.5)*12,
+      duration: 2.5, ease: 'power1.inOut', stagger: 0.05
+    })
+    
+    // Headline
+    .to('#s2-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=2')
+    
+    // More chaos
+    .to('.fragment', {
+      x: () => (Math.random()-0.5)*120,
+      y: () => (Math.random()-0.5)*120,
+      rotation: () => (Math.random()-0.5)*25,
+      opacity: 0.2,
+      duration: 1.8, ease: 'power2.in', stagger: 0.03
+    }, '+=1.5')
+    
+    // Dark
+    .to('#scene2', { opacity: 0, duration: 0.8, ease: 'power2.in' })
+    .call(() => activateScene('scene3'));
+  
+  master.add(tl, 14);
+}
+
+// ============================================
+// SCENE 3: THE COST (32-52s)
+// ============================================
+function buildScene3() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene3', { opacity: 0 })
+    .to('#scene3', { opacity: 1, duration: 0.6 })
+    
+    // Create floating particles
+    .call(() => {
+      const container = document.getElementById('s3-particles');
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.style.cssText = `position:absolute;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:rgba(16,185,129,${0.2+Math.random()*0.3});border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*100}%;`;
+        container.appendChild(p);
+        gsap.to(p, { y: -200-Math.random()*300, opacity: 0, duration: 3+Math.random()*4, repeat: -1, delay: Math.random()*3, ease: 'none' });
+      }
+    })
+    
+    // Stats
+    .to('.stat-block', { opacity: 1, y: 0, duration: 0.8, stagger: 0.6, ease: 'power3.out' })
+    
+    // Counters
+    .call(() => animateCounter('s3-stat1', 0, 47, 2), [], 0.6)
+    .call(() => animateCounter('s3-stat2', 0, 73, 2), [], 1.4)
+    .call(() => animateCounter('s3-stat3', 0, 5.2, 2.5, '$', 'M'), [], 2.2)
+    
+    // Hold
+    .to({}, { duration: 4 })
+    
+    // Fade
+    .to('#scene3', { opacity: 0, duration: 0.7 })
+    .call(() => activateScene('scene4'));
+  
+  master.add(tl, 32);
+}
+
+// ============================================
+// SCENE 4: INTRODUCING LORE (52-70s)
+// ============================================
+function buildScene4() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene4', { opacity: 0 })
+    .to('#scene4', { opacity: 1, duration: 0.5 })
+    
+    // Light sweep
+    .to('#s4-sweep', { left: '150%', duration: 1.3, ease: 'power2.inOut' })
+    
+    // Logo
+    .to('#s4-logo-circle', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.5')
+    .to('#s4-logo-path1', { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out' }, '-=0.3')
+    .to('#s4-logo-path2', { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+    .to('#s4-logo-path3', { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to('#s4-dot1, #s4-dot2, #s4-dot3, #s4-dot4', { opacity: 1, duration: 0.3, stagger: 0.08 }, '-=0.2')
+    .to('#s4-line1, #s4-line2, #s4-line3', { opacity: 0.5, duration: 0.3, stagger: 0.08 }, '-=0.2')
+    
+    // LORE text with shimmer
+    .to('#s4-text', { opacity: 1, duration: 0.8, ease: 'power3.out' }, '-=0.3')
+    .fromTo('#s4-text', 
+      { clipPath: 'inset(0 100% 0 0)' },
+      { clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power2.inOut' },
+      '-=0.6'
+    )
+    
+    // Dot grid
+    .to('#s4-grid', { opacity: 1, duration: 1, ease: 'power2.out' }, '-=0.8')
+    
+    // Subtitle
+    .to('#s4-subtitle', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    
+    // Hold
+    .to({}, { duration: 2.5 })
+    
+    // Fade
+    .add(() => crossFade('scene4', 'scene5', 0.7));
+  
+  master.add(tl, 52);
+}
+
+// ============================================
+// SCENE 5: KNOWLEDGE GRAPH (70-92s)
+// ============================================
+function buildScene5() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene5', { opacity: 0 })
+    .to('#scene5', { opacity: 1, duration: 0.6 })
+    
+    .call(() => {
+      const g = document.getElementById('s5-graph');
+      const nodes = [
+        {x:'50%',y:'40%',type:'concept',label:'API',size:48},
+        {x:'22%',y:'22%',type:'person',label:'SK',size:40},
+        {x:'78%',y:'22%',type:'project',label:'v2',size:40},
+        {x:'12%',y:'58%',type:'resource',label:'Doc',size:36},
+        {x:'88%',y:'58%',type:'idea',label:'💡',size:36},
+        {x:'32%',y:'72%',type:'concept',label:'DB',size:40},
+        {x:'68%',y:'72%',type:'person',label:'MR',size:40},
+        {x:'50%',y:'12%',type:'project',label:'MVP',size:38},
+        {x:'8%',y:'38%',type:'resource',label:'RFC',size:34},
+        {x:'92%',y:'38%',type:'idea',label:'⚡',size:34},
+        {x:'40%',y:'55%',type:'concept',label:'Auth',size:36},
+        {x:'60%',y:'55%',type:'person',label:'AL',size:36},
+      ];
+      
+      nodes.forEach((n, i) => {
+        const el = document.createElement('div');
+        el.className = `graph-node node-${n.type}`;
+        el.textContent = n.label;
+        el.style.left = n.x; el.style.top = n.y;
+        el.style.width = n.size+'px'; el.style.height = n.size+'px';
+        el.style.fontSize = Math.max(10, n.size/4)+'px';
+        el.style.transform = 'translate(-50%,-50%) scale(0)';
+        g.appendChild(el);
+        gsap.to(el, { opacity:1, scale:1, duration:0.5, delay:i*0.1, ease:'back.out(1.7)' });
+      });
+      
+      const edges = [[0,1],[0,2],[0,5],[0,6],[0,10],[0,11],[1,3],[2,4],[3,8],[4,9],[5,6],[1,7],[2,7],[10,5],[11,6],[10,11]];
+      edges.forEach(([a,b], i) => {
+        const el = document.createElement('div');
+        el.className = 'graph-edge';
+        const x1=parseFloat(nodes[a].x),y1=parseFloat(nodes[a].y),x2=parseFloat(nodes[b].x),y2=parseFloat(nodes[b].y);
+        const len = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+        const ang = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+        el.style.left=nodes[a].x; el.style.top=nodes[a].y;
+        el.style.width=len+'%'; el.style.transform=`rotate(${ang}deg)`;
+        el.style.background='rgba(255,255,255,0.08)';
+        g.appendChild(el);
+        gsap.to(el, { opacity:0.3, duration:0.4, delay:1.2+i*0.06, ease:'power2.out' });
+      });
+    })
+    
+    .to('#s5-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '+=1.5')
+    .to('#s5-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=0.3')
+    
+    // Hold with ambient
+    .to({}, { duration: 4 })
+    
+    .add(() => crossFade('scene5', 'scene6', 0.7));
+  
+  master.add(tl, 70);
+}
+
+// ============================================
+// SCENE 6: MORNING DIGEST (92-110s)
+// ============================================
+function buildScene6() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene6', { opacity: 0 })
+    .to('#scene6', { opacity: 1, duration: 0.6 })
+    .to('#s6-sunrise', { opacity: 1, duration: 1.5, ease: 'power2.out' })
+    .to('#s6-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+    .to('#s6-card', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.3')
+    .to('.s6-fill', { width: (i) => [85,65,50][i]+'%', duration: 0.8, stagger: 0.2, ease: 'power2.out' }, '+=0.3')
+    .to('.s6-insight', { opacity: 1, x: 0, duration: 0.6, stagger: 0.2, ease: 'power3.out' }, '+=0.2')
+    .to('#s6-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' })
+    .to({}, { duration: 2.5 })
+    .add(() => crossFade('scene6', 'scene7', 0.7));
+  
+  master.add(tl, 92);
+}
+
+// ============================================
+// SCENE 7: AI CHAT (110-132s)
+// ============================================
+function buildScene7() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene7', { opacity: 0 })
+    .to('#scene7', { opacity: 1, duration: 0.6 })
+    .to('#s7-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('#s7-chat', { opacity: 1, duration: 0.6 }, '-=0.3')
+    .to('#s7-msg1', { opacity: 1, duration: 0.5, ease: 'power3.out' }, '+=0.2')
+    .to('#s7-msg2', { opacity: 1, duration: 0.3 }, '+=0.5')
+    
+    // Typing effect
+    .call(() => {
+      const text = "Your API currently uses a token bucket algorithm with a limit of 100 requests per minute per user. The team discussed migrating to a sliding window counter in the Feb 28 sync.";
+      const el = document.getElementById('s7-ai-text');
+      let i = 0;
+      const iv = setInterval(() => {
+        if (i < text.length) { el.textContent += text[i]; i++; }
+        else { clearInterval(iv); gsap.to('#s7-cursor', { opacity: 0, duration: 0.3, delay: 0.5 }); }
+      }, 22);
+    })
+    
+    // Source badges
+    .call(() => {
+      setTimeout(() => {
+        const src = document.getElementById('s7-sources');
+        ['API Docs', 'Feb 28 Meeting', 'Architecture'].forEach((s, i) => {
+          const badge = document.createElement('span');
+          badge.className = 'source-badge';
+          badge.textContent = s;
+          src.appendChild(badge);
+          gsap.fromTo(badge, { opacity:0, scale:0.5 }, { opacity:1, scale:1, duration:0.4, delay:i*0.12, ease:'back.out(1.7)' });
+        });
+      }, 3800);
+    })
+    
+    .to('#s7-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '+=5')
+    .to({}, { duration: 2 })
+    .add(() => crossFade('scene7', 'scene8', 0.7));
+  
+  master.add(tl, 110);
+}
+
+// ============================================
+// SCENE 8: MEMORY & NOTES (132-150s)
+// ============================================
+function buildScene8() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene8', { opacity: 0 })
+    .to('#scene8', { opacity: 1, duration: 0.6 })
+    .to('#s8-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('#s8-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to('.note-card', { opacity: 1, rotationY: 0, duration: 0.6, stagger: 0.1, ease: 'power3.out' }, '+=0.3')
+    .to('.note-card', { y: -5, duration: 1.5, ease: 'power1.inOut', stagger: { each: 0.1, from: 'random' }, yoyo: true, repeat: 1 }, '+=0.5')
+    .to({}, { duration: 1.5 })
+    .add(() => crossFade('scene8', 'scene9', 0.7));
+  
+  master.add(tl, 132);
+}
+
+// ============================================
+// SCENE 9: KNOWLEDGE HEALTH (150-168s)
+// ============================================
+function buildScene9() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene9', { opacity: 0 })
+    .to('#scene9', { opacity: 1, duration: 0.6 })
+    .to('#s9-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('#s9-health', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    
+    // Gauge
+    .to('#s9-gauge-circle', { strokeDashoffset: 553-(553*0.87), duration: 2, ease: 'power2.out' }, '+=0.3')
+    .call(() => animateCounter('s9-score', 0, 87, 2), [], '-=2')
+    
+    // Stats
+    .to('.s9-stat', { opacity: 1, x: 0, duration: 0.5, stagger: 0.15, ease: 'power3.out' }, '-=1.5')
+    .to('.health-stat-fill', { width: (i) => [82,68,75,91][i]+'%', duration: 1.2, stagger: 0.15, ease: 'power2.out' }, '-=1')
+    .to('#s9-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' })
+    .to({}, { duration: 2.5 })
+    .add(() => crossFade('scene9', 'scene10', 0.7));
+  
+  master.add(tl, 150);
+}
+
+// ============================================
+// SCENE 10: COMPETITIVE ADVANTAGE (168-190s)
+// ============================================
+function buildScene10() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene10', { opacity: 0 })
+    .to('#scene10', { opacity: 1, duration: 0.6 })
+    .to('#s10-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('#s10-table', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to('.comp-header', { opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power2.out' }, '+=0.2')
+    .to('.s10-row .comp-cell', { opacity: 1, duration: 0.3, stagger: 0.03, ease: 'power2.out' }, '+=0.2')
+    
+    // Highlight Lore column
+    .to('.s10-row .comp-cell:nth-child(2)', { 
+      textShadow: '0 0 12px rgba(16,185,129,0.4)', 
+      duration: 0.6, 
+      ease: 'power2.out' 
+    }, '+=0.5')
+    
+    .to({}, { duration: 3 })
+    .add(() => crossFade('scene10', 'scene11', 0.7));
+  
+  master.add(tl, 168);
+}
+
+// ============================================
+// SCENE 11: TEAM COLLABORATION (190-206s)
+// ============================================
+function buildScene11() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene11', { opacity: 0 })
+    .to('#scene11', { opacity: 1, duration: 0.6 })
+    
+    .call(() => {
+      const g = document.getElementById('s11-graph');
+      const nodes = [
+        {x:'30%',y:'30%',type:'concept',label:'API'},
+        {x:'70%',y:'30%',type:'project',label:'v2'},
+        {x:'50%',y:'55%',type:'concept',label:'DB'},
+        {x:'20%',y:'60%',type:'person',label:'SK'},
+        {x:'80%',y:'60%',type:'person',label:'MR'},
+        {x:'50%',y:'80%',type:'idea',label:'⚡'},
+      ];
+      
+      nodes.forEach((n, i) => {
+        const el = document.createElement('div');
+        el.className = `graph-node node-${n.type}`;
+        el.textContent = n.label;
+        el.style.left = n.x; el.style.top = n.y;
+        el.style.width = '40px'; el.style.height = '40px'; el.style.fontSize = '11px';
+        el.style.transform = 'translate(-50%,-50%) scale(0)';
+        g.appendChild(el);
+        gsap.to(el, { opacity:1, scale:1, duration:0.5, delay:i*0.1, ease:'back.out(1.7)' });
+      });
+      
+      // Team cursors
+      const cursors = [
+        {x:'25%',y:'25%',color:'#3B82F6',name:'Sarah'},
+        {x:'75%',y:'25%',color:'#8B5CF6',name:'Marcus'},
+        {x:'50%',y:'70%',color:'#10B981',name:'Aisha'},
+      ];
+      cursors.forEach((c, i) => {
+        const el = document.createElement('div');
+        el.style.cssText = `position:absolute;left:${c.x};top:${c.y};opacity:0;`;
+        el.innerHTML = `<div style="width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:12px solid ${c.color};transform:rotate(-30deg);"></div><div style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:10px;margin-top:-4px;background:${c.color};white-space:nowrap;">${c.name}</div>`;
+        g.appendChild(el);
+        gsap.to(el, { opacity:1, duration:0.5, delay:1+i*0.3, ease:'power2.out' });
+        gsap.to(el, { x:()=>(Math.random()-0.5)*30, y:()=>(Math.random()-0.5)*30, duration:2.5, ease:'power1.inOut', delay:1.5+i*0.3, yoyo:true, repeat:-1 });
+      });
+      
+      // Edges
+      [[0,1],[0,2],[1,2],[2,3],[2,4],[0,3],[1,4],[2,5],[3,5],[4,5]].forEach(([a,b], i) => {
+        const el = document.createElement('div');
+        el.className = 'graph-edge';
+        const x1=parseFloat(nodes[a].x),y1=parseFloat(nodes[a].y),x2=parseFloat(nodes[b].x),y2=parseFloat(nodes[b].y);
+        const len = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+        const ang = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+        el.style.left=nodes[a].x; el.style.top=nodes[a].y;
+        el.style.width=len+'%'; el.style.transform=`rotate(${ang}deg)`;
+        el.style.background='linear-gradient(90deg,rgba(16,185,129,0.15),rgba(59,130,246,0.15))';
+        g.appendChild(el);
+        gsap.to(el, { opacity:0.3, duration:0.4, delay:0.5+i*0.08, ease:'power2.out' });
+      });
+    })
+    
+    .to('#s11-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '+=1.5')
+    .to('#s11-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to({}, { duration: 2 })
+    .add(() => crossFade('scene11', 'scene12', 0.7));
+  
+  master.add(tl, 190);
+}
+
+// ============================================
+// SCENE 12: SECURITY (206-222s)
+// ============================================
+function buildScene12() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene12', { opacity: 0 })
+    .to('#scene12', { opacity: 1, duration: 0.6 })
+    .to('#s12-visual', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('#s12-globe', { opacity: 0.5, duration: 1, ease: 'power2.out' })
+    .to('#s12-shield-path', { strokeDashoffset: 0, duration: 1.2, ease: 'power2.out' }, '-=0.5')
+    .to('#s12-check-path', { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    
+    // Data channels
+    .call(() => {
+      const ch = document.getElementById('s12-channels');
+      [{x:'30%',y:'10%',r:0},{x:'70%',y:'10%',r:0},{x:'10%',y:'50%',r:90},{x:'90%',y:'50%',r:90},{x:'30%',y:'85%',r:0},{x:'70%',y:'85%',r:0}].forEach((p, i) => {
+        const el = document.createElement('div');
+        el.style.cssText = `position:absolute;width:2px;height:35px;background:linear-gradient(to bottom,transparent,var(--emerald-400),transparent);left:${p.x};top:${p.y};transform:translate(-50%,-50%) rotate(${p.r}deg);opacity:0;`;
+        ch.appendChild(el);
+        gsap.to(el, { opacity:0.5, duration:0.4, delay:0.5+i*0.1, ease:'power2.out' });
+        gsap.to(el, { scaleY:0.5, duration:0.8, repeat:-1, yoyo:true, delay:1+i*0.1, ease:'power1.inOut' });
+      });
+    })
+    
+    .to('#s12-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '+=1')
+    .to('#s12-subtext', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    .to('#s12-aurora', { opacity: 1, duration: 0.6, ease: 'power2.out' })
+    .to({}, { duration: 2 })
+    .add(() => crossFade('scene12', 'scene13', 0.7));
+  
+  master.add(tl, 206);
+}
+
+// ============================================
+// SCENE 13: SOCIAL PROOF (222-238s)
+// ============================================
+function buildScene13() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene13', { opacity: 0 })
+    .to('#scene13', { opacity: 1, duration: 0.6 })
+    .to('.testimonial', { opacity: 1, x: 0, duration: 0.8, stagger: 0.5, ease: 'power3.out' })
+    .to('.s13-star', { opacity: 1, duration: 0.4, stagger: 0.5, ease: 'power2.out' }, '-=2')
+    .to('#s13-logos', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '+=0.5')
+    .to({}, { duration: 2 })
+    .add(() => crossFade('scene13', 'scene14', 0.7));
+  
+  master.add(tl, 222);
+}
+
+// ============================================
+// SCENE 14: PRICING (238-254s)
+// ============================================
+function buildScene14() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene14', { opacity: 0 })
+    .to('#scene14', { opacity: 1, duration: 0.6 })
+    .to('#s14-headline', { opacity: 1, duration: 0.8, ease: 'power2.out' })
+    .to('.price-card', { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out' }, '+=0.2')
+    .to('.popular-badge', { opacity: 1, duration: 0.5, ease: 'back.out(1.7)' }, '-=0.5')
+    .to('.price-features li', { opacity: 1, duration: 0.3, stagger: 0.04, ease: 'power2.out' }, '+=0.3')
+    .to('.cta-button', { opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power2.out' }, '+=0.2')
+    .to('.cta-primary', { boxShadow: '0 0 30px rgba(16,185,129,0.4)', duration: 0.8, yoyo: true, repeat: 1, ease: 'power2.inOut' })
+    .to({}, { duration: 2 })
+    .add(() => crossFade('scene14', 'scene15', 0.7));
+  
+  master.add(tl, 238);
+}
+
+// ============================================
+// SCENE 15: THE CLOSE (254-270s)
+// ============================================
+function buildScene15() {
+  const tl = gsap.timeline();
+  
+  tl.set('#scene15', { opacity: 0 })
+    .to('#scene15', { opacity: 1, duration: 0.6 })
+    
+    // Build closing graph
+    .call(() => {
+      const g = document.getElementById('s15-graph');
+      for (let i = 0; i < 30; i++) {
+        const types = ['concept','person','project','resource','idea'];
+        const el = document.createElement('div');
+        el.className = `graph-node node-${types[i%5]}`;
+        el.style.left = (8+Math.random()*84)+'%';
+        el.style.top = (8+Math.random()*84)+'%';
+        el.style.width = '20px'; el.style.height = '20px'; el.style.fontSize = '7px';
+        el.style.transform = 'translate(-50%,-50%) scale(0)';
+        g.appendChild(el);
+        gsap.to(el, { opacity:0.4, scale:1, duration:0.4, delay:i*0.04, ease:'power2.out' });
+      }
+      for (let i = 0; i < 35; i++) {
+        const a = Math.floor(Math.random()*30);
+        const b = Math.floor(Math.random()*30);
+        if (a !== b) {
+          const nodes = g.querySelectorAll('.graph-node');
+          if (nodes[a] && nodes[b]) {
+            const el = document.createElement('div');
+            el.className = 'graph-edge';
+            el.style.left = nodes[a].style.left; el.style.top = nodes[a].style.top;
+            const x1=parseFloat(nodes[a].style.left),y1=parseFloat(nodes[a].style.top);
+            const x2=parseFloat(nodes[b].style.left),y2=parseFloat(nodes[b].style.top);
+            const len = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+            const ang = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+            el.style.width=len+'%'; el.style.transform=`rotate(${ang}deg)`;
+            el.style.background='rgba(255,255,255,0.04)';
+            g.appendChild(el);
+            gsap.to(el, { opacity:0.12, duration:0.3, delay:1.2+i*0.02, ease:'power2.out' });
+          }
+        }
+      }
+    })
+    
+    .to('#s15-graph', { opacity: 0.35, duration: 1.5, ease: 'power2.out' })
+    
+    // Logo
+    .to('#s15-logo', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '+=0.5')
+    
+    // First line
+    .to('#s15-line1', { opacity: 1, duration: 1, ease: 'power2.out' }, '+=0.5')
+    .to({}, { duration: 1.2 })
+    
+    // Second line
+    .to('#s15-line2', { opacity: 1, duration: 1, ease: 'power2.out' })
+    
+    // CTA
+    .to('#s15-cta', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '+=0.5')
+    .to('#s15-url', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+    
+    // CTA pulse
+    .to('#s15-cta', { boxShadow: '0 0 40px rgba(16,185,129,0.5)', duration: 1, yoyo: true, repeat: 1, ease: 'power2.inOut' })
+    
+    // Logo pulse
+    .to('#s15-logo', { scale: 1.1, duration: 0.6, yoyo: true, repeat: 1, ease: 'power2.inOut' }, '-=1')
+    
+    // Hold
+    .to({}, { duration: 2.5 })
+    
+    // Final fade
+    .to('#scene15', { opacity: 0, duration: 1.5, ease: 'power2.in' });
+  
+  master.add(tl, 254);
+}
+
+// ============================================
+// INIT
+// ============================================
+window.addEventListener('load', () => {
+  if (typeof gsap !== 'undefined') {
+    init();
+  } else {
+    const check = setInterval(() => {
+      if (typeof gsap !== 'undefined') { clearInterval(check); init(); }
+    }, 100);
+  }
+});
+</script>
+</body>
+</html>

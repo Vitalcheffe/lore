@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=_1QAJaC6Xwc",
+    "name": "GSAP vs Framer Motion for React - YouTube",
+    "snippet": "Which one should you use in your project? GSAP or Framer Motion? In this video I take a look at the pros and cons of each and which one I ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.tiktok.com/@ryancadby/video/7511390853026417950",
+    "name": "Web Animations: GSAP vs Framer Motion Comparison - TikTok",
+    "snippet": "Web animations - gsap vs framer motion. Projectile Motion · Tracker Motion · Motion Barber Studio · Motion Blur Strobe · Motion Flyer Template.",
+    "host_name": "www.tiktok.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/gsap-vs-motion",
+    "name": "GSAP vs Motion: A detailed comparison",
+    "snippet": "Compare Motion (prev Framer Motion) and GSAP, two leading JavaScript animation libraries. Discover Motion's advantages in bundle size, hardware acceleration ...",
+    "host_name": "motion.dev",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@toukir.ahamed.pigeon/interactive-ui-animations-with-gsap-framer-motion-f2765ae8a051",
+    "name": "Interactive UI Animations with GSAP & Framer Motion - Medium",
+    "snippet": "This article teaches you practical animation patterns using Framer Motion (easy → medium UI) and GSAP (medium → complex creative effects). All ...",
+    "host_name": "medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/resources/get-started",
+    "name": "Let's get animating! | GSAP | Docs & Learning",
+    "snippet": "You can use GSAP to animate pretty much anything JavaScript can touch, in any framework. Whether you want to animate UI, SVG, Three.js or React components - ...",
+    "host_name": "gsap.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=xHs78E3ZiTc",
+    "name": "Animate Like a Pro: Comparing GSAP and Motion One - YouTube",
+    "snippet": "Discover the differences between GSAP and Motion One, two popular animation libraries for web animation. In this video I compare features ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://annnimate.com/blog/gsap-vs-framer-motion-vs-react-spring",
+    "name": "GSAP vs Framer Motion vs React Spring: Which Should You Use in",
+    "snippet": "Quick answer: GSAP for anything complex or performance-critical. Framer Motion for layout animations and exit transitions in UI-heavy apps.",
+    "host_name": "annnimate.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://frontend.horse/articles/amazing-animation-techniques-with-gsap",
+    "name": "Amazing Animation Techniques with GSAP - Frontend Horse",
+    "snippet": "Pete Barr teaches us how he creates beautiful animations with SVG and GSAP. We pick up a few techniques like text splitting and infinite scroll.",
+    "host_name": "frontend.horse",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://semaphore.io/blog/react-framer-motion-gsap",
+    "name": "Web Animation for Your React App: Framer Motion vs GSAP",
+    "snippet": "The article compares Framer Motion and GSAP animation libraries for React, discussing benefits, drawbacks, differences, and setup.",
+    "host_name": "semaphore.io",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.framer.com/marketplace/components/gsap-text-engine",
+    "name": "GSAP Text Engine: Free Interactions Component by Zlatko Marjanović",
+    "snippet": "A powerful GSAP-powered text animation engine for Framer. 40+ customizable presets, viewport triggers, stagger effects, typewriter and scramble reveals, ...",
+    "host_name": "www.framer.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]
