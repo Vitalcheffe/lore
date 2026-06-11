@@ -414,11 +414,11 @@ export default function SettingsPage() {
             <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#18181B]">Settings</h1>
-            <p className="text-sm text-[#71717A]">
+            <h1 className="text-2xl font-bold tracking-tight text-[#18181B] dark:text-[#FAFAFA]">Settings</h1>
+            <p className="text-sm text-[#71717A] dark:text-[#A1A1AA]">
               Manage your preferences and account
               {saving && !showSaveSuccess && (
-                <span className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600">
+                <span className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600 dark:text-emerald-400">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Saving...
                 </span>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.5 }}
-                  className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600"
+                  className="inline-flex items-center gap-1.5 ml-3 text-xs text-emerald-600 dark:text-emerald-400"
                 >
                   <motion.div
                     initial={{ scale: 0 }}
@@ -452,21 +452,21 @@ export default function SettingsPage() {
         transition={{ duration: 0.45, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="mb-6"
       >
-        <Card className="bg-gradient-to-r from-emerald-50/80 to-teal-50/60 border-emerald-100/80 shadow-sm overflow-hidden">
+        <Card className="bg-gradient-to-r from-emerald-50/80 to-teal-50/60 border-emerald-100 dark:border-[rgba(16,185,129,0.20)]/80 shadow-sm overflow-hidden">
           <CardContent className="p-5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-emerald-500/20 shrink-0">
                 {initials || '??'}
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-bold text-[#18181B] truncate">{name || 'Your Name'}</h2>
+                <h2 className="text-lg font-bold text-[#18181B] dark:text-[#FAFAFA] truncate">{name || 'Your Name'}</h2>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-                  <span className="flex items-center gap-1.5 text-sm text-[#71717A]">
+                  <span className="flex items-center gap-1.5 text-sm text-[#71717A] dark:text-[#A1A1AA]">
                     <Mail className="w-3.5 h-3.5" />
                     {email || 'your@email.com'}
                   </span>
                   {joinDate && (
-                    <span className="flex items-center gap-1.5 text-sm text-[#71717A]">
+                    <span className="flex items-center gap-1.5 text-sm text-[#71717A] dark:text-[#A1A1AA]">
                       <Calendar className="w-3.5 h-3.5" />
                       Joined {joinDate}
                     </span>
@@ -478,7 +478,7 @@ export default function SettingsPage() {
                   ? 'bg-emerald-600 text-white border-0 hover:bg-emerald-700'
                   : currentPlan === 'enterprise'
                   ? 'bg-emerald-700 text-white border-0 hover:bg-emerald-800'
-                  : 'bg-white text-emerald-700 border-emerald-200 hover:bg-white'
+                  : 'bg-white dark:bg-[#0F0F12] text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] hover:bg-white dark:bg-[#0F0F12]'
               }`}>
                 {currentPlan === 'pro' && <Crown className="w-3 h-3 mr-1" />}
                 {currentPlan === 'free' ? 'Free Plan' : currentPlan === 'pro' ? 'Pro Plan' : 'Enterprise'}
@@ -497,11 +497,11 @@ export default function SettingsPage() {
           transition={{ duration: 0.4, delay: 0.15 }}
           className="lg:w-[240px] shrink-0"
         >
-          <Card className="bg-white border-[#E5E7EB] shadow-sm overflow-hidden">
+          <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm overflow-hidden">
             <CardContent className="p-2 relative">
               {/* Animated sliding indicator */}
               <motion.div
-                className="absolute left-2 right-2 h-[42px] rounded-xl bg-emerald-50 border border-emerald-100 z-0"
+                className="absolute left-2 right-2 h-[42px] rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] border border-emerald-100 dark:border-[rgba(16,185,129,0.20)] dark:border-[rgba(16,185,129,0.20)] z-0"
                 animate={{
                   top: activeIndex * 44 + 8,
                 }}
@@ -523,8 +523,8 @@ export default function SettingsPage() {
                         w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left
                         transition-colors duration-200 group
                         ${isActive
-                          ? 'text-emerald-700'
-                          : 'text-[#52525B] hover:text-[#18181B]'
+                          ? 'text-emerald-700 dark:text-emerald-400 dark:text-emerald-400'
+                          : 'text-[#52525B] dark:text-[#D4D4D8] hover:text-[#18181B] dark:hover:text-[#FAFAFA]'
                         }
                       `}
                     >
@@ -532,7 +532,7 @@ export default function SettingsPage() {
                         w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200
                         ${isActive
                           ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
-                          : 'bg-[#F9FAFB] text-[#71717A] group-hover:bg-emerald-50 group-hover:text-emerald-600'
+                          : 'bg-[#F9FAFB] dark:bg-[#09090B] text-[#71717A] dark:text-[#A1A1AA] group-hover:bg-emerald-50 dark:group-hover:bg-[rgba(16,185,129,0.10)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
                         }
                       `}
                       >
@@ -562,9 +562,9 @@ export default function SettingsPage() {
         <div className="flex-1 min-w-0">
           {/* Loading state */}
           {loadingData && (
-            <Card className="bg-white border-[#E5E7EB] shadow-sm">
+            <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
               <CardContent className="flex items-center justify-center py-16">
-                <div className="flex items-center gap-3 text-[#71717A]">
+                <div className="flex items-center gap-3 text-[#71717A] dark:text-[#A1A1AA]">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span className="text-sm">Loading your settings...</span>
                 </div>
@@ -583,11 +583,11 @@ export default function SettingsPage() {
             >
               {/* ══════════ PROFILE ══════════ */}
               {activeSection === 'profile' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <User className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">Profile</CardTitle>
@@ -602,9 +602,9 @@ export default function SettingsPage() {
                         {initials || '??'}
                       </div>
                       <div>
-                        <p className="font-semibold text-[#18181B]">{name || 'Your Name'}</p>
-                        <p className="text-sm text-[#71717A]">{email || 'your@email.com'}</p>
-                        <Badge className="mt-2 bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50 text-xs">
+                        <p className="font-semibold text-[#18181B] dark:text-[#FAFAFA]">{name || 'Your Name'}</p>
+                        <p className="text-sm text-[#71717A] dark:text-[#A1A1AA]">{email || 'your@email.com'}</p>
+                        <Badge className="mt-2 bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-xs">
                           {currentPlan === 'free' ? 'Free Plan' : currentPlan === 'pro' ? 'Pro Plan' : 'Enterprise'}
                         </Badge>
                       </div>
@@ -614,40 +614,40 @@ export default function SettingsPage() {
 
                     {/* Name */}
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-sm font-medium text-[#18181B]">Full Name</Label>
+                      <Label htmlFor="name" className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Full Name</Label>
                       <Input
                         id="name"
                         value={name}
                         onChange={(e) => { setName(e.target.value); debouncedPersist({ name: e.target.value }) }}
-                        className="border-[#E5E7EB] focus:border-emerald-400 focus:ring-emerald-400/20"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus:border-emerald-400 focus:ring-emerald-400/20"
                         placeholder="Your name"
                       />
                     </div>
 
                     {/* Email (readonly) */}
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium text-[#18181B]">
+                      <Label htmlFor="email" className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">
                         Email
-                        <Badge variant="secondary" className="ml-2 text-[10px] bg-[#F9FAFB] text-[#71717A]">Read-only</Badge>
+                        <Badge variant="secondary" className="ml-2 text-[10px] bg-[#F9FAFB] dark:bg-[#09090B] text-[#71717A] dark:text-[#A1A1AA]">Read-only</Badge>
                       </Label>
                       <Input
                         id="email"
                         value={email}
                         readOnly
-                        className="border-[#E5E7EB] bg-[#F9FAFB] text-[#71717A] cursor-not-allowed"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] text-[#71717A] dark:text-[#A1A1AA] cursor-not-allowed"
                       />
                     </div>
 
                     {/* Username */}
                     <div className="space-y-2">
-                      <Label htmlFor="username" className="text-sm font-medium text-[#18181B]">Username</Label>
+                      <Label htmlFor="username" className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Username</Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#71717A]">@</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#71717A] dark:text-[#A1A1AA]">@</span>
                         <Input
                           id="username"
                           value={username}
                           onChange={(e) => { setUsername(e.target.value); debouncedPersist({ username: e.target.value }) }}
-                          className="border-[#E5E7EB] focus:border-emerald-400 focus:ring-emerald-400/20 pl-8"
+                          className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus:border-emerald-400 focus:ring-emerald-400/20 pl-8"
                           placeholder="username"
                         />
                       </div>
@@ -655,15 +655,15 @@ export default function SettingsPage() {
 
                     {/* Bio */}
                     <div className="space-y-2">
-                      <Label htmlFor="bio" className="text-sm font-medium text-[#18181B]">Bio</Label>
+                      <Label htmlFor="bio" className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Bio</Label>
                       <Textarea
                         id="bio"
                         value={bio}
                         onChange={(e) => { setBio(e.target.value); debouncedPersist({ bio: e.target.value }) }}
-                        className="border-[#E5E7EB] focus:border-emerald-400 focus:ring-emerald-400/20 min-h-[100px]"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus:border-emerald-400 focus:ring-emerald-400/20 min-h-[100px]"
                         placeholder="Tell us about yourself..."
                       />
-                      <p className="text-xs text-[#A1A1AA]">{bio.length}/280 characters</p>
+                      <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">{bio.length}/280 characters</p>
                     </div>
 
                     <Button
@@ -722,11 +722,11 @@ export default function SettingsPage() {
               {activeSection === 'subscription' && (
                 <div className="space-y-6">
                   {/* Current Plan */}
-                  <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                  <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                          <CreditCard className="w-5 h-5 text-emerald-600" />
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
                           <CardTitle className="text-lg">Subscription & Billing</CardTitle>
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Plan Badge */}
-                      <div className="flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
+                      <div className="flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 dark:border-[rgba(16,185,129,0.20)]">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center">
                             {currentPlan === 'pro' ? (
@@ -746,10 +746,10 @@ export default function SettingsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold text-[#18181B]">
+                            <p className="font-bold text-[#18181B] dark:text-[#FAFAFA]">
                               {currentPlan === 'free' ? 'Free Plan' : currentPlan === 'pro' ? 'Pro Plan' : 'Enterprise Plan'}
                             </p>
-                            <p className="text-sm text-[#71717A]">
+                            <p className="text-sm text-[#71717A] dark:text-[#A1A1AA]">
                               {currentPlan === 'free' ? 'Basic features for individuals' : currentPlan === 'pro' ? 'Advanced features for teams' : 'Custom features for organizations'}
                             </p>
                           </div>
@@ -761,9 +761,9 @@ export default function SettingsPage() {
 
                       {/* Plan Features */}
                       <div className="space-y-2">
-                        <p className="text-sm font-semibold text-[#18181B]">Plan includes:</p>
+                        <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Plan includes:</p>
                         {currentPlan === 'free' ? (
-                          <ul className="space-y-2 text-sm text-[#52525B]">
+                          <ul className="space-y-2 text-sm text-[#52525B] dark:text-[#D4D4D8]">
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Up to 50 knowledge nodes</li>
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 10 AI queries per day</li>
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 100 MB storage</li>
@@ -771,7 +771,7 @@ export default function SettingsPage() {
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Morning digest</li>
                           </ul>
                         ) : (
-                          <ul className="space-y-2 text-sm text-[#52525B]">
+                          <ul className="space-y-2 text-sm text-[#52525B] dark:text-[#D4D4D8]">
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Unlimited knowledge nodes</li>
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> Unlimited AI queries</li>
                             <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 10 GB storage</li>
@@ -795,7 +795,7 @@ export default function SettingsPage() {
                           <Button
                             onClick={handleManageBilling}
                             variant="outline"
-                            className="border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50"
+                            className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]"
                           >
                             Manage Billing
                           </Button>
@@ -805,7 +805,7 @@ export default function SettingsPage() {
                   </Card>
 
                   {/* Usage Stats */}
-                  <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                  <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                     <CardHeader>
                       <CardTitle className="text-base">Usage Statistics</CardTitle>
                       <CardDescription>Your current usage for this billing period</CardDescription>
@@ -814,17 +814,17 @@ export default function SettingsPage() {
                       {/* Nodes */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-[#18181B]">Knowledge Nodes</span>
-                          <span className="text-[#71717A]">
+                          <span className="font-medium text-[#18181B] dark:text-[#FAFAFA]">Knowledge Nodes</span>
+                          <span className="text-[#71717A] dark:text-[#A1A1AA]">
                             {usageStats.nodesLimit > 0
                               ? `${usageStats.totalNodes} / ${usageStats.nodesLimit}`
                               : `${usageStats.totalNodes} (unlimited)`
                             }
                           </span>
                         </div>
-                        <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
+                        <div className="h-2 bg-[#F9FAFB] dark:bg-[#09090B] rounded-full overflow-hidden">
                           <motion.div
-                            className={`h-full rounded-full ${nodesPercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`h-full rounded-full ${nodesPercent >= 90 ? 'bg-amber-500' : 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]0'}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(100, nodesPercent)}%` }}
                             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -835,9 +835,9 @@ export default function SettingsPage() {
                       {/* AI Queries */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-[#18181B]">AI Queries Today</span>
+                          <span className="font-medium text-[#18181B] dark:text-[#FAFAFA]">AI Queries Today</span>
                           <div className="flex items-center gap-2">
-                            <span className={isOverAiLimit ? 'text-amber-600 font-semibold' : 'text-[#71717A]'}>
+                            <span className={isOverAiLimit ? 'text-amber-600 font-semibold' : 'text-[#71717A] dark:text-[#A1A1AA]'}>
                               {usageStats.aiQueriesLimit > 0
                                 ? `${usageStats.aiQueriesToday} / ${usageStats.aiQueriesLimit}`
                                 : `${usageStats.aiQueriesToday} (unlimited)`
@@ -848,9 +848,9 @@ export default function SettingsPage() {
                             )}
                           </div>
                         </div>
-                        <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
+                        <div className="h-2 bg-[#F9FAFB] dark:bg-[#09090B] rounded-full overflow-hidden">
                           <motion.div
-                            className={`h-full rounded-full ${isOverAiLimit ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`h-full rounded-full ${isOverAiLimit ? 'bg-amber-500' : 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]0'}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(100, aiQueriesPercent)}%` }}
                             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
@@ -868,17 +868,17 @@ export default function SettingsPage() {
                       {/* Storage */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-[#18181B]">Storage</span>
-                          <span className="text-[#71717A]">
+                          <span className="font-medium text-[#18181B] dark:text-[#FAFAFA]">Storage</span>
+                          <span className="text-[#71717A] dark:text-[#A1A1AA]">
                             {usageStats.storageLimitMB > 0
                               ? `${formatStorage(usageStats.storageUsedMB)} / ${formatStorage(usageStats.storageLimitMB)}`
                               : `${formatStorage(usageStats.storageUsedMB)} (unlimited)`
                             }
                           </span>
                         </div>
-                        <div className="h-2 bg-[#F9FAFB] rounded-full overflow-hidden">
+                        <div className="h-2 bg-[#F9FAFB] dark:bg-[#09090B] rounded-full overflow-hidden">
                           <motion.div
-                            className={`h-full rounded-full ${storagePercent >= 90 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                            className={`h-full rounded-full ${storagePercent >= 90 ? 'bg-amber-500' : 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]0'}`}
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(100, storagePercent)}%` }}
                             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
@@ -892,11 +892,11 @@ export default function SettingsPage() {
 
               {/* ══════════ KNOWLEDGE GRAPH ══════════ */}
               {activeSection === 'knowledge-graph' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Network className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <Network className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">Knowledge Graph</CardTitle>
@@ -907,7 +907,7 @@ export default function SettingsPage() {
                   <CardContent className="space-y-6">
                     {/* Default Layout */}
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium text-[#18181B]">Default Layout</Label>
+                      <Label className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Default Layout</Label>
                       <RadioGroup
                         value={graphLayout}
                         onValueChange={(v) => { setGraphLayout(v as 'force' | 'radial' | 'tree'); persistSetting({ graphLayout: v }) }}
@@ -919,17 +919,17 @@ export default function SettingsPage() {
                             className={`
                               flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all
                               ${graphLayout === layout
-                                ? 'border-emerald-300 bg-emerald-50 text-emerald-700 shadow-sm'
-                                : 'border-[#E5E7EB] bg-white hover:border-emerald-200 hover:bg-emerald-50/30'
+                                ? 'border-emerald-300 bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 shadow-sm'
+                                : 'border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12] hover:border-emerald-200 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]/30'
                               }
                             `}
                           >
-                            <RadioGroupItem value={layout} className={graphLayout === layout ? 'text-emerald-600' : ''} />
+                            <RadioGroupItem value={layout} className={graphLayout === layout ? 'text-emerald-600 dark:text-emerald-400' : ''} />
                             <span className="text-sm font-medium capitalize">{layout}</span>
                           </Label>
                         ))}
                       </RadioGroup>
-                      <p className="text-xs text-[#A1A1AA]">Force = physics simulation, Radial = hub-spoke, Tree = hierarchical</p>
+                      <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">Force = physics simulation, Radial = hub-spoke, Tree = hierarchical</p>
                     </div>
 
                     <Separator className="bg-[#E5E7EB]" />
@@ -937,8 +937,8 @@ export default function SettingsPage() {
                     {/* Show Labels */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Show Labels</p>
-                        <p className="text-xs text-[#71717A]">Display text labels on graph nodes</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Show Labels</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Display text labels on graph nodes</p>
                       </div>
                       <Switch
                         checked={showLabels}
@@ -952,11 +952,11 @@ export default function SettingsPage() {
                     {/* Node Size */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Node Size</p>
-                        <p className="text-xs text-[#71717A]">Size of nodes in the graph view</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Node Size</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Size of nodes in the graph view</p>
                       </div>
                       <Select value={nodeSize} onValueChange={(v) => { setNodeSize(v as 'small' | 'medium' | 'large'); persistSetting({ nodeSize: v }) }}>
-                        <SelectTrigger className="w-[140px] border-[#E5E7EB]">
+                        <SelectTrigger className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -972,11 +972,11 @@ export default function SettingsPage() {
                     {/* Edge Style */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Edge Style</p>
-                        <p className="text-xs text-[#71717A]">Visual style of connection lines</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Edge Style</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Visual style of connection lines</p>
                       </div>
                       <Select value={edgeStyle} onValueChange={(v) => { setEdgeStyle(v as 'solid' | 'dashed'); persistSetting({ edgeStyle: v }) }}>
-                        <SelectTrigger className="w-[140px] border-[#E5E7EB]">
+                        <SelectTrigger className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -991,8 +991,8 @@ export default function SettingsPage() {
                     {/* Auto-link Discoveries */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Auto-link Discoveries</p>
-                        <p className="text-xs text-[#71717A]">Automatically create connections when new relationships are found</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Auto-link Discoveries</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Automatically create connections when new relationships are found</p>
                       </div>
                       <Switch
                         checked={autoLinkDiscoveries}
@@ -1006,11 +1006,11 @@ export default function SettingsPage() {
                     {/* Animation Speed */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Animation Speed</p>
-                        <p className="text-xs text-[#71717A]">Speed of graph layout transitions</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Animation Speed</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Speed of graph layout transitions</p>
                       </div>
                       <Select value={animationSpeed} onValueChange={(v) => { setAnimationSpeed(v as 'slow' | 'normal' | 'fast'); persistSetting({ animationSpeed: v }) }}>
-                        <SelectTrigger className="w-[140px] border-[#E5E7EB]">
+                        <SelectTrigger className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1026,11 +1026,11 @@ export default function SettingsPage() {
 
               {/* ══════════ MORNING DIGEST ══════════ */}
               {activeSection === 'morning-digest' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Sun className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <Sun className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">Morning Digest</CardTitle>
@@ -1042,8 +1042,8 @@ export default function SettingsPage() {
                     {/* Enabled */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Enable Morning Digest</p>
-                        <p className="text-xs text-[#71717A]">Receive a daily summary of your team&apos;s knowledge updates</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Enable Morning Digest</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Receive a daily summary of your team&apos;s knowledge updates</p>
                       </div>
                       <Switch
                         checked={digestEnabled}
@@ -1059,14 +1059,14 @@ export default function SettingsPage() {
                         {/* Delivery Time */}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-[#18181B]">Delivery Time</p>
-                            <p className="text-xs text-[#71717A]">When to receive your daily digest</p>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Delivery Time</p>
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">When to receive your daily digest</p>
                           </div>
                           <Input
                             type="time"
                             value={deliveryTime}
                             onChange={(e) => { setDeliveryTime(e.target.value); debouncedPersist({ deliveryTime: e.target.value }) }}
-                            className="w-[140px] border-[#E5E7EB] focus:border-emerald-400"
+                            className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus:border-emerald-400"
                           />
                         </div>
 
@@ -1075,8 +1075,8 @@ export default function SettingsPage() {
                         {/* Email Notification */}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-[#18181B]">Email Notification</p>
-                            <p className="text-xs text-[#71717A]">Send digest via email in addition to in-app</p>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Email Notification</p>
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Send digest via email in addition to in-app</p>
                           </div>
                           <Switch
                             checked={digestEmail}
@@ -1090,8 +1090,8 @@ export default function SettingsPage() {
                         {/* Include AI Comment */}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-[#18181B]">Include AI Commentary</p>
-                            <p className="text-xs text-[#71717A]">Add AI-generated insights to your digest</p>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Include AI Commentary</p>
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Add AI-generated insights to your digest</p>
                           </div>
                           <Switch
                             checked={includeAIComment}
@@ -1105,8 +1105,8 @@ export default function SettingsPage() {
                         {/* Focus Areas */}
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm font-medium text-[#18181B]">Focus Areas</p>
-                            <p className="text-xs text-[#71717A]">Select which areas to prioritize in your digest</p>
+                            <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Focus Areas</p>
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Select which areas to prioritize in your digest</p>
                           </div>
                           <div className="space-y-3">
                             {[
@@ -1115,7 +1115,7 @@ export default function SettingsPage() {
                               { key: 'security' as const, label: 'Security', desc: 'Security protocols, auth, and compliance' },
                               { key: 'projects' as const, label: 'Projects', desc: 'Active projects, milestones, and deadlines' },
                             ].map((area) => (
-                              <div key={area.key} className="flex items-start gap-3 p-3 rounded-xl border border-[#E5E7EB] hover:border-emerald-200 transition-colors">
+                              <div key={area.key} className="flex items-start gap-3 p-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 dark:border-[rgba(16,185,129,0.20)] transition-colors">
                                 <Checkbox
                                   id={`focus-${area.key}`}
                                   checked={focusAreas[area.key]}
@@ -1127,10 +1127,10 @@ export default function SettingsPage() {
                                   className="mt-0.5 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                                 />
                                 <div>
-                                  <Label htmlFor={`focus-${area.key}`} className="text-sm font-medium text-[#18181B] cursor-pointer">
+                                  <Label htmlFor={`focus-${area.key}`} className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA] cursor-pointer">
                                     {area.label}
                                   </Label>
-                                  <p className="text-xs text-[#71717A]">{area.desc}</p>
+                                  <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">{area.desc}</p>
                                 </div>
                               </div>
                             ))}
@@ -1144,11 +1144,11 @@ export default function SettingsPage() {
 
               {/* ══════════ AI CHAT ══════════ */}
               {activeSection === 'ai-chat' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <MessageSquare className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <MessageSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">AI Chat</CardTitle>
@@ -1160,11 +1160,11 @@ export default function SettingsPage() {
                     {/* Default Model */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Default Model</p>
-                        <p className="text-xs text-[#71717A]">Choose the AI model for your conversations</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Default Model</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Choose the AI model for your conversations</p>
                       </div>
                       <Select value={defaultModel} onValueChange={(v) => { setDefaultModel(v as 'default' | 'advanced'); persistSetting({ defaultModel: v }) }}>
-                        <SelectTrigger className="w-[160px] border-[#E5E7EB]">
+                        <SelectTrigger className="w-[160px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1172,7 +1172,7 @@ export default function SettingsPage() {
                           <SelectItem value="advanced">
                             <span className="flex items-center gap-2">
                               Advanced
-                              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50 text-[9px] px-1.5">PRO</Badge>
+                              <Badge className="bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-[9px] px-1.5">PRO</Badge>
                             </span>
                           </SelectItem>
                         </SelectContent>
@@ -1184,8 +1184,8 @@ export default function SettingsPage() {
                     {/* Stream Responses */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Stream Responses</p>
-                        <p className="text-xs text-[#71717A]">Display AI responses word by word as they generate</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Stream Responses</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Display AI responses word by word as they generate</p>
                       </div>
                       <Switch
                         checked={streamResponses}
@@ -1199,8 +1199,8 @@ export default function SettingsPage() {
                     {/* Show Sources */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Show Sources</p>
-                        <p className="text-xs text-[#71717A]">Display knowledge source references in AI responses</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Show Sources</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Display knowledge source references in AI responses</p>
                       </div>
                       <Switch
                         checked={showSources}
@@ -1215,10 +1215,10 @@ export default function SettingsPage() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-[#18181B]">Confidence Threshold</p>
-                          <p className="text-xs text-[#71717A]">Minimum confidence level for AI responses</p>
+                          <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Confidence Threshold</p>
+                          <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Minimum confidence level for AI responses</p>
                         </div>
-                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50">
+                        <Badge className="bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]">
                           {confidenceThreshold[0]}%
                         </Badge>
                       </div>
@@ -1230,7 +1230,7 @@ export default function SettingsPage() {
                         step={5}
                         className="w-full"
                       />
-                      <div className="flex justify-between text-xs text-[#A1A1AA]">
+                      <div className="flex justify-between text-xs text-[#A1A1AA] dark:text-[#71717A]">
                         <span>0% — Show all</span>
                         <span>100% — Only high confidence</span>
                       </div>
@@ -1241,11 +1241,11 @@ export default function SettingsPage() {
 
               {/* ══════════ NOTIFICATIONS ══════════ */}
               {activeSection === 'notifications' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Bell className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <Bell className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">Notifications</CardTitle>
@@ -1257,8 +1257,8 @@ export default function SettingsPage() {
                     {/* Email Notifications */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Email Notifications</p>
-                        <p className="text-xs text-[#71717A]">Receive important updates via email</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Email Notifications</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Receive important updates via email</p>
                       </div>
                       <Switch
                         checked={emailNotifs}
@@ -1272,8 +1272,8 @@ export default function SettingsPage() {
                     {/* Weekly Summary */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Weekly Summary</p>
-                        <p className="text-xs text-[#71717A]">Get a weekly overview of your team&apos;s knowledge activity</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Weekly Summary</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Get a weekly overview of your team&apos;s knowledge activity</p>
                       </div>
                       <Switch
                         checked={weeklySummary}
@@ -1287,8 +1287,8 @@ export default function SettingsPage() {
                     {/* New Features */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">New Features</p>
-                        <p className="text-xs text-[#71717A]">Be notified about new LORE features and improvements</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">New Features</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Be notified about new LORE features and improvements</p>
                       </div>
                       <Switch
                         checked={newFeatures}
@@ -1302,8 +1302,8 @@ export default function SettingsPage() {
                     {/* Digest Reminders */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Digest Reminders</p>
-                        <p className="text-xs text-[#71717A]">Remind you to check your daily digest</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Digest Reminders</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Remind you to check your daily digest</p>
                       </div>
                       <Switch
                         checked={digestReminders}
@@ -1317,8 +1317,8 @@ export default function SettingsPage() {
                     {/* Notification Sounds */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Notification Sounds</p>
-                        <p className="text-xs text-[#71717A]">Play sounds for achievements and notifications</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Notification Sounds</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Play sounds for achievements and notifications</p>
                       </div>
                       <Switch
                         checked={soundEnabled}
@@ -1336,11 +1336,11 @@ export default function SettingsPage() {
               {/* ══════════ PRIVACY & SECURITY ══════════ */}
               {activeSection === 'privacy-security' && (
                 <div className="space-y-6">
-                  <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                  <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                          <Shield className="w-5 h-5 text-emerald-600" />
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
                           <CardTitle className="text-lg">Privacy & Security</CardTitle>
@@ -1352,8 +1352,8 @@ export default function SettingsPage() {
                       {/* Two-Factor Authentication */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-[#18181B]">Two-Factor Authentication</p>
-                          <p className="text-xs text-[#71717A]">Add an extra layer of security to your account</p>
+                          <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Two-Factor Authentication</p>
+                          <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Add an extra layer of security to your account</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 text-[10px]">Coming Soon</Badge>
@@ -1371,11 +1371,11 @@ export default function SettingsPage() {
                       {/* Data Retention */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-[#18181B]">Data Retention</p>
-                          <p className="text-xs text-[#71717A]">How long to keep your data after deletion</p>
+                          <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Data Retention</p>
+                          <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">How long to keep your data after deletion</p>
                         </div>
                         <Select value={dataRetention} onValueChange={(v) => { setDataRetention(v as '30' | '90' | '365' | 'forever'); persistSetting({ dataRetention: v }) }}>
-                          <SelectTrigger className="w-[140px] border-[#E5E7EB]">
+                          <SelectTrigger className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1392,14 +1392,14 @@ export default function SettingsPage() {
                       {/* Download My Data */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-[#18181B]">Download My Data</p>
-                          <p className="text-xs text-[#71717A]">Export all your data in JSON format</p>
+                          <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Download My Data</p>
+                          <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Export all your data in JSON format</p>
                         </div>
                         <Button
                           variant="outline"
                           onClick={handleDownloadData}
                           disabled={downloadingData}
-                          className="border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50"
+                          className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)]"
                         >
                           {downloadingData ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
                           Download
@@ -1409,7 +1409,7 @@ export default function SettingsPage() {
                   </Card>
 
                   {/* Danger Zone - now inside privacy-security section */}
-                  <Card className="bg-white border-red-200 shadow-sm">
+                  <Card className="bg-white dark:bg-[#0F0F12] border-red-200 shadow-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
@@ -1459,11 +1459,11 @@ export default function SettingsPage() {
 
               {/* ══════════ APPEARANCE ══════════ */}
               {activeSection === 'appearance' && (
-                <Card className="bg-white border-[#E5E7EB] shadow-sm">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Palette className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
+                        <Palette className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
                         <CardTitle className="text-lg">Appearance</CardTitle>
@@ -1475,15 +1475,15 @@ export default function SettingsPage() {
                     {/* Theme */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Theme</p>
-                        <p className="text-xs text-[#71717A]">Choose your preferred color scheme</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Theme</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Choose your preferred color scheme</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
-                          <div className="w-4 h-4 rounded-full bg-white border border-[#E5E7EB]" />
-                          <span className="text-sm font-medium text-emerald-700">Light</span>
+                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] border border-emerald-200 dark:border-[rgba(16,185,129,0.20)]">
+                          <div className="w-4 h-4 rounded-full bg-white dark:bg-[#0F0F12] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]" />
+                          <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Light</span>
                         </div>
-                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50 text-[10px]">
+                        <Badge className="bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-[10px]">
                           <Lock className="w-2.5 h-2.5 mr-0.5" />
                           Only option
                         </Badge>
@@ -1495,11 +1495,11 @@ export default function SettingsPage() {
                     {/* Font Size */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Font Size</p>
-                        <p className="text-xs text-[#71717A]">Adjust the base font size</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Font Size</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Adjust the base font size</p>
                       </div>
                       <Select value={fontSize} onValueChange={(v) => { setFontSize(v as 'normal' | 'large'); persistSetting({ fontSize: v }) }}>
-                        <SelectTrigger className="w-[140px] border-[#E5E7EB]">
+                        <SelectTrigger className="w-[140px] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1514,14 +1514,14 @@ export default function SettingsPage() {
                     {/* Sidebar Position */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Sidebar Position</p>
-                        <p className="text-xs text-[#71717A]">Choose which side the sidebar appears on</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Sidebar Position</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Choose which side the sidebar appears on</p>
                       </div>
-                      <div className="flex items-center gap-1 p-1 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
+                      <div className="flex items-center gap-1 p-1 bg-[#F9FAFB] dark:bg-[#09090B] rounded-lg border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                         <button
                           onClick={() => { setSidebarPosition('left'); persistSetting({ sidebarPosition: 'left' }) }}
                           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                            sidebarPosition === 'left' ? 'bg-white text-[#18181B] shadow-sm' : 'text-[#71717A] hover:text-[#52525B]'
+                            sidebarPosition === 'left' ? 'bg-white dark:bg-[#0F0F12] text-[#18181B] dark:text-[#FAFAFA] shadow-sm' : 'text-[#71717A] dark:text-[#A1A1AA] hover:text-[#52525B] dark:text-[#D4D4D8]'
                           }`}
                         >
                           Left
@@ -1529,7 +1529,7 @@ export default function SettingsPage() {
                         <button
                           onClick={() => { setSidebarPosition('right'); persistSetting({ sidebarPosition: 'right' }) }}
                           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                            sidebarPosition === 'right' ? 'bg-white text-[#18181B] shadow-sm' : 'text-[#71717A] hover:text-[#52525B]'
+                            sidebarPosition === 'right' ? 'bg-white dark:bg-[#0F0F12] text-[#18181B] dark:text-[#FAFAFA] shadow-sm' : 'text-[#71717A] dark:text-[#A1A1AA] hover:text-[#52525B] dark:text-[#D4D4D8]'
                           }`}
                         >
                           Right
@@ -1542,8 +1542,8 @@ export default function SettingsPage() {
                     {/* Reduced Motion */}
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-[#18181B]">Reduced Motion</p>
-                        <p className="text-xs text-[#71717A]">Minimize animations throughout the interface</p>
+                        <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Reduced Motion</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Minimize animations throughout the interface</p>
                       </div>
                       <Switch
                         checked={reducedMotion}
@@ -1579,10 +1579,10 @@ export default function SettingsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white border border-red-200/50">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white dark:bg-[#0F0F12] border border-red-200/50">
                     <div>
-                      <p className="text-sm font-medium text-[#18181B]">Delete Account</p>
-                      <p className="text-xs text-[#71717A]">Permanently delete your account and all associated data</p>
+                      <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Delete Account</p>
+                      <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Permanently delete your account and all associated data</p>
                     </div>
                     <Button
                       disabled
@@ -1592,10 +1592,10 @@ export default function SettingsPage() {
                       Coming Soon
                     </Button>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white border border-red-200/50">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-white dark:bg-[#0F0F12] border border-red-200/50">
                     <div>
-                      <p className="text-sm font-medium text-[#18181B]">Export All Data</p>
-                      <p className="text-xs text-[#71717A]">Download a complete export of your knowledge graph and settings</p>
+                      <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">Export All Data</p>
+                      <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Download a complete export of your knowledge graph and settings</p>
                     </div>
                     <a
                       href="/api/export?type=all"

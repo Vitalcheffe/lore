@@ -48,7 +48,7 @@ const edges = [
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAFBFC] px-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center not-found-bg px-4 relative overflow-hidden">
       <style dangerouslySetInnerHTML={{ __html: driftStyles }} />
 
       {/* Background floating dots */}
@@ -152,7 +152,7 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mt-4 text-lg sm:text-xl text-[#475569] font-medium leading-relaxed"
+          className="mt-4 text-lg sm:text-xl text-[#475569] dark:text-[#A1A1AA] font-medium leading-relaxed"
         >
           This knowledge hasn&apos;t been discovered yet
         </motion.p>
@@ -161,7 +161,7 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mt-2 text-sm text-gray-400 max-w-sm"
+          className="mt-2 text-sm text-gray-400 dark:text-gray-500 max-w-sm"
         >
           The page you&apos;re looking for seems to have disconnected from the knowledge graph. Let&apos;s reconnect you.
         </motion.p>
@@ -186,7 +186,7 @@ export default function NotFound() {
           <Button
             asChild
             variant="outline"
-            className="h-11 px-6 rounded-xl text-sm font-semibold border-emerald-200 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-300 transition-all hover:-translate-y-0.5 w-full sm:w-auto"
+            className="h-11 px-6 rounded-xl text-sm font-semibold border-emerald-200 dark:border-[rgba(16,185,129,0.20)] text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.10)] hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.15)] hover:border-emerald-300 dark:hover:border-[rgba(16,185,129,0.30)] transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           >
             <Link href="/app?search=true">
               <Search className="w-4 h-4 mr-2" />
@@ -197,7 +197,7 @@ export default function NotFound() {
           <Button
             asChild
             variant="ghost"
-            className="h-11 px-6 rounded-xl text-sm font-medium text-[#475569] hover:text-[#0F172A] hover:bg-gray-100 transition-all hover:-translate-y-0.5 w-full sm:w-auto"
+            className="h-11 px-6 rounded-xl text-sm font-medium text-[#475569] dark:text-[#A1A1AA] hover:text-[#0F172A] dark:hover:text-[#FAFAFA] hover:bg-gray-100 dark:hover:bg-[#27272A] transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           >
             <Link href="/">
               <Home className="w-4 h-4 mr-2" />
@@ -211,12 +211,12 @@ export default function NotFound() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.7 }}
-          className="mt-12 flex items-center gap-2 text-gray-300"
+          className="mt-12 flex items-center gap-2 text-gray-300 dark:text-gray-600"
         >
           <div className="w-6 h-6 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
             <Brain className="w-3 h-3 text-white" />
           </div>
-          <span className="text-xs font-bold tracking-tight text-gray-400">LORE</span>
+          <span className="text-xs font-bold tracking-tight text-gray-400 dark:text-gray-500">LORE</span>
         </motion.div>
       </div>
     </div>

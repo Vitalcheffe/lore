@@ -92,7 +92,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0F0F12]">
       <style dangerouslySetInnerHTML={{ __html: graphStyles }} />
 
       {/* Top nav spacer */}
@@ -204,22 +204,22 @@ export default function LoginPage() {
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
                   <Brain className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg font-bold tracking-tight text-[#0F172A]">LORE</span>
+                <span className="text-lg font-bold tracking-tight text-[#0F172A] dark:text-[#FAFAFA]">LORE</span>
               </Link>
-              <h1 className="text-2xl font-extrabold text-[#0F172A]">Welcome back</h1>
-              <p className="text-sm text-[#475569] mt-1">Sign in to your Lore account</p>
+              <h1 className="text-2xl font-extrabold text-[#0F172A] dark:text-[#FAFAFA]">Welcome back</h1>
+              <p className="text-sm text-[#475569] dark:text-[#A1A1AA] mt-1">Sign in to your Lore account</p>
             </div>
 
-            <Card className="border-[#E5E7EB] shadow-sm rounded-2xl">
+            <Card className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-sm rounded-2xl bg-white dark:bg-[#0F0F12]">
               <CardHeader className="hidden lg:block pb-2">
-                <CardTitle className="text-2xl font-bold text-[#0F172A]">Welcome back</CardTitle>
-                <CardDescription className="text-[#475569]">Sign in to your Lore account</CardDescription>
+                <CardTitle className="text-2xl font-bold text-[#0F172A] dark:text-[#FAFAFA]">Welcome back</CardTitle>
+                <CardDescription className="text-[#475569] dark:text-[#A1A1AA]">Sign in to your Lore account</CardDescription>
               </CardHeader>
               <CardContent className="pt-4 lg:pt-2">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email */}
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-[#0F172A] text-sm font-medium">Email</Label>
+                    <Label htmlFor="email" className="text-[#0F172A] dark:text-[#FAFAFA] text-sm font-medium">Email</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
@@ -228,7 +228,7 @@ export default function LoginPage() {
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="login-input pl-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white transition-all duration-200"
+                        className="login-input pl-10 h-11 rounded-xl border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] focus:bg-white dark:focus:bg-[#0F0F12] transition-all duration-200"
                         required
                       />
                     </div>
@@ -237,7 +237,7 @@ export default function LoginPage() {
                   {/* Password */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-[#0F172A] text-sm font-medium">Password</Label>
+                      <Label htmlFor="password" className="text-[#0F172A] dark:text-[#FAFAFA] text-sm font-medium">Password</Label>
                       <Link href="/forgot-password" className="text-xs font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
                         Forgot password?
                       </Link>
@@ -250,7 +250,7 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="login-input pl-10 pr-10 h-11 rounded-xl border-[#E5E7EB] bg-[#F9FAFB] focus:bg-white transition-all duration-200"
+                        className="login-input pl-10 pr-10 h-11 rounded-xl border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] focus:bg-white dark:focus:bg-[#0F0F12] transition-all duration-200"
                         required
                       />
                       <button
@@ -271,7 +271,7 @@ export default function LoginPage() {
                       onCheckedChange={(checked) => setRememberMe(checked === true)}
                       className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                     />
-                    <label htmlFor="remember" className="text-sm text-[#475569] cursor-pointer select-none">
+                    <label htmlFor="remember" className="text-sm text-[#475569] dark:text-[#A1A1AA] cursor-pointer select-none">
                       Remember me
                     </label>
                   </div>
@@ -312,9 +312,9 @@ export default function LoginPage() {
 
                 {/* Divider */}
                 <div className="flex items-center gap-4 my-6">
-                  <div className="flex-1 h-px bg-[#E5E7EB]" />
+                  <div className="flex-1 h-px bg-[#E5E7EB] dark:bg-[rgba(255,255,255,0.08)]" />
                   <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">or</span>
-                  <div className="flex-1 h-px bg-[#E5E7EB]" />
+                  <div className="flex-1 h-px bg-[#E5E7EB] dark:bg-[rgba(255,255,255,0.08)]" />
                 </div>
 
                 {/* Google OAuth — more prominent */}
@@ -322,7 +322,7 @@ export default function LoginPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 rounded-xl text-sm font-semibold border-[#E5E7EB] bg-white hover:bg-[#F9FAFB] hover:border-gray-300 hover:shadow-md transition-all duration-200"
+                    className="w-full h-12 rounded-xl text-sm font-semibold border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:border-gray-300 dark:hover:border-[rgba(255,255,255,0.12)] hover:shadow-md transition-all duration-200"
                     onClick={() => signIn('google', { callbackUrl: '/app' })}
                   >
                     <svg className="w-5 h-5 mr-2.5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
@@ -331,7 +331,7 @@ export default function LoginPage() {
                 </motion.div>
 
                 {/* Sign up link */}
-                <p className="text-center text-sm text-[#475569] mt-6">
+                <p className="text-center text-sm text-[#475569] dark:text-[#A1A1AA] mt-6">
                   Don&apos;t have an account?{' '}
                   <Link href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">
                     Sign up
@@ -366,7 +366,7 @@ export default function LoginPage() {
                 {['Acme Corp', 'NovaTech', 'Meridian', 'Apex Labs', 'Vantage AI'].map((name) => (
                   <span
                     key={name}
-                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] text-[11px] font-semibold text-gray-500 tracking-tight"
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#F9FAFB] dark:bg-[#18181B] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] text-[11px] font-semibold text-gray-500 dark:text-gray-400 tracking-tight"
                   >
                     {name}
                   </span>

@@ -88,18 +88,18 @@ export function ShortcutHelp() {
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="fixed inset-0 z-[151] flex items-center justify-center p-4 pointer-events-none"
           >
-            <div className="bg-white rounded-2xl shadow-2xl border border-[#E5E7EB] w-full max-w-lg max-h-[80vh] overflow-hidden pointer-events-auto">
+            <div className="bg-white dark:bg-[#0F0F12] rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] w-full max-w-lg max-h-[80vh] overflow-hidden pointer-events-auto">
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB]">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
                     <Keyboard className="w-4 h-4 text-emerald-600" />
                   </div>
-                  <h2 className="text-base font-bold text-[#18181B]">Keyboard Shortcuts</h2>
+                  <h2 className="text-base font-bold text-[#18181B] dark:text-[#FAFAFA]">Keyboard Shortcuts</h2>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:text-[#52525B] hover:bg-gray-100 transition-colors"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-[#52525B] dark:hover:text-[#D4D4D8] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.06)] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -109,7 +109,7 @@ export function ShortcutHelp() {
               <div className="px-6 py-4 overflow-y-auto max-h-[60vh] space-y-6">
                 {shortcutCategories.map((category) => (
                   <div key={category.name}>
-                    <h3 className="text-xs font-bold text-[#A1A1AA] uppercase tracking-wider mb-3">
+                    <h3 className="text-xs font-bold text-[#A1A1AA] dark:text-[#71717A] uppercase tracking-wider mb-3">
                       {category.name}
                     </h3>
                     <div className="space-y-2">
@@ -118,10 +118,10 @@ export function ShortcutHelp() {
                           key={shortcut.keys}
                           className="flex items-center justify-between py-1.5"
                         >
-                          <span className="text-sm text-[#52525B]">
+                          <span className="text-sm text-[#52525B] dark:text-[#D4D4D8]">
                             {shortcut.description}
                           </span>
-                          <kbd className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-[#18181B] bg-[#F3F4F6] border border-[#E5E7EB] rounded-md font-mono">
+                          <kbd className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-[#18181B] dark:text-[#FAFAFA] bg-[#F3F4F6] dark:bg-[rgba(255,255,255,0.06)] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] rounded-md font-mono">
                             {shortcut.keys}
                           </kbd>
                         </div>
@@ -132,9 +132,9 @@ export function ShortcutHelp() {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-3 border-t border-[#E5E7EB] bg-[#F9FAFB]">
-                <p className="text-xs text-[#A1A1AA] text-center">
-                  Press <kbd className="px-1.5 py-0.5 text-[10px] font-semibold bg-white border border-[#E5E7EB] rounded font-mono">?</kbd> anytime to toggle this panel
+              <div className="px-6 py-3 border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B]">
+                <p className="text-xs text-[#A1A1AA] dark:text-[#71717A] text-center">
+                  Press <kbd className="px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-[#0F0F12] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] rounded font-mono">?</kbd> anytime to toggle this panel
                 </p>
               </div>
             </div>

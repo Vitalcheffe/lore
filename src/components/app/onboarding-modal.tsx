@@ -653,22 +653,22 @@ export function OnboardingModal() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.93, y: 20 }}
         transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden border border-[#E5E7EB]"
+        className="bg-white dark:bg-[#0F0F12] rounded-2xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
       >
         {/* ── Progress Bar ─────────────────────────────────── */}
         <div className="px-8 pt-5 pb-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-[#A1A1AA] dark:text-[#71717A] uppercase tracking-wider">
               Step {currentStep + 1} of {TOTAL_STEPS}
             </span>
             <button
               onClick={handleSkip}
-              className="text-[11px] text-[#A1A1AA] hover:text-[#71717A] font-medium transition-colors"
+              className="text-[11px] text-[#A1A1AA] dark:text-[#71717A] hover:text-[#71717A] font-medium transition-colors"
             >
               Skip for now
             </button>
           </div>
-          <div className="w-full h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-[#F3F4F6] dark:bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
             <motion.div
               className="h-full rounded-full"
               style={{
@@ -705,23 +705,23 @@ export function OnboardingModal() {
                   >
                     <Brain className="w-7 h-7 text-emerald-600" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-[#18181B] mb-2">
+                  <h2 className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2">
                     Welcome to Lore
                   </h2>
-                  <p className="text-sm text-[#71717A] leading-relaxed max-w-md mb-4">
+                  <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] leading-relaxed max-w-md mb-4">
                     Your team&apos;s memory, alive. Capture, connect, and recall knowledge so nothing falls through the cracks.
                   </p>
                   <WelcomeIllustration />
                   {/* Name input */}
                   <div className="w-full max-w-xs mt-3">
-                    <label className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider block text-left mb-1.5">
+                    <label className="text-[11px] font-semibold text-[#A1A1AA] dark:text-[#71717A] uppercase tracking-wider block text-left mb-1.5">
                       What should we call you?
                     </label>
                     <Input
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       placeholder={user?.name || 'Enter your name'}
-                      className="h-10 text-sm rounded-xl border-[#E5E7EB] focus-visible:border-emerald-300 focus-visible:ring-emerald-100"
+                      className="h-10 text-sm rounded-xl border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:border-emerald-300 focus-visible:ring-emerald-100"
                     />
                   </div>
                 </>
@@ -739,16 +739,16 @@ export function OnboardingModal() {
                   >
                     <Plus className="w-7 h-7 text-cyan-600" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-[#18181B] mb-2">
+                  <h2 className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2">
                     Your First Node
                   </h2>
-                  <p className="text-sm text-[#71717A] leading-relaxed max-w-md mb-3">
+                  <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] leading-relaxed max-w-md mb-3">
                     Every piece of knowledge in Lore is a <strong>node</strong> — an idea, project, resource, or concept. Pick one to start!
                   </p>
                   <NodeCreationIllustration />
                   {/* Suggestions */}
                   <div className="w-full max-w-sm mt-3">
-                    <label className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider block text-left mb-2">
+                    <label className="text-[11px] font-semibold text-[#A1A1AA] dark:text-[#71717A] uppercase tracking-wider block text-left mb-2">
                       Choose a starting point
                     </label>
                     <div className="grid grid-cols-2 gap-2 mb-3">
@@ -762,7 +762,7 @@ export function OnboardingModal() {
                             className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all text-sm ${
                               isSelected
                                 ? 'border-emerald-300 bg-emerald-50/50 shadow-sm shadow-emerald-100'
-                                : 'border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30'
+                                : 'border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 hover:bg-emerald-50/30'
                             }`}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -773,7 +773,7 @@ export function OnboardingModal() {
                             >
                               <SugIcon className="w-3.5 h-3.5" style={{ color: sug.color }} />
                             </div>
-                            <span className="font-medium text-[#18181B] text-[13px]">{sug.label}</span>
+                            <span className="font-medium text-[#18181B] dark:text-[#FAFAFA] text-[13px]">{sug.label}</span>
                             {isSelected && <Check className="w-3.5 h-3.5 text-emerald-500 ml-auto" />}
                           </motion.button>
                         )
@@ -786,7 +786,7 @@ export function OnboardingModal() {
                         setSelectedSuggestion(null)
                       }}
                       placeholder="Or type your own node title..."
-                      className="h-10 text-sm rounded-xl border-[#E5E7EB] focus-visible:border-emerald-300 focus-visible:ring-emerald-100"
+                      className="h-10 text-sm rounded-xl border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:border-emerald-300 focus-visible:ring-emerald-100"
                     />
                   </div>
                 </>
@@ -804,10 +804,10 @@ export function OnboardingModal() {
                   >
                     <Network className="w-7 h-7 text-purple-600" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-[#18181B] mb-2">
+                  <h2 className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2">
                     Connect Your Knowledge
                   </h2>
-                  <p className="text-sm text-[#71717A] leading-relaxed max-w-md mb-3">
+                  <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] leading-relaxed max-w-md mb-3">
                     <strong>Edges</strong> link your nodes together with meaningful relationships — like &ldquo;references&rdquo;, &ldquo;depends on&rdquo;, or &ldquo;created by&rdquo;. This is where the magic happens.
                   </p>
                   <EdgeDemoIllustration />
@@ -851,10 +851,10 @@ export function OnboardingModal() {
                   >
                     <MessageSquare className="w-7 h-7 text-orange-600" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-[#18181B] mb-2">
+                  <h2 className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2">
                     Meet AI Chat
                   </h2>
-                  <p className="text-sm text-[#71717A] leading-relaxed max-w-md mb-3">
+                  <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] leading-relaxed max-w-md mb-3">
                     Ask Lore anything about your knowledge graph. AI understands your connections and surfaces insights you might miss.
                   </p>
                   <ChatIllustration />
@@ -878,7 +878,7 @@ export function OnboardingModal() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.8 }}
                     >
-                      <div className="bg-[#F3F4F6] text-[#18181B] px-3 py-2 rounded-2xl rounded-bl-md text-xs max-w-[80%]">
+                      <div className="bg-[#F3F4F6] dark:bg-[rgba(255,255,255,0.06)] text-[#18181B] dark:text-[#FAFAFA] px-3 py-2 rounded-2xl rounded-bl-md text-xs max-w-[80%]">
                         <TypingMessage
                           text="User Research references it, and Design System depends on it. Both are key inputs for your roadmap planning."
                           speed={20}
@@ -902,10 +902,10 @@ export function OnboardingModal() {
                   >
                     <PartyPopper className="w-7 h-7 text-emerald-600" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-[#18181B] mb-2">
+                  <h2 className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2">
                     You&apos;re All Set!
                   </h2>
-                  <p className="text-sm text-[#71717A] leading-relaxed max-w-md mb-3">
+                  <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] leading-relaxed max-w-md mb-3">
                     We&apos;ve set up 3 sample nodes and 2 connections to get you started. Your knowledge graph is ready to explore!
                   </p>
                   <CelebrationIllustration />
@@ -915,46 +915,46 @@ export function OnboardingModal() {
                       onClick={() => {
                         completeOnboarding()
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30 transition-all text-left group"
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 hover:bg-emerald-50/30 transition-all text-left group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center shrink-0">
                         <Network className="w-4 h-4 text-emerald-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#18181B]">Explore your graph</p>
-                        <p className="text-[11px] text-[#A1A1AA]">See your sample nodes & connections</p>
+                        <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Explore your graph</p>
+                        <p className="text-[11px] text-[#A1A1AA] dark:text-[#71717A]">See your sample nodes & connections</p>
                       </div>
                     </motion.button>
                     <motion.button
                       onClick={() => {
                         completeOnboarding()
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] hover:border-cyan-200 hover:bg-cyan-50/30 transition-all text-left group"
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-cyan-200 hover:bg-cyan-50/30 transition-all text-left group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-cyan-50 dark:bg-[rgba(8,145,178,0.10)] flex items-center justify-center shrink-0">
                         <MessageSquare className="w-4 h-4 text-cyan-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#18181B]">Chat with Lore AI</p>
-                        <p className="text-[11px] text-[#A1A1AA]">Ask about your knowledge graph</p>
+                        <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Chat with Lore AI</p>
+                        <p className="text-[11px] text-[#A1A1AA] dark:text-[#71717A]">Ask about your knowledge graph</p>
                       </div>
                     </motion.button>
                     <motion.button
                       onClick={handleGetStarted}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] hover:border-purple-200 hover:bg-purple-50/30 transition-all text-left group"
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-purple-200 hover:bg-purple-50/30 transition-all text-left group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-[rgba(124,58,237,0.10)] flex items-center justify-center shrink-0">
                         <LayoutDashboard className="w-4 h-4 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#18181B]">Go to dashboard</p>
-                        <p className="text-[11px] text-[#A1A1AA]">Explore your workspace</p>
+                        <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Go to dashboard</p>
+                        <p className="text-[11px] text-[#A1A1AA] dark:text-[#71717A]">Explore your workspace</p>
                       </div>
                     </motion.button>
                   </div>
@@ -965,7 +965,7 @@ export function OnboardingModal() {
         </div>
 
         {/* ── Navigation Footer ────────────────────────────── */}
-        <div className="px-8 pb-6 pt-2 flex items-center justify-between border-t border-[#F3F4F6]">
+        <div className="px-8 pb-6 pt-2 flex items-center justify-between border-t border-[#F3F4F6] dark:border-[rgba(255,255,255,0.04)]">
           {/* Progress Dots */}
           <div className="flex items-center gap-2">
             {Array.from({ length: TOTAL_STEPS }, (_, i) => (
@@ -980,7 +980,7 @@ export function OnboardingModal() {
                     ? 'w-6 bg-emerald-500'
                     : i < currentStep
                     ? 'w-3 bg-emerald-300'
-                    : 'w-3 bg-[#E5E7EB]'
+                    : 'w-3 bg-[#E5E7EB] dark:bg-[rgba(255,255,255,0.12)]'
                 }`}
                 aria-label={`Go to step ${i + 1}`}
               />
@@ -994,7 +994,7 @@ export function OnboardingModal() {
                 variant="ghost"
                 size="sm"
                 onClick={handleBack}
-                className="text-[#71717A] hover:text-[#18181B] text-xs gap-1"
+                className="text-[#71717A] dark:text-[#A1A1AA] hover:text-[#18181B] text-xs gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back

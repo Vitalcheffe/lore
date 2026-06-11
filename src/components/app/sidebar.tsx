@@ -17,6 +17,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from 'lucide-react'
 import { SidebarSearch } from '@/components/app/sidebar-search'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -30,9 +31,10 @@ import { useTheme } from 'next-themes'
 // ─── Navigation Items ──────────────────────────────────────
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/app', shortcut: '⌘D', description: 'Overview of your knowledge base', color: '#059669' },
+  { label: 'Search', icon: Search, href: '/app/search', shortcut: '⌘K', description: 'Search across all your knowledge', color: '#10B981' },
   { label: 'Knowledge Graph', icon: Network, href: '/app/graph', shortcut: '⌘G', description: 'Visualize and connect your knowledge', color: '#0891B2' },
   { label: 'Morning Digest', icon: Sun, href: '/app/digest', shortcut: '⌘M', description: 'Daily AI-powered briefing', color: '#D97706', hasNotification: true },
-  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat', shortcut: '⌘K', description: 'Ask questions about your knowledge', color: '#0284C7', hasNotification: true },
+  { label: 'AI Chat', icon: MessageSquare, href: '/app/chat', shortcut: '⌘⇧K', description: 'Ask questions about your knowledge', color: '#0284C7', hasNotification: true },
   { label: 'Memory', icon: BookOpen, href: '/app/memory', shortcut: '⌘N', description: 'Notes, bookmarks, and insights', color: '#7C3AED' },
   { label: 'Team', icon: Users, href: '/app/team', shortcut: '⌘T', description: 'Collaborate with your team', color: '#DB2777' },
   { label: 'Settings', icon: Settings, href: '/app/settings', shortcut: '⌘S', description: 'Customize your experience', color: '#52525B' },
@@ -41,7 +43,7 @@ const navItems = [
 // ─── Plan badge styles ──────────────────────────────────────
 const planBadgeStyles: Record<string, string> = {
   free: 'text-zinc-600 border-zinc-200 bg-zinc-50/50',
-  pro: 'text-emerald-700 border-emerald-200 bg-emerald-50/50',
+  pro: 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.10)]',
   enterprise: 'text-violet-700 border-violet-200 bg-violet-50/50',
 }
 
@@ -105,14 +107,14 @@ function MiniGraphAnimation() {
 // ─── Shimmer Badge ─────────────────────────────────────────
 function ShimmerBadge() {
   return (
-    <span className="relative inline-flex items-center overflow-hidden rounded-md border border-emerald-200 bg-emerald-50/50 px-1.5 py-0.5">
+    <span className="relative inline-flex items-center overflow-hidden rounded-md border border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.10)] px-1.5 py-0.5">
       {/* Shimmer overlay */}
       <motion.span
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"
         animate={{ x: ['-100%', '200%'] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
       />
-      <span className="relative text-[9px] font-bold tracking-wide text-emerald-700">PRO</span>
+      <span className="relative text-[9px] font-bold tracking-wide text-emerald-700 dark:text-emerald-400">PRO</span>
     </span>
   )
 }
@@ -173,7 +175,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-50
-          ${sidebarWidth} bg-white border-r border-[#E5E7EB]
+          ${sidebarWidth} bg-white dark:bg-[#0F0F12] border-r border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]
           flex flex-col relative
           transform transition-all duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]
           lg:translate-x-0
@@ -192,7 +194,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
         {/* ── Logo Section ──────────────────────────────── */}
         <div
           role="banner"
-          className={`h-16 flex items-center gap-2.5 border-b border-[#E5E7EB] shrink-0 transition-all duration-300 ${
+          className={`h-16 flex items-center gap-2.5 border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shrink-0 transition-all duration-300 ${
             collapsed ? 'px-3 justify-center' : 'px-6'
           }`}
         >
@@ -211,7 +213,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
               />
             </div>
             {!collapsed && (
-              <span className="text-lg font-bold tracking-tight text-[#18181B] group-hover:text-emerald-700 transition-colors">
+              <span className="text-lg font-bold tracking-tight text-[#18181B] dark:text-[#FAFAFA] group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                 LORE
               </span>
             )}
@@ -222,7 +224,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
               <MiniGraphAnimation />
               <Badge
                 variant="secondary"
-                className="ml-auto text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-50"
+                className="ml-auto text-[10px] font-bold bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)]"
               >
                 BETA
               </Badge>
@@ -231,15 +233,15 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
           {/* Mobile close button */}
           <button
             onClick={onClose}
-            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors ml-1"
+            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-[#18181B] transition-colors ml-1"
             aria-label="Close sidebar"
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
           {/* Desktop collapse toggle */}
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex w-6 h-6 items-center justify-center rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
+            className="hidden lg:flex w-6 h-6 items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-[#18181B] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-all"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
@@ -253,7 +255,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  className="w-full h-8 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] flex items-center justify-center text-[#A1A1AA] hover:text-[#71717A] hover:border-emerald-300 transition-colors"
+                  className="w-full h-8 rounded-lg border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-[#71717A] dark:hover:text-[#A1A1AA] hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors"
                   aria-label="Search"
                 >
                   <SearchIcon className="w-3.5 h-3.5" />
@@ -283,8 +285,8 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                         group relative w-full flex items-center ${collapsed ? 'justify-center' : 'gap-3'} ${collapsed ? 'px-2' : 'px-3'} py-2.5 rounded-xl text-sm font-medium transition-all
                         ${
                           active
-                            ? 'bg-emerald-50 text-emerald-700 shadow-sm border border-emerald-100'
-                            : 'text-[#52525B] hover:bg-[#F9FAFB] hover:text-[#18181B] border border-transparent'
+                            ? 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-[rgba(16,185,129,0.20)]'
+                            : 'text-[#52525B] dark:text-[#D4D4D8] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA] border border-transparent dark:border-transparent'
                         }
                       `}
                     >
@@ -298,9 +300,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                       />
                       <div className="relative">
                         <item.icon
-                          className={`w-4 h-4 transition-colors ${
-                            active ? 'text-emerald-600' : 'text-[#71717A] group-hover:text-emerald-600'
-                          }`}
+                          className={active ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#71717A] dark:text-[#A1A1AA] group-hover:text-emerald-600 dark:group-hover:text-emerald-400'}
                         />
                         {/* Notification dot for Chat & Digest */}
                         {item.hasNotification && unread > 0 && !active && (
@@ -321,7 +321,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                               transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                             />
                           ) : (
-                            <span className="ml-auto text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="ml-auto text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
                               {item.shortcut}
                             </span>
                           )}
@@ -338,7 +338,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                   {collapsed && (
                     <TooltipContent side="right" className="text-xs">
                       <p className="font-semibold">{item.label}</p>
-                      <p className="text-[#A1A1AA] mt-0.5">{item.description}</p>
+                      <p className="text-[#A1A1AA] dark:text-[#71717A] mt-0.5">{item.description}</p>
                     </TooltipContent>
                   )}
                   {!collapsed && (
@@ -353,7 +353,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
         </TooltipProvider>
 
         {/* ── User Section ──────────────────────────────── */}
-        <div className={`shrink-0 border-t border-[#E5E7EB] ${collapsed ? 'p-2' : 'p-4'}`}>
+        <div className={`shrink-0 border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] ${collapsed ? 'p-2' : 'p-4'}`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} mb-3`}>
             {/* Gradient initials avatar */}
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0 relative">
@@ -377,12 +377,12 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-[#18181B] truncate">
+                  <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA] truncate">
                     {user?.name ?? 'Guest'}
                   </p>
                   <ShimmerBadge />
                 </div>
-                <p className="text-xs text-[#71717A] truncate">
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] truncate">
                   {user?.email ?? ''}
                 </p>
               </div>
@@ -398,7 +398,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
               </Badge>
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="h-8 w-8 flex items-center justify-center rounded-lg text-[#71717A] hover:bg-[#F9FAFB] dark:hover:bg-white/10 transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-lg text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-white/10 transition-colors"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (
@@ -409,7 +409,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
               </button>
               <motion.button
                 onClick={() => signOut()}
-                className="ml-auto h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs text-[#71717A] hover:text-red-600 hover:bg-red-50 transition-all relative overflow-hidden"
+                className="ml-auto h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs text-[#71717A] dark:text-[#A1A1AA] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all relative overflow-hidden"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -428,7 +428,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="h-7 w-7 flex items-center justify-center rounded-lg text-[#71717A] hover:bg-[#F9FAFB] dark:hover:bg-white/10 transition-colors"
+                    className="h-7 w-7 flex items-center justify-center rounded-lg text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-white/10 transition-colors"
                     aria-label="Toggle theme"
                   >
                     {theme === 'dark' ? (
@@ -444,7 +444,7 @@ export function AppSidebar({ isOpen, onClose, collapsed = false, onToggleCollaps
                 <TooltipTrigger asChild>
                   <motion.button
                     onClick={() => signOut()}
-                    className="h-7 w-7 flex items-center justify-center rounded-lg text-[#71717A] hover:text-red-600 hover:bg-red-50 transition-all"
+                    className="h-7 w-7 flex items-center justify-center rounded-lg text-[#71717A] dark:text-[#A1A1AA] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     aria-label="Sign out"

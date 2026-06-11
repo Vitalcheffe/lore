@@ -106,7 +106,7 @@ function StreamingMessage({
   const isStreaming = displayedWordCount < words.length
 
   return (
-    <div className="text-sm leading-relaxed text-[#52525B] whitespace-pre-wrap break-words">
+    <div className="text-sm leading-relaxed text-[#52525B] dark:text-[#D4D4D8] whitespace-pre-wrap break-words">
       {visibleText}
       {isStreaming && <BlinkingCursor />}
     </div>
@@ -200,8 +200,8 @@ function AnimatedChatEmptyState({
         }}
         className="relative mb-6"
       >
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center border border-emerald-200/50 shadow-sm">
-          <MessageSquare className="w-7 h-7 text-emerald-600" />
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-[rgba(16,185,129,0.15)] dark:to-[rgba(20,184,166,0.15)] flex items-center justify-center border border-emerald-200/50 dark:border-[rgba(16,185,129,0.20)] shadow-sm">
+          <MessageSquare className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
         </div>
         {/* Animated glow ring */}
         <motion.div
@@ -224,7 +224,7 @@ function AnimatedChatEmptyState({
             transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
           },
         }}
-        className="text-xl font-bold text-[#18181B] mb-2 tracking-tight"
+        className="text-xl font-bold text-[#18181B] dark:text-[#FAFAFA] mb-2 tracking-tight"
       >
         Ask your knowledge graph
       </motion.h3>
@@ -239,7 +239,7 @@ function AnimatedChatEmptyState({
             transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
           },
         }}
-        className="text-sm text-[#71717A] max-w-md leading-relaxed mb-8"
+        className="text-sm text-[#71717A] dark:text-[#A1A1AA] max-w-md leading-relaxed mb-8"
       >
         Start a conversation with your data. Ask questions, explore connections,
         and get AI-powered insights from your knowledge base.
@@ -272,11 +272,11 @@ function AnimatedChatEmptyState({
             onClick={() => onSuggestionClick?.(suggestion.text)}
             className={`
               text-left px-4 py-3.5 rounded-xl
-              border border-[#E5E7EB] bg-white
-              hover:border-emerald-200 hover:bg-emerald-50/40
+              border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12]
+              hover:border-emerald-200 dark:hover:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50/40 dark:hover:bg-[rgba(16,185,129,0.06)]
               hover:shadow-md hover:shadow-emerald-500/5
               transition-all duration-200
-              text-xs text-[#52525B] font-medium
+              text-xs text-[#52525B] dark:text-[#D4D4D8] font-medium
               group
             `}
             whileHover={{ scale: 1.03, y: -2 }}
@@ -686,7 +686,7 @@ export default function AIChatPage() {
   }
 
   return (
-    <div className="h-full flex bg-white overflow-hidden">
+    <div className="h-full flex bg-white dark:bg-[#0F0F12] overflow-hidden">
       {/* ─── Mobile Sidebar Overlay ───────────────────────── */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -704,7 +704,7 @@ export default function AIChatPage() {
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-50
-          w-80 sm:w-72 bg-[#F9FAFB] border-r border-[#E5E7EB]
+          w-80 sm:w-72 bg-[#F9FAFB] dark:bg-[#09090B] border-r border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]
           flex flex-col
           transform transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]
           lg:translate-x-0
@@ -712,19 +712,19 @@ export default function AIChatPage() {
         `}
       >
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-[#E5E7EB] shrink-0">
+        <div className="p-4 border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shrink-0">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-sm font-bold text-[#18181B]">AI Chat</span>
+              <span className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">AI Chat</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-white flex items-center justify-center"
+              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-white dark:hover:bg-[#18181B] flex items-center justify-center"
             >
-              <X className="w-5 h-5 text-[#71717A]" />
+              <X className="w-5 h-5 text-[#71717A] dark:text-[#A1A1AA]" />
             </button>
           </div>
           <Button
@@ -739,13 +739,13 @@ export default function AIChatPage() {
         {/* Search */}
         <div className="p-3 shrink-0">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA]" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A]" />
             <input
               type="text"
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-full pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
+              className="h-8 w-full pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
             />
           </div>
         </div>
@@ -754,7 +754,7 @@ export default function AIChatPage() {
         <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5">
           {isLoadingConversations ? (
             <div className="flex items-center justify-center py-8">
-              <div className="flex items-center gap-2 text-[#A1A1AA]">
+              <div className="flex items-center gap-2 text-[#A1A1AA] dark:text-[#71717A]">
                 <motion.div
                   className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
@@ -765,7 +765,7 @@ export default function AIChatPage() {
             </div>
           ) : sortedConversations.length === 0 ? (
             <div className="flex items-center justify-center py-8">
-              <p className="text-xs text-[#A1A1AA]">No conversations yet</p>
+              <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">No conversations yet</p>
             </div>
           ) : (
             sortedConversations.map((convo) => (
@@ -774,8 +774,8 @@ export default function AIChatPage() {
                 onClick={() => handleSelectConvo(convo.id)}
                 className={`w-full text-left p-3 rounded-xl transition-all group ${
                   activeConvoId === convo.id
-                    ? 'bg-white border border-emerald-100 shadow-sm'
-                    : 'hover:bg-white/60 active:bg-white/80 border border-transparent'
+                    ? 'bg-white dark:bg-[#0F0F12] border border-emerald-100 dark:border-[rgba(16,185,129,0.15)] shadow-sm'
+                    : 'hover:bg-white/60 dark:hover:bg-[#0F0F12]/60 active:bg-white/80 dark:active:bg-[#0F0F12]/80 border border-transparent'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -784,13 +784,13 @@ export default function AIChatPage() {
                       {convo.pinned && <Pin className="w-2.5 h-2.5 text-emerald-500 shrink-0" />}
                       <p
                         className={`text-xs font-semibold truncate ${
-                          activeConvoId === convo.id ? 'text-emerald-700' : 'text-[#18181B]'
+                          activeConvoId === convo.id ? 'text-emerald-700 dark:text-emerald-400' : 'text-[#18181B] dark:text-[#FAFAFA]'
                         }`}
                       >
                         {convo.title}
                       </p>
                     </div>
-                    <p className="text-[10px] text-[#A1A1AA] mt-0.5 truncate">{convo.preview}</p>
+                    <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] mt-0.5 truncate">{convo.preview}</p>
                     <p className="text-[9px] text-[#D4D4D8] mt-1">{convo.updatedAt}</p>
                   </div>
                   <div className="flex items-center gap-0.5 lg:opacity-0 lg:group-hover:opacity-100 opacity-70 transition-opacity">
@@ -799,12 +799,12 @@ export default function AIChatPage() {
                         e.stopPropagation()
                         handleTogglePin(convo.id)
                       }}
-                      className="min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                      className="min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] active:bg-emerald-100 dark:active:bg-[rgba(16,185,129,0.15)] transition-colors"
                     >
                       {convo.pinned ? (
                         <PinOff className="w-3.5 h-3.5 text-emerald-500" />
                       ) : (
-                        <Pin className="w-3.5 h-3.5 text-[#A1A1AA]" />
+                        <Pin className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A]" />
                       )}
                     </button>
                     <button
@@ -814,7 +814,7 @@ export default function AIChatPage() {
                       }}
                       className="min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center hover:bg-red-50 active:bg-red-100 transition-colors"
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-[#A1A1AA] hover:text-red-500" />
+                      <Trash2 className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] hover:text-red-500" />
                     </button>
                   </div>
                 </div>
@@ -827,19 +827,19 @@ export default function AIChatPage() {
       {/* ─── Main Chat Area ───────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Chat Header */}
-        <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 shrink-0">
+        <div className="h-14 bg-white dark:bg-[#0F0F12] border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex items-center justify-between px-4 shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] active:bg-[#F3F4F6] flex items-center justify-center"
+              className="lg:hidden min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] active:bg-[#F3F4F6] dark:active:bg-[#27272A] flex items-center justify-center"
             >
-              <Menu className="w-5 h-5 text-[#52525B]" />
+              <Menu className="w-5 h-5 text-[#52525B] dark:text-[#D4D4D8]" />
             </button>
             <div>
-              <h2 className="text-sm font-bold text-[#18181B]">
+              <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                 {activeConvo?.title || 'AI Chat'}
               </h2>
-              <p className="text-[10px] text-[#71717A]">
+              <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA]">
                 {isLoadingMessages
                   ? 'Loading messages...'
                   : `${activeConvo?.messages.length || 0} messages`}
@@ -851,7 +851,7 @@ export default function AIChatPage() {
               <TooltipTrigger asChild>
                 <Badge
                   variant="outline"
-                  className="text-[9px] font-bold text-emerald-700 border-emerald-200 bg-emerald-50/50 gap-1"
+                  className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)] gap-1"
                 >
                   <Sparkles className="w-2.5 h-2.5" />
                   Powered by Lore
@@ -878,7 +878,7 @@ export default function AIChatPage() {
             </div>
           ) : isLoadingMessages ? (
             <div className="flex items-center justify-center h-full">
-              <div className="flex items-center gap-2 text-[#A1A1AA]">
+              <div className="flex items-center gap-2 text-[#A1A1AA] dark:text-[#71717A]">
                 <motion.div
                   className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full"
                   animate={{ rotate: 360 }}
@@ -908,15 +908,15 @@ export default function AIChatPage() {
                         <div className="w-4 h-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
                           <Sparkles className="w-2 h-2 text-white" />
                         </div>
-                        <span className="text-[10px] font-semibold text-emerald-600">Lore AI</span>
+                        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Lore AI</span>
                         {msg.timestamp && (
-                          <span className="text-[9px] text-[#A1A1AA] ml-auto">{msg.timestamp}</span>
+                          <span className="text-[9px] text-[#A1A1AA] dark:text-[#71717A] ml-auto">{msg.timestamp}</span>
                         )}
                       </div>
                     )}
                     <div
                       className={`px-3.5 py-2.5 ${
-                        msg.role === 'user' ? 'text-white' : 'text-[#52525B]'
+                        msg.role === 'user' ? 'text-white' : 'text-[#52525B] dark:text-[#D4D4D8]'
                       }`}
                     >
                       {msg.role === 'assistant' ? (
@@ -936,9 +936,9 @@ export default function AIChatPage() {
                     </div>
                     {/* Sources - enhanced with pulse animation, tooltip, and click navigation */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <div className="px-3.5 pb-2.5 pt-1 border-t border-[rgba(0,0,0,0.04)]">
+                      <div className="px-3.5 pb-2.5 pt-1 border-t border-[rgba(0,0,0,0.04)] dark:border-[rgba(255,255,255,0.06)]">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <Network className="w-2.5 h-2.5 text-[#A1A1AA]" />
+                          <Network className="w-2.5 h-2.5 text-[#A1A1AA] dark:text-[#71717A]" />
                           <TooltipProvider delayDuration={200}>
                             {msg.sources.map((source) => {
                               const srcColor = getSourceColor(source)
@@ -963,7 +963,7 @@ export default function AIChatPage() {
                                     >
                                       <Badge
                                         variant="outline"
-                                        className="text-[9px] font-medium py-0 px-1.5 border-[#E5E7EB] cursor-pointer hover:shadow-sm transition-shadow"
+                                        className="text-[9px] font-medium py-0 px-1.5 border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] cursor-pointer hover:shadow-sm transition-shadow"
                                         style={{
                                           color: srcColor,
                                           borderColor: `${srcColor}30`,
@@ -996,8 +996,8 @@ export default function AIChatPage() {
                             onClick={() => handleReaction(msg.id, 'up')}
                             className={`min-w-[28px] min-h-[28px] rounded-lg flex items-center justify-center transition-colors ${
                               reactions[msg.id] === 'up'
-                                ? 'bg-emerald-100 text-emerald-600'
-                                : 'hover:bg-[#F3F4F6] text-[#A1A1AA] hover:text-emerald-500'
+                                ? 'bg-emerald-100 dark:bg-[rgba(16,185,129,0.15)] text-emerald-600 dark:text-emerald-400'
+                                : 'hover:bg-[#F3F4F6] dark:hover:bg-[#27272A] text-[#A1A1AA] dark:text-[#71717A] hover:text-emerald-500'
                             }`}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -1008,8 +1008,8 @@ export default function AIChatPage() {
                             onClick={() => handleReaction(msg.id, 'down')}
                             className={`min-w-[28px] min-h-[28px] rounded-lg flex items-center justify-center transition-colors ${
                               reactions[msg.id] === 'down'
-                                ? 'bg-red-100 text-red-500'
-                                : 'hover:bg-[#F3F4F6] text-[#A1A1AA] hover:text-red-400'
+                                ? 'bg-red-100 dark:bg-[rgba(239,68,68,0.15)] text-red-500'
+                                : 'hover:bg-[#F3F4F6] dark:hover:bg-[#27272A] text-[#A1A1AA] dark:text-[#71717A] hover:text-red-400'
                             }`}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -1055,7 +1055,7 @@ export default function AIChatPage() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-[#E5E7EB] bg-white p-3 sm:p-4 shrink-0 safe-area-bottom">
+        <div className="border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12] p-3 sm:p-4 shrink-0 safe-area-bottom">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-end gap-2">
               <div className="flex-1 relative">
@@ -1067,7 +1067,7 @@ export default function AIChatPage() {
                   placeholder="Ask about your knowledge graph..."
                   rows={1}
                   disabled={isTyping}
-                  className="w-full resize-none rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-4 py-3 text-sm text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all disabled:opacity-50"
+                  className="w-full resize-none rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] px-4 py-3 text-sm text-[#18181B] dark:text-[#FAFAFA] placeholder:text-[#A1A1AA] dark:placeholder:text-[#71717A] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all disabled:opacity-50"
                   style={{ maxHeight: '120px' }}
                 />
               </div>
@@ -1079,9 +1079,9 @@ export default function AIChatPage() {
                 <Send className="w-4 h-4" />
               </Button>
             </div>
-            <p className="hidden sm:block text-[10px] text-[#A1A1AA] mt-2 text-center">
-              Press <kbd className="px-1 py-0.5 bg-[#F4F4F5] rounded text-[9px] font-mono">Enter</kbd> to send,{' '}
-              <kbd className="px-1 py-0.5 bg-[#F4F4F5] rounded text-[9px] font-mono">Shift+Enter</kbd> for new line
+            <p className="hidden sm:block text-[10px] text-[#A1A1AA] dark:text-[#71717A] mt-2 text-center">
+              Press <kbd className="px-1 py-0.5 bg-[#F4F4F5] dark:bg-[#27272A] rounded text-[9px] font-mono">Enter</kbd> to send,{' '}
+              <kbd className="px-1 py-0.5 bg-[#F4F4F5] dark:bg-[#27272A] rounded text-[9px] font-mono">Shift+Enter</kbd> for new line
             </p>
           </div>
         </div>

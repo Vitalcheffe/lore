@@ -294,7 +294,7 @@ function HealthScoreRing({ score, color, glow }: { score: number; color: string;
           cy="70"
           r={radius}
           fill="none"
-          stroke="rgba(0,0,0,0.06)"
+          className="stroke-[rgba(0,0,0,0.06)] dark:stroke-[rgba(255,255,255,0.06)]"
           strokeWidth={strokeWidth}
         />
         {/* Progress circle */}
@@ -355,12 +355,12 @@ function MiniProgressBar({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[11px] font-medium text-[#52525B]">{label}</span>
+          <span className="text-[11px] font-medium text-[#52525B] dark:text-[#D4D4D8]">{label}</span>
           <span className="text-[10px] font-semibold" style={{ color }}>
             {value}/{maxValue}
           </span>
         </div>
-        <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ background: color }}
@@ -439,14 +439,14 @@ function ProTipCard() {
   const [tipIndex] = useState(() => Math.floor(Math.random() * PRO_TIPS.length))
 
   return (
-    <Card className="bg-gradient-to-r from-amber-50/80 to-amber-100/40 border-amber-200/60 hover:shadow-sm transition-shadow">
+    <Card className="bg-gradient-to-r from-amber-50/80 to-amber-100/40 dark:from-[rgba(245,158,11,0.08)] dark:to-[rgba(245,158,11,0.04)] border-amber-200/60 dark:border-[rgba(245,158,11,0.15)] hover:shadow-sm transition-shadow">
       <CardContent className="p-4 flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-          <Lightbulb className="w-4 h-4 text-amber-600" />
+        <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-[rgba(245,158,11,0.12)] flex items-center justify-center shrink-0 mt-0.5">
+          <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">Pro Tip</p>
-          <p className="text-sm text-amber-900/80 leading-relaxed">{PRO_TIPS[tipIndex]}</p>
+          <p className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1">Pro Tip</p>
+          <p className="text-sm text-amber-900/80 dark:text-amber-200/80 leading-relaxed">{PRO_TIPS[tipIndex]}</p>
         </div>
       </CardContent>
     </Card>
@@ -734,13 +734,13 @@ export default function DashboardPage() {
           ═══════════════════════════════════════════════════════ */}
       <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] dark:text-[#FAFAFA] tracking-tight">
             {greeting}, {firstName}
           </h1>
-          <p className="text-sm text-[#71717A] mt-1">
+          <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] mt-1">
             Here&apos;s what&apos;s happening in your knowledge graph today.
           </p>
-          <p className="text-[11px] text-[#A1A1AA] mt-1.5 flex items-center gap-1">
+          <p className="text-[11px] text-[#A1A1AA] dark:text-[#71717A] mt-1.5 flex items-center gap-1">
             <Clock className="w-3 h-3" />
             Last updated just now
           </p>
@@ -748,7 +748,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className="text-[10px] font-semibold text-emerald-700 border-emerald-200 bg-emerald-50/50 gap-1"
+            className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)] gap-1"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {isLoading ? 'Loading...' : `${nodeCount} nodes active`}
@@ -757,7 +757,7 @@ export default function DashboardPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 gap-1 h-7"
+              className="text-xs text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] gap-1 h-7"
             >
               <Download className="w-3 h-3" />
               Export
@@ -823,7 +823,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -2 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow cursor-default">
+            <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:shadow-md transition-shadow cursor-default">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div
@@ -835,17 +835,17 @@ export default function DashboardPage() {
                   <Zap className="w-3.5 h-3.5 text-emerald-500" />
                 </div>
                 <p
-                  className="text-2xl font-bold text-[#18181B]"
+                  className="text-2xl font-bold text-[#18181B] dark:text-[#FAFAFA]"
                   style={{ fontVariantNumeric: 'tabular-nums' }}
                 >
                   <AnimatedNumber value={parseInt(card.value)} />
                   {card.suffix && (
-                    <span className="text-sm font-medium text-[#71717A] ml-0.5">
+                    <span className="text-sm font-medium text-[#71717A] dark:text-[#A1A1AA] ml-0.5">
                       {card.suffix}
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-[#71717A] mt-1">{card.label}</p>
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] mt-1">{card.label}</p>
                 <p className="text-[11px] font-medium mt-2" style={{ color: card.color }}>
                   {card.change}
                 </p>
@@ -859,20 +859,20 @@ export default function DashboardPage() {
           KNOWLEDGE HEALTH SCORE
           ═══════════════════════════════════════════════════════ */}
       <motion.div variants={itemVariants}>
-        <Card className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow">
+        <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-100 dark:from-[rgba(16,185,129,0.12)] to-teal-100 dark:to-[rgba(13,148,136,0.08)] flex items-center justify-center">
                   <Heart className="w-3.5 h-3.5 text-emerald-600" />
                 </div>
-                <h2 className="text-sm font-bold text-[#18181B]">
+                <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                   Knowledge Health Score
                 </h2>
               </div>
               <Badge
                 variant="outline"
-                className="text-[9px] font-bold border-emerald-200 bg-emerald-50/50"
+                className="text-[9px] font-bold border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)]"
                 style={{ color: getHealthColor(healthScore.total) }}
               >
                 {getHealthLabel(healthScore.total).toUpperCase()}
@@ -922,7 +922,7 @@ export default function DashboardPage() {
 
               {/* Weekly Activity Mini Chart */}
               <div className="flex-1 w-full sm:min-w-[180px] sm:max-w-[240px]">
-                <p className="text-[11px] font-semibold text-[#71717A] mb-2 uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-[#71717A] dark:text-[#A1A1AA] mb-2 uppercase tracking-wider">
                   Weekly Activity
                 </p>
                 <WeeklyActivityChart data={weeklyChartData} />
@@ -938,35 +938,35 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Knowledge Graph Preview */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-white border-[#E5E7EB] h-full" style={{ animation: 'pulseGlow 3s ease-in-out infinite' }}>
+          <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] h-full" style={{ animation: 'pulseGlow 3s ease-in-out infinite' }}>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-[#18181B]">
+                <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                   Knowledge Graph
                 </h2>
                 <Badge
                   variant="outline"
-                  className="text-[9px] font-bold text-emerald-700 border-emerald-200 bg-emerald-50/50"
+                  className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)]"
                 >
                   LIVE
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="pb-6">
-              <div className="rounded-xl bg-gradient-to-br from-[#F9FAFB] to-white border border-[#E5E7EB] p-4 mb-4">
+              <div className="rounded-xl bg-gradient-to-br from-[#F9FAFB] dark:from-[#09090B] to-white dark:to-[#0F0F12] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] p-4 mb-4">
                 <MiniGraphSVG />
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-xs text-[#71717A]">
-                  <span className="font-semibold text-[#18181B]">{nodeCount}</span> nodes ·{' '}
-                  <span className="font-semibold text-[#18181B]">{edgeCount}</span> edges ·{' '}
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">
+                  <span className="font-semibold text-[#18181B] dark:text-[#FAFAFA]">{nodeCount}</span> nodes ·{' '}
+                  <span className="font-semibold text-[#18181B] dark:text-[#FAFAFA]">{edgeCount}</span> edges ·{' '}
                   <span className="font-semibold text-emerald-600">{newTodayCount} new today</span>
                 </p>
                 <Link href="/app/graph">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 gap-1"
+                    className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] gap-1"
                   >
                     View Full Graph
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -979,20 +979,20 @@ export default function DashboardPage() {
 
         {/* Morning Digest Preview */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-white border-[#E5E7EB] h-full">
+          <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] h-full">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-100 dark:from-[rgba(245,158,11,0.12)] to-orange-100 dark:to-[rgba(249,115,22,0.08)] flex items-center justify-center">
                     <Sun className="w-3.5 h-3.5 text-amber-600" />
                   </div>
-                  <h2 className="text-sm font-bold text-[#18181B]">
+                  <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                     Morning Digest
                   </h2>
                 </div>
                 <Badge
                   variant="outline"
-                  className="text-[9px] font-semibold text-amber-700 border-amber-200 bg-amber-50/50 gap-1"
+                  className="text-[9px] font-semibold text-amber-700 dark:text-amber-400 border-amber-200 dark:border-[rgba(245,158,11,0.15)] bg-amber-50/50 dark:bg-[rgba(245,158,11,0.06)] gap-1"
                 >
                   <Clock className="w-2.5 h-2.5" />
                   Today 8:00 AM
@@ -1000,8 +1000,8 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pb-6">
-              <div className="rounded-xl bg-gradient-to-br from-amber-50/50 via-white to-orange-50/30 border border-amber-100/50 p-4 mb-4">
-                <p className="text-sm text-[#52525B] leading-relaxed">
+              <div className="rounded-xl bg-gradient-to-br from-amber-50/50 dark:from-[rgba(245,158,11,0.06)] via-white dark:via-[#0F0F12] to-orange-50/30 dark:to-[rgba(249,115,22,0.04)] border border-amber-100/50 dark:border-[rgba(245,158,11,0.10)] p-4 mb-4">
+                <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] leading-relaxed">
                   {digestSummary}
                 </p>
               </div>
@@ -1020,14 +1020,14 @@ export default function DashboardPage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-[#71717A]">
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">
                   {contributorCount} contributor{contributorCount !== 1 ? 's' : ''} active today
                 </p>
                 <Link href="/app/digest" className="sm:ml-auto">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 gap-1"
+                    className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] gap-1"
                   >
                     Read Full Digest
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1045,9 +1045,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity Feed */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
-          <Card className="bg-white border-[#E5E7EB]">
+          <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
             <CardHeader className="pb-2">
-              <h2 className="text-sm font-bold text-[#18181B]">
+              <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                 Recent Activity
               </h2>
             </CardHeader>
@@ -1057,7 +1057,7 @@ export default function DashboardPage() {
                   recentActivity.map((item, i) => (
                     <div
                       key={`${item.title}-${i}`}
-                      className="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-[#F9FAFB] transition-colors cursor-default"
+                      className="flex items-center gap-3 py-3 px-2 rounded-lg hover:bg-[#F9FAFB] dark:hover:bg-[#09090B] transition-colors cursor-default"
                       style={{
                         borderBottom:
                           i < recentActivity.length - 1
@@ -1071,16 +1071,16 @@ export default function DashboardPage() {
                       >
                         <item.icon className="w-4 h-4" style={{ color: item.color }} />
                       </div>
-                      <p className="text-sm text-[#52525B] font-medium truncate flex-1">
+                      <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] font-medium truncate flex-1">
                         {item.title}
                       </p>
-                      <span className="text-xs text-[#A1A1AA] shrink-0 whitespace-nowrap">
+                      <span className="text-xs text-[#A1A1AA] dark:text-[#71717A] shrink-0 whitespace-nowrap">
                         {item.time}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-8 text-[#A1A1AA]">
+                  <div className="flex flex-col items-center justify-center py-8 text-[#A1A1AA] dark:text-[#71717A]">
                     <CircleDot className="w-8 h-8 mb-2 opacity-40" />
                     <p className="text-sm">No recent activity yet</p>
                     <p className="text-xs mt-1">Add a node to get started</p>
@@ -1093,9 +1093,9 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-white border-[#E5E7EB] h-full">
+          <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] h-full">
             <CardHeader className="pb-2">
-              <h2 className="text-sm font-bold text-[#18181B]">
+              <h2 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                 Quick Actions
               </h2>
             </CardHeader>
@@ -1103,21 +1103,21 @@ export default function DashboardPage() {
               {/* Add Node - opens dialog */}
               <Dialog open={addNodeOpen} onOpenChange={setAddNodeOpen}>
                 <DialogTrigger asChild>
-                  <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30 transition-all text-left group">
-                    <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                  <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 dark:hover:border-[rgba(16,185,129,0.20)] hover:bg-emerald-50/30 transition-all text-left group">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-[rgba(16,185,129,0.15)] transition-colors">
                       <Plus className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#18181B]">Add Node</p>
-                      <p className="text-xs text-[#71717A]">Add a new knowledge node</p>
+                      <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Add Node</p>
+                      <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Add a new knowledge node</p>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] group-hover:text-emerald-600 transition-colors" />
+                    <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] group-hover:text-emerald-600 transition-colors" />
                   </button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
                         <Plus className="w-3.5 h-3.5 text-emerald-600" />
                       </div>
                       Add Knowledge Node
@@ -1132,7 +1132,7 @@ export default function DashboardPage() {
                       <Input
                         id="node-title"
                         placeholder="e.g., Payment Gateway Architecture"
-                        className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
                         value={nodeTitle}
                         onChange={(e) => setNodeTitle(e.target.value)}
                       />
@@ -1142,7 +1142,7 @@ export default function DashboardPage() {
                       <Input
                         id="node-type"
                         placeholder="e.g., Concept, Decision, Fact"
-                        className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
                         value={nodeType}
                         onChange={(e) => setNodeType(e.target.value)}
                       />
@@ -1153,7 +1153,7 @@ export default function DashboardPage() {
                         id="node-desc"
                         placeholder="Describe this knowledge node..."
                         rows={3}
-                        className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
+                        className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
                         value={nodeDesc}
                         onChange={(e) => setNodeDesc(e.target.value)}
                       />
@@ -1163,7 +1163,7 @@ export default function DashboardPage() {
                     <Button
                       variant="outline"
                       onClick={() => setAddNodeOpen(false)}
-                      className="border-[#E5E7EB]"
+                      className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
                       disabled={isSubmitting}
                     >
                       Cancel
@@ -1181,43 +1181,43 @@ export default function DashboardPage() {
 
               {/* Start Chat */}
               <Link href="/app/chat" className="block">
-                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] hover:border-teal-200 hover:bg-teal-50/30 transition-all text-left group">
-                  <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center shrink-0 group-hover:bg-teal-100 transition-colors">
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-teal-200 hover:bg-teal-50/30 transition-all text-left group">
+                  <div className="w-9 h-9 rounded-lg bg-teal-50 dark:bg-[rgba(13,148,136,0.10)] flex items-center justify-center shrink-0 group-hover:bg-teal-100 dark:group-hover:bg-[rgba(13,148,136,0.15)] transition-colors">
                     <MessageSquare className="w-4 h-4 text-teal-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#18181B]">Start Chat</p>
-                    <p className="text-xs text-[#71717A]">Ask your knowledge graph</p>
+                    <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Start Chat</p>
+                    <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Ask your knowledge graph</p>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] group-hover:text-teal-600 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] group-hover:text-teal-600 transition-colors" />
                 </button>
               </Link>
 
               {/* Create Note */}
               <Link href="/app/memory" className="block">
-                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] hover:border-violet-200 hover:bg-violet-50/30 transition-all text-left group">
-                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center shrink-0 group-hover:bg-violet-100 transition-colors">
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-violet-200 hover:bg-violet-50/30 transition-all text-left group">
+                  <div className="w-9 h-9 rounded-lg bg-violet-50 dark:bg-[rgba(124,58,237,0.10)] flex items-center justify-center shrink-0 group-hover:bg-violet-100 dark:group-hover:bg-[rgba(124,58,237,0.15)] transition-colors">
                     <BookOpen className="w-4 h-4 text-violet-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#18181B]">Create Note</p>
-                    <p className="text-xs text-[#71717A]">Capture a new memory</p>
+                    <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Create Note</p>
+                    <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Capture a new memory</p>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] group-hover:text-violet-600 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] group-hover:text-violet-600 transition-colors" />
                 </button>
               </Link>
 
               {/* Morning Digest */}
               <Link href="/app/digest" className="block">
-                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] hover:border-amber-200 hover:bg-amber-50/30 transition-all text-left group">
-                  <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center shrink-0 group-hover:bg-amber-100 transition-colors">
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-amber-200 hover:bg-amber-50/30 transition-all text-left group">
+                  <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-[rgba(245,158,11,0.10)] flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-[rgba(245,158,11,0.15)] transition-colors">
                     <Sun className="w-4 h-4 text-amber-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#18181B]">Today&apos;s Digest</p>
-                    <p className="text-xs text-[#71717A]">Read your morning briefing</p>
+                    <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">Today&apos;s Digest</p>
+                    <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Read your morning briefing</p>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] group-hover:text-amber-600 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] group-hover:text-amber-600 transition-colors" />
                 </button>
               </Link>
             </CardContent>

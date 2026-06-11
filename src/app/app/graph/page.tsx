@@ -259,7 +259,7 @@ function CopyIdButton({ id }: { id: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+      className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] transition-all shrink-0"
       title="Copy node ID"
     >
       {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
@@ -280,7 +280,7 @@ function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 8, scale: 0.95 }}
           transition={{ duration: 0.15, ease: 'easeOut' }}
-          className="pointer-events-none absolute z-50 w-64 rounded-xl bg-white border border-[#E5E7EB] shadow-xl shadow-black/8 overflow-hidden"
+          className="pointer-events-none absolute z-50 w-64 rounded-xl bg-white dark:bg-[#0F0F12] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-xl shadow-black/8 overflow-hidden"
         >
           {/* Colored top accent */}
           <div className="h-1" style={{ background: color }} />
@@ -297,7 +297,7 @@ function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#18181B] truncate">{node.title}</p>
+                <p className="text-xs font-bold text-[#18181B] dark:text-[#FAFAFA] truncate">{node.title}</p>
                 <Badge
                   className="mt-0.5 text-[8px] font-semibold capitalize px-1.5 py-0"
                   style={{
@@ -313,7 +313,7 @@ function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean
             </div>
 
             {/* Content Preview */}
-            <p className="text-[10px] text-[#71717A] leading-relaxed line-clamp-3">
+            <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA] leading-relaxed line-clamp-3">
               {contentPreview}
             </p>
 
@@ -323,13 +323,13 @@ function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean
                 {node.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#F3F4F6] text-[#71717A] font-medium"
+                    className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-[#27272A] text-[#71717A] dark:text-[#A1A1AA] font-medium"
                   >
                     {tag}
                   </span>
                 ))}
                 {node.tags.length > 3 && (
-                  <span className="text-[8px] px-1.5 py-0.5 text-[#A1A1AA]">
+                  <span className="text-[8px] px-1.5 py-0.5 text-[#A1A1AA] dark:text-[#71717A]">
                     +{node.tags.length - 3}
                   </span>
                 )}
@@ -338,7 +338,7 @@ function NodeHoverPreview({ node, visible }: { node: GraphNode; visible: boolean
 
             {/* Created Date */}
             {node.createdAt && (
-              <p className="text-[8px] text-[#A1A1AA]">
+              <p className="text-[8px] text-[#A1A1AA] dark:text-[#71717A]">
                 Created {node.createdAt}
               </p>
             )}
@@ -413,8 +413,7 @@ function Minimap({
       ref={minimapRef}
       width={minimapW}
       height={minimapH}
-      className="rounded-lg cursor-pointer"
-      style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(0,0,0,0.08)' }}
+      className="rounded-lg cursor-pointer bg-white/85 dark:bg-[#18181B]/85 border border-black/[0.08] dark:border-white/[0.08]"
       onClick={handleMinimapClick}
     >
       {/* Edges as thin lines */}
@@ -964,22 +963,22 @@ export default function KnowledgeGraphPage() {
   // ─── Loading State ──────────────────────────────────────
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-[#F9FAFB]">
-        <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-4 shrink-0">
+      <div className="h-full flex flex-col bg-[#F9FAFB] dark:bg-[#09090B]">
+        <div className="h-14 bg-white dark:bg-[#0F0F12] border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex items-center justify-between px-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
               <Network className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-[#18181B]">Knowledge Graph</h1>
-              <p className="text-[10px] text-[#71717A]">Loading...</p>
+              <h1 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">Knowledge Graph</h1>
+              <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA]">Loading...</p>
             </div>
           </div>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs text-[#71717A]">Loading graph data...</p>
+            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">Loading graph data...</p>
           </div>
         </div>
       </div>
@@ -987,16 +986,16 @@ export default function KnowledgeGraphPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-[#F9FAFB]" ref={containerRef}>
+    <div className="h-full flex flex-col bg-[#F9FAFB] dark:bg-[#09090B] dark:bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M0%200h40v40H0z%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M40%200v40M0%2040h40%22%20stroke%3D%22rgba(255%2C255%2C255%2C0.03)%22%20stroke-width%3D%221%22%2F%3E%3C%2Fsvg%3E')]" ref={containerRef}>
       {/* ─── Top Bar ────────────────────────────────────────── */}
-      <div className="h-14 bg-white border-b border-[#E5E7EB] flex items-center justify-between px-3 sm:px-4 shrink-0 z-20">
+      <div className="h-14 bg-white dark:bg-[#0F0F12] border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex items-center justify-between px-3 sm:px-4 shrink-0 z-20">
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
             <Network className="w-4 h-4 text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-[#18181B]">Knowledge Graph</h1>
-            <p className="text-[10px] text-[#71717A]">
+            <h1 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">Knowledge Graph</h1>
+            <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA]">
               {nodes.length} nodes · {edges.length} edges
             </p>
           </div>
@@ -1006,20 +1005,20 @@ export default function KnowledgeGraphPage() {
         <div className="hidden md:flex items-center gap-2">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA]" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A]" />
             <input
               type="text"
               placeholder="Search nodes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-56 pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
+              className="h-8 w-56 pl-8 pr-3 text-xs rounded-lg border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
             />
           </div>
 
           {/* Type Filter */}
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="h-8 w-28 text-xs border-[#E5E7EB] bg-white">
-              <Filter className="w-3 h-3 mr-1 text-[#71717A]" />
+            <SelectTrigger className="h-8 w-28 text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12]">
+              <Filter className="w-3 h-3 mr-1 text-[#71717A] dark:text-[#A1A1AA]" />
               <SelectValue placeholder="Filter" />
             </SelectTrigger>
             <SelectContent>
@@ -1038,13 +1037,13 @@ export default function KnowledgeGraphPage() {
         <div className="flex md:hidden items-center gap-1">
           <button
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] active:bg-[#F3F4F6] transition-colors"
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] active:bg-[#F3F4F6] dark:active:bg-[#27272A] transition-colors"
           >
             <Search className="w-4 h-4" />
           </button>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="h-10 w-10 !px-0 !justify-center border-[#E5E7EB] bg-white rounded-lg">
-              <Filter className="w-4 h-4 text-[#71717A]" />
+            <SelectTrigger className="h-10 w-10 !px-0 !justify-center border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-white dark:bg-[#0F0F12] rounded-lg">
+              <Filter className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
@@ -1067,22 +1066,22 @@ export default function KnowledgeGraphPage() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden overflow-hidden bg-white border-b border-[#E5E7EB] z-20"
+            className="md:hidden overflow-hidden bg-white dark:bg-[#0F0F12] border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] z-20"
           >
             <div className="px-3 py-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA]" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A]" />
                 <input
                   type="text"
                   placeholder="Search nodes..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="h-10 w-full pl-8 pr-10 text-sm rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
+                  className="h-10 w-full pl-8 pr-10 text-sm rounded-lg border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-300 transition-all"
                 />
                 <button
                   onClick={() => { setMobileSearchOpen(false); setSearchQuery('') }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center text-[#A1A1AA] hover:text-[#18181B]"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-[#18181B] dark:hover:text-[#FAFAFA]"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -1123,7 +1122,7 @@ export default function KnowledgeGraphPage() {
         </AnimatePresence>
 
         {/* Left Toolbar (desktop only) */}
-        <div className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-1.5 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-1.5 shadow-lg">
+        <div className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 flex-col gap-1.5 bg-white/90 dark:bg-[#0F0F12]/90 backdrop-blur-sm border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] dark:border-[rgba(255,255,255,0.08)] rounded-xl p-1.5 shadow-lg">
           <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1134,8 +1133,8 @@ export default function KnowledgeGraphPage() {
                   }}
                   className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                     toolMode === 'select'
-                      ? 'bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100'
-                      : 'text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B]'
+                      ? 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-600 shadow-sm border border-emerald-100 dark:border-[rgba(16,185,129,0.15)]'
+                      : 'text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA]'
                   }`}
                 >
                   <MousePointer2 className="w-4 h-4" />
@@ -1148,7 +1147,7 @@ export default function KnowledgeGraphPage() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setAddNodeDialogOpen(true)}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] hover:text-emerald-600 transition-all"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -1165,8 +1164,8 @@ export default function KnowledgeGraphPage() {
                   }}
                   className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                     toolMode === 'addEdge'
-                      ? 'bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100'
-                      : 'text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B]'
+                      ? 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-600 shadow-sm border border-emerald-100 dark:border-[rgba(16,185,129,0.15)]'
+                      : 'text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA]'
                   }`}
                 >
                   <Link2 className="w-4 h-4" />
@@ -1198,7 +1197,7 @@ export default function KnowledgeGraphPage() {
               <TooltipTrigger asChild>
                 <button
                   onClick={handleZoomIn}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B] transition-all"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA] transition-all"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </button>
@@ -1210,7 +1209,7 @@ export default function KnowledgeGraphPage() {
               <TooltipTrigger asChild>
                 <button
                   onClick={handleZoomOut}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B] transition-all"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA] transition-all"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
@@ -1222,7 +1221,7 @@ export default function KnowledgeGraphPage() {
               <TooltipTrigger asChild>
                 <button
                   onClick={handleFitToScreen}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B] transition-all"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] hover:text-[#18181B] dark:hover:text-[#FAFAFA] transition-all"
                 >
                   <Maximize className="w-4 h-4" />
                 </button>
@@ -1233,13 +1232,13 @@ export default function KnowledgeGraphPage() {
         </div>
 
         {/* Mobile Bottom Toolbar */}
-        <div className="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] px-2 py-1.5 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-20 bg-white/95 dark:bg-[#0F0F12]/95 backdrop-blur-sm border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] dark:border-[rgba(255,255,255,0.08)] px-2 py-1.5 flex items-center justify-around shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
           <button
             onClick={() => { setToolMode('select'); setAddEdgeSource(null) }}
             className={`min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all ${
               toolMode === 'select'
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'text-[#71717A] active:bg-[#F9FAFB]'
+                ? 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-600'
+                : 'text-[#71717A] dark:text-[#A1A1AA] active:bg-[#F9FAFB] dark:active:bg-[#18181B]'
             }`}
           >
             <MousePointer2 className="w-4 h-4" />
@@ -1247,7 +1246,7 @@ export default function KnowledgeGraphPage() {
           </button>
           <button
             onClick={() => setAddNodeDialogOpen(true)}
-            className="min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 text-[#71717A] active:bg-emerald-50 active:text-emerald-600 transition-all"
+            className="min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 text-[#71717A] dark:text-[#A1A1AA] active:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] dark:active:bg-[rgba(16,185,129,0.10)] active:text-emerald-600 transition-all"
           >
             <Plus className="w-4 h-4" />
             <span className="text-[9px] font-medium">Add</span>
@@ -1256,8 +1255,8 @@ export default function KnowledgeGraphPage() {
             onClick={() => { setToolMode('addEdge'); setAddEdgeSource(null) }}
             className={`min-w-[44px] min-h-[44px] rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all ${
               toolMode === 'addEdge'
-                ? 'bg-emerald-50 text-emerald-600'
-                : 'text-[#71717A] active:bg-[#F9FAFB]'
+                ? 'bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-600'
+                : 'text-[#71717A] dark:text-[#A1A1AA] active:bg-[#F9FAFB] dark:active:bg-[#18181B]'
             }`}
           >
             <Link2 className="w-4 h-4" />
@@ -1278,14 +1277,14 @@ export default function KnowledgeGraphPage() {
           <div className="flex items-center gap-0.5">
             <button
               onClick={handleZoomOut}
-              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] active:bg-[#F9FAFB] transition-all"
+              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] active:bg-[#F9FAFB] dark:active:bg-[#18181B] transition-all"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
-            <span className="text-[9px] font-mono text-[#A1A1AA] w-8 text-center">{Math.round(zoom * 100)}%</span>
+            <span className="text-[9px] font-mono text-[#A1A1AA] dark:text-[#71717A] w-8 text-center">{Math.round(zoom * 100)}%</span>
             <button
               onClick={handleZoomIn}
-              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] active:bg-[#F9FAFB] transition-all"
+              className="min-w-[36px] min-h-[44px] rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] active:bg-[#F9FAFB] dark:active:bg-[#18181B] transition-all"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
@@ -1322,12 +1321,12 @@ export default function KnowledgeGraphPage() {
             {/* ── Enhanced Background Patterns ── */}
             {/* Small dot grid */}
             <pattern id="dotGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <circle cx="15" cy="15" r="0.6" fill="rgba(0,0,0,0.05)" />
+              <circle cx="15" cy="15" r="0.6" fill="rgba(0,0,0,0.05)" className="dark:fill-[rgba(255,255,255,0.06)]" />
             </pattern>
             {/* Larger grid lines */}
             <pattern id="lineGrid" width="150" height="150" patternUnits="userSpaceOnUse">
-              <line x1="150" y1="0" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" />
-              <line x1="0" y1="150" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" />
+              <line x1="150" y1="0" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" className="dark:stroke-[rgba(255,255,255,0.04)]" />
+              <line x1="0" y1="150" x2="150" y2="150" stroke="rgba(0,0,0,0.035)" strokeWidth="0.5" className="dark:stroke-[rgba(255,255,255,0.04)]" />
             </pattern>
             {/* Radial gradient for background */}
             <radialGradient id="bgGradient" cx="50%" cy="50%" r="60%">
@@ -1395,7 +1394,7 @@ export default function KnowledgeGraphPage() {
           <g transform={`translate(${pan.x / zoom}, ${pan.y / zoom}) scale(${zoom})`}>
             {/* ── Enhanced Background ── */}
             {/* Base fill */}
-            <rect x="-2000" y="-2000" width="6000" height="6000" fill="#F9FAFB" />
+            <rect x="-2000" y="-2000" width="6000" height="6000" fill="#F9FAFB" className="dark:fill-[#09090B]" />
             {/* Radial gradient overlay */}
             <rect x="-2000" y="-2000" width="6000" height="6000" fill="url(#bgGradient)" />
             {/* Small dot grid */}
@@ -1504,6 +1503,7 @@ export default function KnowledgeGraphPage() {
                           strokeWidth={0.5}
                           opacity={0.95}
                           filter="url(#nodeShadow)"
+                          className="dark:fill-[#18181B]"
                         />
                         <text
                           x={-edge.label.length * 0.5}
@@ -1690,7 +1690,7 @@ export default function KnowledgeGraphPage() {
                     stroke="white"
                     strokeWidth={2.5}
                     filter="url(#nodeShadow)"
-                    className="transition-all duration-150"
+                    className="transition-all duration-150 dark:stroke-[#27272A]"
                   >
                     {/* Pop-in animation for newly created nodes */}
                     {isNewNode && (
@@ -1760,7 +1760,7 @@ export default function KnowledgeGraphPage() {
                     fontSize={10}
                     fontWeight={isSelected ? 700 : 500}
                     opacity={showLabels ? 1 : 0.5}
-                    className="transition-all duration-200"
+                    className="transition-all duration-200 dark:fill-[#D4D4D8]"
                   >
                     {node.title}
                   </text>
@@ -1787,7 +1787,7 @@ export default function KnowledgeGraphPage() {
 
         {/* Empty State Overlay */}
         {nodes.length === 0 && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F9FAFB]/80 backdrop-blur-sm">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#F9FAFB] dark:bg-[#09090B]/80 dark:bg-[#09090B]/80 backdrop-blur-sm">
             <GraphEmptyState onAddNode={() => setAddNodeDialogOpen(true)} />
             <motion.button
               onClick={() => setAddNodeDialogOpen(true)}
@@ -1806,7 +1806,7 @@ export default function KnowledgeGraphPage() {
 
         {/* Zoom indicator (desktop only) - enhanced with badge style */}
         <div className="hidden md:flex absolute bottom-3 left-3 z-20 items-center gap-1.5">
-          <div className="bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A] shadow-sm">
+          <div className="bg-white/90 dark:bg-[#0F0F12]/90 backdrop-blur-sm border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] dark:border-[rgba(255,255,255,0.08)] rounded-lg px-2.5 py-1 text-[10px] font-mono text-[#71717A] dark:text-[#A1A1AA] shadow-sm">
             {Math.round(zoom * 100)}%
           </div>
         </div>
@@ -1825,32 +1825,32 @@ export default function KnowledgeGraphPage() {
         </div>
 
         {/* Legend (desktop only) - moved above minimap */}
-        <div className="hidden md:block absolute bottom-[90px] right-3 z-20 bg-white/90 backdrop-blur-sm border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
-          <p className="text-[9px] font-bold text-[#71717A] uppercase tracking-wider mb-2">Legend</p>
+        <div className="hidden md:block absolute bottom-[90px] right-3 z-20 bg-white/90 dark:bg-[#0F0F12]/90 backdrop-blur-sm border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] dark:border-[rgba(255,255,255,0.08)] rounded-xl p-3 shadow-sm">
+          <p className="text-[9px] font-bold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-2">Legend</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1">
             {Object.entries(typeColors).map(([type, color]) => (
               <div key={type} className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-                <span className="text-[9px] text-[#71717A] capitalize">{type}</span>
+                <span className="text-[9px] text-[#71717A] dark:text-[#A1A1AA] capitalize">{type}</span>
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 pt-2 border-t border-[#E5E7EB]">
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 pt-2 border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
             <div className="flex items-center gap-1">
               <div className="w-4 h-0 border-t border-[#71717A]" />
-              <span className="text-[9px] text-[#71717A]">Related</span>
+              <span className="text-[9px] text-[#71717A] dark:text-[#A1A1AA]">Related</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-0 border-t-2 border-dashed border-[#71717A]" />
-              <span className="text-[9px] text-[#71717A]">Depends</span>
+              <span className="text-[9px] text-[#71717A] dark:text-[#A1A1AA]">Depends</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-0 border-t border-dotted border-[#71717A]" />
-              <span className="text-[9px] text-[#71717A]">Created by</span>
+              <span className="text-[9px] text-[#71717A] dark:text-[#A1A1AA]">Created by</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-0 border-t-2 border-[#71717A]" />
-              <span className="text-[9px] text-[#71717A]">References</span>
+              <span className="text-[9px] text-[#71717A] dark:text-[#A1A1AA]">References</span>
             </div>
           </div>
         </div>
@@ -1863,16 +1863,16 @@ export default function KnowledgeGraphPage() {
               animate={{ x: 0, opacity: 1, y: 0 }}
               exit={{ x: 320, opacity: 0, y: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="absolute right-0 top-0 bottom-0 w-80 bg-white border-l border-[#E5E7EB] shadow-xl z-20 flex flex-col overflow-hidden hidden md:flex"
+              className="absolute right-0 top-0 bottom-0 w-80 bg-white dark:bg-[#0F0F12] border-l border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] shadow-xl z-20 flex flex-col overflow-hidden hidden md:flex"
             >
               {/* Panel Header */}
-              <div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between shrink-0">
-                <h3 className="text-sm font-bold text-[#18181B]">Node Details</h3>
+              <div className="p-4 border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex items-center justify-between shrink-0">
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">Node Details</h3>
                 <button
                   onClick={() => setSelectedNodeId(null)}
-                  className="w-7 h-7 rounded-lg hover:bg-[#F9FAFB] flex items-center justify-center transition-colors"
+                  className="w-7 h-7 rounded-lg hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] flex items-center justify-center transition-colors"
                 >
-                  <X className="w-4 h-4 text-[#71717A]" />
+                  <X className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
                 </button>
               </div>
 
@@ -1881,11 +1881,11 @@ export default function KnowledgeGraphPage() {
                 {/* Title */}
                 <div>
                   <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-[#18181B]">{selectedNode.title}</h2>
+                  <h2 className="text-lg font-bold text-[#18181B] dark:text-[#FAFAFA]">{selectedNode.title}</h2>
                 </div>
                 {/* Node ID with copy & share buttons */}
                 <div className="flex items-center gap-1.5 mt-1">
-                  <p className="text-[10px] text-[#A1A1AA] font-mono truncate max-w-[180px]">{selectedNode.id}</p>
+                  <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] font-mono truncate max-w-[180px]">{selectedNode.id}</p>
                   <CopyIdButton id={selectedNode.id} />
                   <button
                     onClick={async () => {
@@ -1896,7 +1896,7 @@ export default function KnowledgeGraphPage() {
                         toast.error('Failed to copy share link')
                       }
                     }}
-                    className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+                    className="w-5 h-5 rounded flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] transition-all shrink-0"
                     title="Share node link"
                   >
                     <Share2 className="w-3 h-3" />
@@ -1919,20 +1919,20 @@ export default function KnowledgeGraphPage() {
 
                 {/* Content */}
                 <div>
-                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Description</p>
-                  <p className="text-sm text-[#52525B] leading-relaxed">{selectedNode.content}</p>
+                  <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-1">Description</p>
+                  <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] leading-relaxed">{selectedNode.content}</p>
                 </div>
 
                 {/* Tags */}
                 {selectedNode.tags && selectedNode.tags.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">Tags</p>
+                    <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-2">Tags</p>
                     <div className="flex flex-wrap gap-1.5">
                       {selectedNode.tags.map((tag) => (
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="text-[10px] font-medium text-[#71717A] border-[#E5E7EB]"
+                          className="text-[10px] font-medium text-[#71717A] dark:text-[#A1A1AA] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
                         >
                           {tag}
                         </Badge>
@@ -1945,7 +1945,7 @@ export default function KnowledgeGraphPage() {
 
                 {/* Connected Nodes */}
                 <div>
-                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">
+                  <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-2">
                     Connected ({connectedNodes.length})
                   </p>
                   <div className="space-y-1.5 max-h-48 overflow-y-auto">
@@ -1959,7 +1959,7 @@ export default function KnowledgeGraphPage() {
                         <button
                           key={cn.id}
                           onClick={() => setSelectedNodeId(cn.id)}
-                          className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-[#F9FAFB] transition-colors text-left group"
+                          className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] transition-colors text-left group"
                         >
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
@@ -1971,11 +1971,11 @@ export default function KnowledgeGraphPage() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-[#18181B] truncate group-hover:text-emerald-700 transition-colors">
+                            <p className="text-xs font-semibold text-[#18181B] dark:text-[#FAFAFA] truncate group-hover:text-emerald-700 transition-colors">
                               {cn.title}
                             </p>
                             {edge && (
-                              <p className="text-[10px] text-[#A1A1AA] truncate">{edge.label}</p>
+                              <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] truncate">{edge.label}</p>
                             )}
                           </div>
                           <ChevronRight className="w-3 h-3 text-[#D4D4D8] group-hover:text-emerald-500 transition-colors" />
@@ -1988,19 +1988,19 @@ export default function KnowledgeGraphPage() {
                 {/* Created Date */}
                 {selectedNode.createdAt && (
                   <div>
-                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Created</p>
-                    <p className="text-xs text-[#A1A1AA]">{selectedNode.createdAt}</p>
+                    <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-1">Created</p>
+                    <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">{selectedNode.createdAt}</p>
                   </div>
                 )}
               </div>
 
               {/* Panel Actions */}
-              <div className="p-4 border-t border-[#E5E7EB] flex gap-2 shrink-0">
+              <div className="p-4 border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex gap-2 shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={openEditDialog}
-                  className="flex-1 text-xs border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30"
+                  className="flex-1 text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)]/30"
                 >
                   <Pencil className="w-3 h-3 mr-1" />
                   Edit
@@ -2009,7 +2009,7 @@ export default function KnowledgeGraphPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleDeleteNode}
-                  className="flex-1 text-xs border-[#E5E7EB] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
+                  className="flex-1 text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
                   Delete
@@ -2027,22 +2027,22 @@ export default function KnowledgeGraphPage() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="md:hidden absolute left-0 right-0 bottom-0 z-30 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden"
+              className="md:hidden absolute left-0 right-0 bottom-0 z-30 bg-white dark:bg-[#0F0F12] rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex flex-col overflow-hidden"
               style={{ maxHeight: '65vh' }}
             >
               {/* Drag handle */}
               <div className="flex justify-center pt-2 pb-1 shrink-0">
-                <div className="w-10 h-1 rounded-full bg-[#D4D4D8]" />
+                <div className="w-10 h-1 rounded-full bg-[#D4D4D8] dark:bg-[#52525B]" />
               </div>
 
               {/* Panel Header */}
               <div className="px-4 pb-2 flex items-center justify-between shrink-0">
-                <h3 className="text-sm font-bold text-[#18181B]">Node Details</h3>
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">Node Details</h3>
                 <button
                   onClick={() => setSelectedNodeId(null)}
-                  className="min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] flex items-center justify-center transition-colors"
+                  className="min-w-[44px] min-h-[44px] rounded-lg hover:bg-[#F9FAFB] dark:hover:bg-[#18181B] flex items-center justify-center transition-colors"
                 >
-                  <X className="w-5 h-5 text-[#71717A]" />
+                  <X className="w-5 h-5 text-[#71717A] dark:text-[#A1A1AA]" />
                 </button>
               </div>
 
@@ -2051,10 +2051,10 @@ export default function KnowledgeGraphPage() {
                 {/* Title */}
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-[#18181B]">{selectedNode.title}</h2>
+                    <h2 className="text-lg font-bold text-[#18181B] dark:text-[#FAFAFA]">{selectedNode.title}</h2>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1">
-                    <p className="text-[10px] text-[#A1A1AA] font-mono truncate max-w-[200px]">{selectedNode.id}</p>
+                    <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] font-mono truncate max-w-[200px]">{selectedNode.id}</p>
                     <CopyIdButton id={selectedNode.id} />
                     <button
                       onClick={async () => {
@@ -2065,7 +2065,7 @@ export default function KnowledgeGraphPage() {
                           toast.error('Failed to copy share link')
                         }
                       }}
-                      className="min-w-[44px] min-h-[44px] rounded flex items-center justify-center text-[#A1A1AA] hover:text-emerald-600 hover:bg-emerald-50 transition-all shrink-0"
+                      className="min-w-[44px] min-h-[44px] rounded flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] transition-all shrink-0"
                       title="Share node link"
                     >
                       <Share2 className="w-4 h-4" />
@@ -2088,20 +2088,20 @@ export default function KnowledgeGraphPage() {
 
                 {/* Content */}
                 <div>
-                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Description</p>
-                  <p className="text-sm text-[#52525B] leading-relaxed">{selectedNode.content}</p>
+                  <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-1">Description</p>
+                  <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] leading-relaxed">{selectedNode.content}</p>
                 </div>
 
                 {/* Tags */}
                 {selectedNode.tags && selectedNode.tags.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">Tags</p>
+                    <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-2">Tags</p>
                     <div className="flex flex-wrap gap-1.5">
                       {selectedNode.tags.map((tag) => (
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="text-[10px] font-medium text-[#71717A] border-[#E5E7EB]"
+                          className="text-[10px] font-medium text-[#71717A] dark:text-[#A1A1AA] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
                         >
                           {tag}
                         </Badge>
@@ -2114,7 +2114,7 @@ export default function KnowledgeGraphPage() {
 
                 {/* Connected Nodes */}
                 <div>
-                  <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-2">
+                  <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-2">
                     Connected ({connectedNodes.length})
                   </p>
                   <div className="space-y-1">
@@ -2128,7 +2128,7 @@ export default function KnowledgeGraphPage() {
                         <button
                           key={cn.id}
                           onClick={() => setSelectedNodeId(cn.id)}
-                          className="w-full flex items-center gap-2 p-2 rounded-lg active:bg-[#F9FAFB] transition-colors text-left"
+                          className="w-full flex items-center gap-2 p-2 rounded-lg active:bg-[#F9FAFB] dark:active:bg-[#18181B] transition-colors text-left"
                         >
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
@@ -2140,11 +2140,11 @@ export default function KnowledgeGraphPage() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-[#18181B] truncate">
+                            <p className="text-xs font-semibold text-[#18181B] dark:text-[#FAFAFA] truncate">
                               {cn.title}
                             </p>
                             {edge && (
-                              <p className="text-[10px] text-[#A1A1AA] truncate">{edge.label}</p>
+                              <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] truncate">{edge.label}</p>
                             )}
                           </div>
                           <ChevronRight className="w-3 h-3 text-[#D4D4D8]" />
@@ -2157,19 +2157,19 @@ export default function KnowledgeGraphPage() {
                 {/* Created Date */}
                 {selectedNode.createdAt && (
                   <div>
-                    <p className="text-xs font-semibold text-[#71717A] uppercase tracking-wider mb-1">Created</p>
-                    <p className="text-xs text-[#A1A1AA]">{selectedNode.createdAt}</p>
+                    <p className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider mb-1">Created</p>
+                    <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">{selectedNode.createdAt}</p>
                   </div>
                 )}
               </div>
 
               {/* Panel Actions */}
-              <div className="p-4 border-t border-[#E5E7EB] flex gap-2 shrink-0 safe-area-bottom">
+              <div className="p-4 border-t border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex gap-2 shrink-0 safe-area-bottom">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={openEditDialog}
-                  className="flex-1 h-11 text-xs border-[#E5E7EB] hover:border-emerald-200 hover:bg-emerald-50/30"
+                  className="flex-1 h-11 text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)]/30"
                 >
                   <Pencil className="w-3 h-3 mr-1" />
                   Edit
@@ -2178,7 +2178,7 @@ export default function KnowledgeGraphPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleDeleteNode}
-                  className="flex-1 h-11 text-xs border-[#E5E7EB] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
+                  className="flex-1 h-11 text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] text-red-500 hover:border-red-200 hover:bg-red-50/30 hover:text-red-600"
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
                   Delete
@@ -2194,7 +2194,7 @@ export default function KnowledgeGraphPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
                 <Plus className="w-3.5 h-3.5 text-emerald-600" />
               </div>
               Add Knowledge Node
@@ -2211,13 +2211,13 @@ export default function KnowledgeGraphPage() {
                 placeholder="e.g., Payment Gateway Architecture"
                 value={newNodeTitle}
                 onChange={(e) => setNewNodeTitle(e.target.value)}
-                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="new-type">Type</Label>
               <Select value={newNodeType} onValueChange={(v) => setNewNodeType(v as GraphNode['type'])}>
-                <SelectTrigger className="border-[#E5E7EB]">
+                <SelectTrigger className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -2238,7 +2238,7 @@ export default function KnowledgeGraphPage() {
                 rows={3}
                 value={newNodeContent}
                 onChange={(e) => setNewNodeContent(e.target.value)}
-                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
+                className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
               />
             </div>
             <div className="space-y-2">
@@ -2248,7 +2248,7 @@ export default function KnowledgeGraphPage() {
                 placeholder="e.g., api, architecture, backend"
                 value={newNodeTags}
                 onChange={(e) => setNewNodeTags(e.target.value)}
-                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
               />
             </div>
           </div>
@@ -2256,7 +2256,7 @@ export default function KnowledgeGraphPage() {
             <Button
               variant="outline"
               onClick={() => setAddNodeDialogOpen(false)}
-              className="border-[#E5E7EB]"
+              className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
             >
               Cancel
             </Button>
@@ -2276,7 +2276,7 @@ export default function KnowledgeGraphPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center">
                 <Pencil className="w-3.5 h-3.5 text-emerald-600" />
               </div>
               Edit Node
@@ -2292,7 +2292,7 @@ export default function KnowledgeGraphPage() {
                 id="edit-title"
                 value={editNodeTitle}
                 onChange={(e) => setEditNodeTitle(e.target.value)}
-                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
+                className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300"
               />
             </div>
             <div className="space-y-2">
@@ -2302,7 +2302,7 @@ export default function KnowledgeGraphPage() {
                 value={editNodeContent}
                 onChange={(e) => setEditNodeContent(e.target.value)}
                 rows={4}
-                className="border-[#E5E7EB] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
+                className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-300 resize-none"
               />
             </div>
           </div>
@@ -2310,7 +2310,7 @@ export default function KnowledgeGraphPage() {
             <Button
               variant="outline"
               onClick={() => setEditNodeDialogOpen(false)}
-              className="border-[#E5E7EB]"
+              className="border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]"
             >
               Cancel
             </Button>

@@ -280,7 +280,7 @@ export function NotificationCenter() {
       {/* ── Bell Button ────────────────────────────────────── */}
       <motion.button
         onClick={toggleOpen}
-        className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] hover:bg-[#F9FAFB] hover:text-[#18181B] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:ring-offset-1"
+        className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F9FAFB] dark:hover:bg-[#09090B] dark:bg-[#09090B] hover:text-[#18181B] dark:hover:text-[#FAFAFA] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/30 focus-visible:ring-offset-1"
         aria-label={`Notifications${count > 0 ? ` (${count} unread)` : ''}`}
         {...(count > 0 ? bellBounce : {})}
       >
@@ -312,16 +312,16 @@ export function NotificationCenter() {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="absolute right-0 top-full mt-2 w-[360px] bg-white border border-[#E5E7EB] rounded-2xl shadow-xl shadow-black/[0.06] z-50 overflow-hidden"
+            className="absolute right-0 top-full mt-2 w-[360px] bg-white dark:bg-[#0F0F12] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] rounded-2xl shadow-xl shadow-black/[0.06] z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F3F4F6]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F3F4F6] dark:border-[rgba(255,255,255,0.04)]">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-[#18181B]">Notifications</h3>
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">Notifications</h3>
                 {count > 0 && (
                   <Badge
                     variant="secondary"
-                    className="text-[10px] font-bold bg-emerald-50 text-emerald-700 h-5 px-1.5"
+                    className="text-[10px] font-bold bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] text-emerald-700 dark:text-emerald-400 h-5 px-1.5"
                   >
                     {count} new
                   </Badge>
@@ -333,7 +333,7 @@ export function NotificationCenter() {
                     variant="ghost"
                     size="sm"
                     onClick={markAllAsRead}
-                    className="text-[11px] font-medium text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 h-7 px-2 gap-1"
+                    className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 hover:bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] h-7 px-2 gap-1"
                   >
                     <Check className="w-3 h-3" />
                     Mark all read
@@ -341,7 +341,7 @@ export function NotificationCenter() {
                 )}
                 <button
                   onClick={() => setOpen(false)}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#A1A1AA] hover:bg-[#F9FAFB] hover:text-[#52525B] transition-colors"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#A1A1AA] dark:text-[#71717A] hover:bg-[#F9FAFB] dark:hover:bg-[#09090B] dark:bg-[#09090B] hover:text-[#52525B] dark:hover:text-[#D4D4D8] transition-colors"
                   aria-label="Close notifications"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -353,13 +353,13 @@ export function NotificationCenter() {
             {notifications.length === 0 ? (
               /* ── Empty State ────────────────────────────── */
               <div className="flex flex-col items-center justify-center py-10 px-6">
-                <div className="w-12 h-12 rounded-full bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-[#F9FAFB] dark:bg-[#09090B] border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex items-center justify-center mb-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                 </div>
-                <p className="text-sm font-semibold text-[#18181B] mb-1">
+                <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA] mb-1">
                   No new notifications
                 </p>
-                <p className="text-xs text-[#71717A] text-center">
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] text-center">
                   You&apos;re all caught up! Check back later for updates.
                 </p>
               </div>
@@ -380,8 +380,8 @@ export function NotificationCenter() {
                         className={`
                           flex items-start gap-3 px-4 py-3 transition-colors group
                           ${notification.read
-                            ? 'bg-white hover:bg-[#FAFAFA]'
-                            : 'bg-emerald-50/40 hover:bg-emerald-50/70'
+                            ? 'bg-white dark:bg-[#0F0F12] hover:bg-[#FAFAFA] dark:hover:bg-[rgba(255,255,255,0.04)]'
+                            : 'bg-emerald-50/40 dark:bg-[rgba(16,185,129,0.08)] hover:bg-emerald-50/70 dark:hover:bg-[rgba(16,185,129,0.14)]'
                           }
                         `}
                       >
@@ -402,8 +402,8 @@ export function NotificationCenter() {
                             <p
                               className={`text-sm leading-snug ${
                                 notification.read
-                                  ? 'font-medium text-[#52525B]'
-                                  : 'font-semibold text-[#18181B]'
+                                  ? 'font-medium text-[#52525B] dark:text-[#D4D4D8]'
+                                  : 'font-semibold text-[#18181B] dark:text-[#FAFAFA]'
                               }`}
                             >
                               {notification.title}
@@ -412,10 +412,10 @@ export function NotificationCenter() {
                               <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
                             )}
                           </div>
-                          <p className="text-xs text-[#71717A] leading-relaxed mt-0.5 line-clamp-2">
+                          <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] leading-relaxed mt-0.5 line-clamp-2">
                             {notification.description}
                           </p>
-                          <p className="text-[10px] text-[#A1A1AA] mt-1.5 font-medium">
+                          <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] mt-1.5 font-medium">
                             {formatTimeAgo(notification.createdAt)}
                           </p>
                         </div>
@@ -432,10 +432,10 @@ export function NotificationCenter() {
             )}
 
             {/* ── What's New Section ────────────────────────── */}
-            <div className="border-t border-[#F3F4F6]">
+            <div className="border-t border-[#F3F4F6] dark:border-[rgba(255,255,255,0.04)]">
               <div className="px-4 pt-3 pb-1 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-xs font-bold text-[#18181B]">What&apos;s New</span>
+                <span className="text-xs font-bold text-[#18181B] dark:text-[#FAFAFA]">What&apos;s New</span>
                 <Badge className="h-[16px] min-w-[16px] px-1 text-[8px] font-bold bg-emerald-600 text-white border-0 shadow-sm flex items-center justify-center rounded-full">
                   New
                 </Badge>
@@ -450,8 +450,8 @@ export function NotificationCenter() {
                   <div key={item.title} className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
                     <div className="min-w-0">
-                      <p className="text-[11px] font-semibold text-[#18181B] leading-tight">{item.title}</p>
-                      <p className="text-[10px] text-[#71717A] leading-relaxed">{item.desc}</p>
+                      <p className="text-[11px] font-semibold text-[#18181B] dark:text-[#FAFAFA] leading-tight">{item.title}</p>
+                      <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA] leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -460,8 +460,8 @@ export function NotificationCenter() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="border-t border-[#F3F4F6] px-4 py-2.5">
-                <p className="text-[10px] text-[#A1A1AA] text-center">
+              <div className="border-t border-[#F3F4F6] dark:border-[rgba(255,255,255,0.04)] px-4 py-2.5">
+                <p className="text-[10px] text-[#A1A1AA] dark:text-[#71717A] text-center">
                   Notifications are based on your knowledge graph activity
                 </p>
               </div>

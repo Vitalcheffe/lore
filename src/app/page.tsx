@@ -535,10 +535,10 @@ function ComparisonCell({ status }: { status: CellStatus }) {
   if (status === 'best') {
     return (
       <div className="flex items-center justify-center gap-1.5">
-        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-          <Check className="w-3.5 h-3.5 text-emerald-600" strokeWidth={3} />
+        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-[rgba(16,185,129,0.15)] flex items-center justify-center">
+          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" strokeWidth={3} />
         </div>
-        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] px-2 py-0.5 rounded-full">
           Best
         </span>
       </div>
@@ -556,7 +556,7 @@ function ComparisonCell({ status }: { status: CellStatus }) {
   if (status === 'basic') {
     return (
       <div className="flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-[#27272A] flex items-center justify-center">
           <Check className="w-3 h-3 text-gray-400" strokeWidth={3} />
         </div>
       </div>
@@ -675,7 +675,7 @@ export default function LandingPage() {
   const howItWorksInView = useInView(howItWorksRef, { once: true, margin: '-100px' })
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#0F0F12]">
       <Navbar />
 
       {/* ═══════════════════════════════════════════════════════════
@@ -689,17 +689,10 @@ export default function LandingPage() {
 
         {/* Gradient overlays for readability */}
         <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0.3) 70%, rgba(255,255,255,0.5) 100%)',
-          }}
+          className="absolute inset-0 pointer-events-none hero-gradient-overlay"
         />
         <div
-          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
-          }}
+          className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none hero-gradient-bottom"
         />
 
         {/* Content */}
@@ -710,7 +703,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-              className="text-5xl sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight leading-[1.05] text-[#0F172A]"
+              className="text-5xl sm:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight leading-[1.05] text-[#0F172A] dark:text-[#FAFAFA]"
             >
               Your Team&apos;s Memory,{' '}
               <span className="gradient-text-hero">Alive.</span>
@@ -721,7 +714,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.25, 0.4, 0.25, 1] }}
-              className="mt-6 text-lg sm:text-xl text-[#475569] leading-relaxed max-w-xl"
+              className="mt-6 text-lg sm:text-xl text-[#475569] dark:text-[#A1A1AA] leading-relaxed max-w-xl"
             >
               Lore gives your team a shared memory that&apos;s structured, always consistent, and available everywhere. Powered by Aurora DSQL&apos;s multi-region architecture for zero-data-drift knowledge management.
             </motion.p>
@@ -755,7 +748,7 @@ export default function LandingPage() {
                 { text: 'Real-time sync', icon: Zap },
                 { text: 'Zero config', icon: Cloud },
               ].map((item) => (
-                <div key={item.text} className="flex items-center gap-2 text-[13px] text-[#475569] font-medium">
+                <div key={item.text} className="flex items-center gap-2 text-[13px] text-[#475569] dark:text-[#A1A1AA] font-medium">
                   <Check className="w-4 h-4 text-emerald-500" strokeWidth={3} />
                   {item.text}
                 </div>
@@ -785,7 +778,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <stat.icon className="w-4 h-4 text-emerald-500" />
                     <span
-                      className="text-2xl sm:text-3xl font-extrabold text-[#0F172A]"
+                      className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-[#FAFAFA]"
                       style={{ fontVariantNumeric: 'tabular-nums' }}
                     >
                       <AnimatedCounter
@@ -795,7 +788,7 @@ export default function LandingPage() {
                       />
                     </span>
                   </div>
-                  <span className="text-xs font-medium text-[#71717A] tracking-wide uppercase">
+                  <span className="text-xs font-medium text-[#71717A] dark:text-[#A1A1AA] tracking-wide uppercase">
                     {stat.label}
                   </span>
                 </motion.div>
@@ -808,27 +801,27 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════
           SOCIAL PROOF BAR
           ═══════════════════════════════════════════════════════════ */}
-      <section className="py-10 border-y border-gray-100 bg-[#F9FAFB]">
+      <section className="py-10 border-y border-gray-100 dark:border-[rgba(255,255,255,0.08)] bg-[#F9FAFB] dark:bg-[#09090B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
-            <p className="text-center text-sm font-medium text-[#71717A] mb-6">
-              Trusted by <span className="text-emerald-600 font-bold">2,000+</span> knowledge workers at
+            <p className="text-center text-sm font-medium text-[#71717A] dark:text-[#A1A1AA] mb-6">
+              Trusted by <span className="text-emerald-600 dark:text-emerald-400 font-bold">2,000+</span> knowledge workers at
             </p>
           </FadeIn>
           <FadeIn delay={0.1}>
             <div className="marquee-track relative overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-16 z-10" style={{ background: 'linear-gradient(to right, #F9FAFB, transparent)' }} />
-              <div className="absolute right-0 top-0 bottom-0 w-16 z-10" style={{ background: 'linear-gradient(to left, #F9FAFB, transparent)' }} />
+              <div className="absolute left-0 top-0 bottom-0 w-16 z-10 marquee-fade-left" />
+              <div className="absolute right-0 top-0 bottom-0 w-16 z-10 marquee-fade-right" />
               <div className="marquee-content">
                 {[...companies, ...companies].map((name, i) => (
                   <div
                     key={`${name}-${i}`}
                     className="flex items-center gap-2 mx-8 shrink-0"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                    <div className="w-7 h-7 rounded-lg bg-white dark:bg-[#0F0F12] border border-gray-200 dark:border-[rgba(255,255,255,0.08)] flex items-center justify-center shadow-sm">
                       <span className="text-[10px] font-bold text-emerald-600">{name[0]}</span>
                     </div>
-                    <span className="text-sm font-semibold text-[#A1A1AA] whitespace-nowrap tracking-wide">
+                    <span className="text-sm font-semibold text-[#A1A1AA] dark:text-[#71717A] whitespace-nowrap tracking-wide">
                       {name}
                     </span>
                   </div>
@@ -867,23 +860,23 @@ export default function LandingPage() {
                 <thead>
                   <tr>
                     <th className="text-left p-4 w-[200px]">
-                      <span className="text-xs font-bold tracking-wider uppercase text-[#A1A1AA]">Feature</span>
+                      <span className="text-xs font-bold tracking-wider uppercase text-[#A1A1AA] dark:text-[#71717A]">Feature</span>
                     </th>
                     <th className="p-4 text-center">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200">
-                        <Brain className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-bold text-emerald-700">Lore</span>
-                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-100 px-2 py-0.5 rounded-full">YOU</span>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] border border-emerald-200 dark:border-[rgba(16,185,129,0.20)]">
+                        <Brain className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Lore</span>
+                        <span className="text-[10px] font-bold text-emerald-500 bg-emerald-100 dark:bg-[rgba(16,185,129,0.15)] px-2 py-0.5 rounded-full">YOU</span>
                       </div>
                     </th>
                     <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A]">Obsidian</span>
+                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Obsidian</span>
                     </th>
                     <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A]">Notion</span>
+                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Notion</span>
                     </th>
                     <th className="p-4 text-center">
-                      <span className="text-sm font-semibold text-[#71717A]">Mem.ai</span>
+                      <span className="text-sm font-semibold text-[#71717A] dark:text-[#A1A1AA]">Mem.ai</span>
                     </th>
                   </tr>
                 </thead>
@@ -891,15 +884,15 @@ export default function LandingPage() {
                   {comparisonRows.map((row, i) => (
                     <tr
                       key={row.feature}
-                      className={i < comparisonRows.length - 1 ? 'border-b border-gray-100' : ''}
+                      className={i < comparisonRows.length - 1 ? 'border-b border-gray-100 dark:border-[rgba(255,255,255,0.08)]' : ''}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-2.5">
                           <row.icon className="w-4 h-4 text-emerald-500" />
-                          <span className="text-sm font-semibold text-[#0F172A]">{row.feature}</span>
+                          <span className="text-sm font-semibold text-[#0F172A] dark:text-[#FAFAFA]">{row.feature}</span>
                         </div>
                       </td>
-                      <td className="p-4 bg-emerald-50/40">
+                      <td className="p-4 bg-emerald-50/40 dark:bg-[rgba(16,185,129,0.06)]">
                         <ComparisonCell status={row.lore} />
                       </td>
                       <td className="p-4 text-center">
@@ -923,7 +916,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════
           FEATURES SECTION
           ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB]" id="features">
+      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]" id="features">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <FadeIn>
@@ -977,14 +970,14 @@ export default function LandingPage() {
                         <feature.icon className="w-5 h-5" style={{ color: feature.color }} />
                       </motion.div>
                       <div>
-                        <h3 className="text-lg font-bold text-[#0F172A]">{feature.title}</h3>
+                        <h3 className="text-lg font-bold text-[#0F172A] dark:text-[#FAFAFA]">{feature.title}</h3>
                         <p className="text-sm font-medium" style={{ color: feature.color }}>
                           {feature.subtitle}
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm text-[#475569] leading-relaxed mb-4">{feature.desc}</p>
-                    <div className="rounded-xl bg-[#F9FAFB] border border-gray-100 p-3 mt-2">
+                    <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed mb-4">{feature.desc}</p>
+                    <div className="rounded-xl bg-[#F9FAFB] dark:bg-[#09090B] border border-gray-100 dark:border-[rgba(255,255,255,0.08)] p-3 mt-2">
                       {featureSVGs[i]}
                     </div>
                   </div>
@@ -1027,11 +1020,11 @@ export default function LandingPage() {
                       ))}
                     </div>
                     {/* Quote */}
-                    <p className="text-sm text-[#475569] leading-relaxed flex-1 mb-6">
+                    <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed flex-1 mb-6">
                       &ldquo;{t.quote}&rdquo;
                     </p>
                     {/* Author */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100 dark:border-[rgba(255,255,255,0.08)]">
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                         style={{ background: t.bgColor }}
@@ -1044,8 +1037,8 @@ export default function LandingPage() {
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-[#0F172A]">{t.name}</p>
-                        <p className="text-xs text-[#71717A]">
+                        <p className="text-sm font-bold text-[#0F172A] dark:text-[#FAFAFA]">{t.name}</p>
+                        <p className="text-xs text-[#71717A] dark:text-[#A1A1AA]">
                           {t.title}, {t.company}
                         </p>
                       </div>
@@ -1061,7 +1054,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════
           HOW IT WORKS
           ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB]" id="how-it-works" ref={howItWorksRef}>
+      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]" id="how-it-works" ref={howItWorksRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <FadeIn>
@@ -1084,7 +1077,7 @@ export default function LandingPage() {
               <FadeIn key={step.step} delay={i * 0.12}>
                 <div className="feature-card text-center relative">
                   {/* Step number */}
-                  <span className="absolute top-4 right-4 text-xs font-mono text-gray-300 font-bold">
+                  <span className="absolute top-4 right-4 text-xs font-mono text-gray-300 dark:text-gray-600 font-bold">
                     {step.step}
                   </span>
                   <motion.div
@@ -1100,8 +1093,8 @@ export default function LandingPage() {
                   >
                     <step.icon className="w-6 h-6" style={{ color: step.color }} />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">{step.title}</h3>
-                  <p className="text-sm text-[#475569] leading-relaxed">{step.desc}</p>
+                  <h3 className="text-xl font-bold text-[#0F172A] dark:text-[#FAFAFA] mb-3">{step.title}</h3>
+                  <p className="text-sm text-[#475569] dark:text-[#A1A1AA] leading-relaxed">{step.desc}</p>
                   {/* Animated connector */}
                   {i < 2 && (
                     <AnimatedConnector
@@ -1133,7 +1126,7 @@ export default function LandingPage() {
                     Architecture — Aurora DSQL
                   </span>
                 </div>
-                <div className="p-6 bg-white">
+                <div className="p-6 bg-white dark:bg-[#0F0F12]">
                   <svg
                     viewBox="0 0 400 220"
                     className="w-full h-auto"
@@ -1245,7 +1238,7 @@ export default function LandingPage() {
                 </h2>
               </FadeIn>
               <FadeIn delay={0.12}>
-                <p className="text-lg text-[#475569] leading-relaxed">
+                <p className="text-lg text-[#475569] dark:text-[#A1A1AA] leading-relaxed">
                   Aurora DSQL provides serializable isolation across multiple regions — meaning your team&apos;s memory is identical everywhere. No stale caches, no conflicts, no data drift. Consistency is non-negotiable.
                 </p>
               </FadeIn>
@@ -1266,10 +1259,10 @@ export default function LandingPage() {
                     },
                   ].map((item) => (
                     <div key={item.text} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-[rgba(16,185,129,0.10)] flex items-center justify-center shrink-0">
                         <item.icon className="w-4 h-4 text-emerald-600" />
                       </div>
-                      <span className="text-sm text-[#475569] font-medium">
+                      <span className="text-sm text-[#475569] dark:text-[#A1A1AA] font-medium">
                         {item.text}
                       </span>
                     </div>
@@ -1284,7 +1277,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════
           TRUST / SECURITY BADGES
           ═══════════════════════════════════════════════════════════ */}
-      <section className="py-10 border-y border-gray-100">
+      <section className="py-10 border-y border-gray-100 dark:border-[rgba(255,255,255,0.08)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn>
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
@@ -1309,7 +1302,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════
           PRICING TEASER
           ═══════════════════════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 bg-[#F9FAFB]">
+      <section className="py-20 md:py-28 bg-[#F9FAFB] dark:bg-[#09090B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <FadeIn>
@@ -1344,17 +1337,17 @@ export default function LandingPage() {
                   )}
 
                   <div className="text-center mb-6">
-                    <h3 className="text-lg font-bold text-[#0F172A] mb-1">{tier.name}</h3>
-                    <p className="text-sm text-[#71717A] mb-4">{tier.desc}</p>
+                    <h3 className="text-lg font-bold text-[#0F172A] dark:text-[#FAFAFA] mb-1">{tier.name}</h3>
+                    <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] mb-4">{tier.desc}</p>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-extrabold text-[#0F172A]">
+                      <span className="text-4xl font-extrabold text-[#0F172A] dark:text-[#FAFAFA]">
                         {tier.price}
                       </span>
                       {tier.period !== 'forever' && tier.period !== 'tailored pricing' && (
-                        <span className="text-sm text-[#71717A]">/{tier.period}</span>
+                        <span className="text-sm text-[#71717A] dark:text-[#A1A1AA]">/{tier.period}</span>
                       )}
                     </div>
-                    <p className="text-xs text-[#A1A1AA] mt-1">
+                    <p className="text-xs text-[#A1A1AA] dark:text-[#71717A] mt-1">
                       {tier.period === 'forever' ? 'Free forever' : tier.period === 'tailored pricing' ? 'Tailored to your needs' : `Billed ${tier.period}`}
                     </p>
                   </div>
@@ -1363,7 +1356,7 @@ export default function LandingPage() {
                     {tier.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5">
                         <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" strokeWidth={3} />
-                        <span className="text-sm text-[#475569]">{f}</span>
+                        <span className="text-sm text-[#475569] dark:text-[#A1A1AA]">{f}</span>
                       </li>
                     ))}
                   </ul>
@@ -1373,7 +1366,7 @@ export default function LandingPage() {
                     className={`w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-semibold transition-all ${
                       tier.featured
                         ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5'
-                        : 'bg-white text-[#0F172A] border border-gray-200 hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5'
+                        : 'bg-white dark:bg-[#0F0F12] text-[#0F172A] dark:text-[#FAFAFA] border border-gray-200 dark:border-[rgba(255,255,255,0.08)] hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-md hover:-translate-y-0.5'
                     }`}
                   >
                     {tier.cta}

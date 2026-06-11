@@ -196,10 +196,10 @@ export default function DigestPage() {
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-amber-100 flex items-center justify-center mb-4 shadow-sm">
               <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
             </div>
-            <h2 className="text-lg font-semibold text-[#18181B] mb-1">
+            <h2 className="text-lg font-semibold text-[#18181B] dark:text-[#FAFAFA] mb-1">
               Preparing your digest…
             </h2>
-            <p className="text-sm text-[#71717A]">
+            <p className="text-sm text-[#71717A] dark:text-[#A1A1AA]">
               Gathering insights from your knowledge graph
             </p>
           </div>
@@ -217,10 +217,10 @@ export default function DigestPage() {
             <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-4 shadow-sm">
               <AlertCircle className="w-6 h-6 text-red-500" />
             </div>
-            <h2 className="text-lg font-semibold text-[#18181B] mb-1">
+            <h2 className="text-lg font-semibold text-[#18181B] dark:text-[#FAFAFA] mb-1">
               Something went wrong
             </h2>
-            <p className="text-sm text-[#71717A] text-center max-w-md">
+            <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] text-center max-w-md">
               {error}
             </p>
           </div>
@@ -297,10 +297,10 @@ export default function DigestPage() {
               <Calendar className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#18181B] dark:text-[#FAFAFA] tracking-tight">
                 Morning Digest
               </h1>
-              <p className="text-sm text-[#71717A] mt-0.5">
+              <p className="text-sm text-[#71717A] dark:text-[#A1A1AA] mt-0.5">
                 {dateDisplay}
               </p>
             </div>
@@ -315,35 +315,35 @@ export default function DigestPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* ── Daily Summary Card ─────────────────────── */}
             <motion.div variants={itemVariants}>
-              <Card className="bg-white border-[#E5E7EB] overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-50 via-white to-amber-50/30 p-6">
+              <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-50 via-white to-amber-50/30 dark:from-[rgba(16,185,129,0.06)] dark:via-[#0F0F12] dark:to-[rgba(245,158,11,0.04)] p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
                         <Sun className="w-4 h-4 text-white" />
                       </div>
-                      <h2 className="text-lg font-bold text-[#18181B]">
+                      <h2 className="text-lg font-bold text-[#18181B] dark:text-[#FAFAFA]">
                         Daily Summary
                       </h2>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge
                         variant="outline"
-                        className="text-[10px] font-semibold gap-1.5 border-emerald-200 bg-emerald-50/50 text-emerald-700"
+                        className="text-[10px] font-semibold gap-1.5 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)] text-emerald-700 dark:text-emerald-400"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         {moodLabel}
                       </Badge>
                       <Badge
                         variant="outline"
-                        className="text-[10px] font-semibold gap-1 border-violet-200 bg-violet-50/50 text-violet-700"
+                        className="text-[10px] font-semibold gap-1 border-violet-200 dark:border-[rgba(139,92,246,0.20)] bg-violet-50/50 dark:bg-[rgba(139,92,246,0.06)] text-violet-700 dark:text-violet-400"
                       >
                         <Sparkles className="w-2.5 h-2.5" />
                         Powered by AI
                       </Badge>
                     </div>
                   </div>
-                  <p className="text-sm text-[#52525B] leading-relaxed">
+                  <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] leading-relaxed">
                     {digest.summary}
                   </p>
                 </div>
@@ -354,13 +354,13 @@ export default function DigestPage() {
             {keyInsightsMapped.length > 0 && (
               <motion.div variants={itemVariants}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-[#18181B] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     Key Insights
                   </h3>
                   <Badge
                     variant="outline"
-                    className="text-[10px] font-semibold gap-1.5 border-emerald-200 bg-emerald-50/50 text-emerald-700"
+                    className="text-[10px] font-semibold gap-1.5 border-emerald-200 dark:border-[rgba(16,185,129,0.20)] bg-emerald-50/50 dark:bg-[rgba(16,185,129,0.06)] text-emerald-700 dark:text-emerald-400"
                   >
                     <Sparkles className="w-2.5 h-2.5" />
                     AI Insight
@@ -389,12 +389,12 @@ export default function DigestPage() {
                       }}
                     >
                       <Card
-                        className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow group cursor-default overflow-hidden"
+                        className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:shadow-md transition-shadow group cursor-default overflow-hidden"
                       >
                         {/* Emerald left border accent */}
                         <div className="flex">
                           <div className="w-1 bg-gradient-to-b from-emerald-400 to-emerald-600 shrink-0" />
-                          <CardContent className="p-4 flex-1 bg-gradient-to-br from-emerald-50/30 via-white to-white">
+                          <CardContent className="p-4 flex-1 bg-gradient-to-br from-emerald-50/30 via-white to-white dark:from-[rgba(16,185,129,0.04)] dark:via-[#0F0F12] dark:to-[#0F0F12]">
                             <div className="flex items-center gap-2 mb-3">
                               <div
                                 className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -404,10 +404,10 @@ export default function DigestPage() {
                               </div>
                               <Sparkles className="w-3.5 h-3.5 text-emerald-500 ml-auto opacity-60 group-hover:opacity-100 transition-opacity" />
                             </div>
-                            <h4 className="text-sm font-semibold text-[#18181B] mb-1.5 leading-snug">
+                            <h4 className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA] mb-1.5 leading-snug">
                               {insight.title}
                             </h4>
-                            <p className="text-xs text-[#71717A] leading-relaxed">
+                            <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] leading-relaxed">
                               {insight.description}
                             </p>
                           </CardContent>
@@ -422,15 +422,15 @@ export default function DigestPage() {
             {/* ── Knowledge Changes Timeline ──────────────── */}
             {timelineMapped.length > 0 && (
               <motion.div variants={itemVariants}>
-                <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Knowledge Changes Timeline
                 </h3>
-                <Card className="bg-white border-[#E5E7EB]">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                   <CardContent className="p-6">
                     <div className="relative">
                       {/* Timeline line */}
-                      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-[#E5E7EB]" />
+                      <div className="absolute left-[15px] top-2 bottom-2 w-px bg-[#E5E7EB] dark:bg-[rgba(255,255,255,0.08)]" />
 
                       <div className="space-y-5">
                         {timelineMapped.map((entry, i) => (
@@ -443,7 +443,7 @@ export default function DigestPage() {
                           >
                             {/* Timeline dot + icon */}
                             <div
-                              className="w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 z-10 border-2 border-white shadow-sm"
+                              className="w-[30px] h-[30px] rounded-full flex items-center justify-center shrink-0 z-10 border-2 border-white dark:border-[#0F0F12] shadow-sm"
                               style={{ background: entry.bgColor }}
                             >
                               <entry.icon className="w-3.5 h-3.5" style={{ color: entry.color }} />
@@ -451,14 +451,14 @@ export default function DigestPage() {
                             {/* Content */}
                             <div className="flex-1 min-w-0 pt-0.5">
                               <div className="flex items-center gap-2 mb-0.5">
-                                <span className="text-xs font-semibold text-[#71717A]">
+                                <span className="text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA]">
                                   {entry.time}
                                 </span>
                               </div>
-                              <p className="text-sm font-medium text-[#18181B]">
+                              <p className="text-sm font-medium text-[#18181B] dark:text-[#FAFAFA]">
                                 {entry.description}
                               </p>
-                              <p className="text-xs text-[#A1A1AA] mt-0.5">
+                              <p className="text-xs text-[#A1A1AA] dark:text-[#71717A] mt-0.5">
                                 Affected: {entry.affected}
                               </p>
                             </div>
@@ -474,19 +474,19 @@ export default function DigestPage() {
             {/* ── Focus Areas ─────────────────────────────── */}
             {focusAreasMapped.length > 0 && (
               <motion.div variants={itemVariants}>
-                <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-                  <LayoutGrid className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3 flex items-center gap-2">
+                  <LayoutGrid className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Focus Areas
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {focusAreasMapped.map((area) => (
                     <Card
                       key={area.name}
-                      className="bg-white border-[#E5E7EB] hover:shadow-md transition-shadow"
+                      className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:shadow-md transition-shadow"
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-[#18181B]">
+                          <h4 className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">
                             {area.name}
                           </h4>
                           <span
@@ -500,7 +500,7 @@ export default function DigestPage() {
                           value={area.progress}
                           className="h-2 bg-gray-100"
                         />
-                        <p className="text-[11px] text-[#A1A1AA] mt-1.5">
+                        <p className="text-[11px] text-[#A1A1AA] dark:text-[#71717A] mt-1.5">
                           Knowledge coverage
                         </p>
                       </CardContent>
@@ -515,21 +515,21 @@ export default function DigestPage() {
           <div className="space-y-6">
             {/* ── Quick Stats ────────────────────────────── */}
             <motion.div variants={itemVariants}>
-              <h3 className="text-sm font-bold text-[#18181B] mb-3">Quick Stats</h3>
-              <Card className="bg-white border-[#E5E7EB]">
+              <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3">Quick Stats</h3>
+              <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                 <CardContent className="p-4">
                   <div className="grid grid-cols-2 gap-3">
                     {quickStatsMapped.map((stat) => (
                       <div
                         key={stat.label}
-                        className="rounded-xl bg-[#F9FAFB] p-3 text-center border border-[#F3F4F6]"
+                        className="rounded-xl bg-[#F9FAFB] dark:bg-[#09090B] p-3 text-center border border-[#F3F4F6] dark:border-[rgba(255,255,255,0.06)]"
                       >
                         <stat.icon
                           className="w-4 h-4 mx-auto mb-1.5"
                           style={{ color: stat.color }}
                         />
-                        <p className="text-xl font-bold text-[#18181B]">{stat.value}</p>
-                        <p className="text-[10px] text-[#71717A] mt-0.5 leading-tight">
+                        <p className="text-xl font-bold text-[#18181B] dark:text-[#FAFAFA]">{stat.value}</p>
+                        <p className="text-[10px] text-[#71717A] dark:text-[#A1A1AA] mt-0.5 leading-tight">
                           {stat.label}
                         </p>
                       </div>
@@ -542,11 +542,11 @@ export default function DigestPage() {
             {/* ── Action Items ────────────────────────────── */}
             {actionItems.length > 0 && (
               <motion.div variants={itemVariants}>
-                <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3 flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Action Items
                 </h3>
-                <Card className="bg-white border-[#E5E7EB]">
+                <Card className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)]">
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       {actionItems.map((item) => (
@@ -559,8 +559,8 @@ export default function DigestPage() {
                           <span
                             className={`text-sm leading-relaxed transition-colors ${
                               item.checked
-                                ? 'text-[#A1A1AA] line-through'
-                                : 'text-[#52525B]'
+                                ? 'text-[#A1A1AA] dark:text-[#71717A] line-through'
+                                : 'text-[#52525B] dark:text-[#D4D4D8]'
                             }`}
                           >
                             {item.label}
@@ -568,8 +568,8 @@ export default function DigestPage() {
                         </div>
                       ))}
                     </div>
-                    <Separator className="my-4 bg-[#E5E7EB]" />
-                    <p className="text-xs text-[#A1A1AA]">
+                    <Separator className="my-4 bg-[#E5E7EB] dark:bg-[rgba(255,255,255,0.08)]" />
+                    <p className="text-xs text-[#A1A1AA] dark:text-[#71717A]">
                       {actionItems.filter((i) => i.checked).length} of {actionItems.length} completed
                     </p>
                   </CardContent>
@@ -580,23 +580,23 @@ export default function DigestPage() {
             {/* ── AI Comment ─────────────────────────────── */}
             {digest.aiComment && (
               <motion.div variants={itemVariants}>
-                <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-violet-600" />
+                <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                   AI Insight
                 </h3>
                 <div className="relative">
-                  <div className="bg-gradient-to-br from-violet-50 via-white to-emerald-50/30 rounded-2xl border border-violet-100 p-5">
+                  <div className="bg-gradient-to-br from-violet-50 via-white to-emerald-50/30 dark:from-[rgba(139,92,246,0.06)] dark:via-[#0F0F12] dark:to-[rgba(16,185,129,0.04)] rounded-2xl border border-violet-100 dark:border-[rgba(139,92,246,0.15)] p-5">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center shrink-0 shadow-sm">
                         <Sparkles className="w-3.5 h-3.5 text-white" />
                       </div>
-                      <p className="text-sm text-[#52525B] leading-relaxed">
+                      <p className="text-sm text-[#52525B] dark:text-[#D4D4D8] leading-relaxed">
                         {digest.aiComment}
                       </p>
                     </div>
                   </div>
                   {/* Speech bubble pointer */}
-                  <div className="absolute -bottom-2 left-8 w-4 h-4 bg-white border-r border-b border-violet-100 transform rotate-45" />
+                  <div className="absolute -bottom-2 left-8 w-4 h-4 bg-white dark:bg-[#0F0F12] border-r border-b border-violet-100 dark:border-[rgba(139,92,246,0.15)] transform rotate-45" />
                 </div>
               </motion.div>
             )}
@@ -608,30 +608,30 @@ export default function DigestPage() {
             ═══════════════════════════════════════════════════════ */}
         {pastDigests.length > 0 && (
           <motion.div variants={itemVariants} className="mt-8">
-            <h3 className="text-sm font-bold text-[#18181B] mb-3 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-emerald-600" />
+            <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA] mb-3 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Past Digests
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {pastDigests.map((pd) => (
                 <Card
                   key={pd.id}
-                  className="bg-white border-[#E5E7EB] hover:shadow-md hover:border-emerald-200 transition-all group cursor-pointer"
+                  className="bg-white dark:bg-[#0F0F12] border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] hover:shadow-md hover:border-emerald-200 dark:hover:border-[rgba(16,185,129,0.20)] transition-all group cursor-pointer"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-[#18181B]">
+                      <h4 className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA]">
                         {pd.day}
                       </h4>
-                      <span className="text-[10px] text-[#A1A1AA]">{formatPastDigestDate(pd.date)}</span>
+                      <span className="text-[10px] text-[#A1A1AA] dark:text-[#71717A]">{formatPastDigestDate(pd.date)}</span>
                     </div>
-                    <p className="text-xs text-[#71717A] leading-relaxed mb-3">
+                    <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] leading-relaxed mb-3">
                       {pd.summary}
                     </p>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 p-0 h-auto gap-1"
+                      className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-[rgba(16,185,129,0.10)] p-0 h-auto gap-1"
                     >
                       Read more
                       <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />

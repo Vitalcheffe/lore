@@ -83,7 +83,7 @@ function CircularProgress({
       {/* Center percentage */}
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.span
-          className="text-lg font-bold text-emerald-700"
+          className="text-lg font-bold text-emerald-700 dark:text-emerald-400"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.5 }}
@@ -177,7 +177,7 @@ export function ProfileCompletionCard({ nodeCount }: { nodeCount: number }) {
         exit={{ opacity: 0, y: -8, scale: 0.98 }}
         transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <Card className="bg-gradient-to-r from-emerald-50/80 via-white to-teal-50/40 border-emerald-100/80 overflow-hidden">
+        <Card className="bg-gradient-to-r from-emerald-50/80 dark:from-[rgba(16,185,129,0.08)] via-white dark:via-[#0F0F12] to-teal-50/40 dark:to-[rgba(20,184,166,0.06)] border-emerald-100/80 dark:border-[rgba(16,185,129,0.15)] overflow-hidden">
           <CardContent className="p-5">
             <div className="flex items-start gap-5">
               {/* ── Circular Progress ──────────────────────── */}
@@ -188,7 +188,7 @@ export function ProfileCompletionCard({ nodeCount }: { nodeCount: number }) {
               {/* ── Content ────────────────────────────────── */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-sm font-bold text-[#18181B]">
+                  <h3 className="text-sm font-bold text-[#18181B] dark:text-[#FAFAFA]">
                     Complete your profile
                   </h3>
                   <motion.span
@@ -201,7 +201,7 @@ export function ProfileCompletionCard({ nodeCount }: { nodeCount: number }) {
                     {completionPercentage}%
                   </motion.span>
                 </div>
-                <p className="text-xs text-[#71717A] mb-3">
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] mb-3">
                   Finish setting up your account to unlock the full power of LORE.
                 </p>
 
@@ -216,14 +216,14 @@ export function ProfileCompletionCard({ nodeCount }: { nodeCount: number }) {
                     >
                       <Link
                         href={item.href}
-                        className="flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-lg hover:bg-white/60 transition-colors group"
+                        className="flex items-center gap-2.5 py-1.5 px-2 -mx-2 rounded-lg hover:bg-white/60 dark:hover:bg-[rgba(255,255,255,0.04)] transition-colors group"
                       >
-                        <div className="w-5 h-5 rounded-full border-2 border-[#D4D4D8] bg-white flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
+                        <div className="w-5 h-5 rounded-full border-2 border-[#D4D4D8] dark:border-[#52525B] bg-white dark:bg-[#0F0F12] flex items-center justify-center shrink-0 group-hover:border-emerald-300 transition-colors">
                           {/* Empty circle for incomplete */}
                         </div>
-                        <item.icon className="w-3.5 h-3.5 text-[#A1A1AA] shrink-0 group-hover:text-emerald-500 transition-colors" />
+                        <item.icon className="w-3.5 h-3.5 text-[#A1A1AA] dark:text-[#71717A] shrink-0 group-hover:text-emerald-500 transition-colors" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-[#52525B] group-hover:text-[#18181B] transition-colors">
+                          <p className="text-xs font-medium text-[#52525B] dark:text-[#D4D4D8] group-hover:text-[#18181B] dark:group-hover:text-[#FAFAFA] transition-colors">
                             {item.label}
                           </p>
                         </div>

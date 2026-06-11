@@ -31,6 +31,7 @@ function getSkeletonVariant(pathname: string): PageSkeletonVariant {
   if (pathname.startsWith('/app/digest')) return 'digest'
   if (pathname.startsWith('/app/settings')) return 'settings'
   if (pathname.startsWith('/app/team')) return 'team'
+  if (pathname.startsWith('/app/search')) return 'dashboard'
   return 'dashboard'
 }
 
@@ -43,6 +44,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.startsWith('/app/digest')) return 'Morning Digest'
   if (pathname.startsWith('/app/settings')) return 'Settings'
   if (pathname.startsWith('/app/team')) return 'Team'
+  if (pathname.startsWith('/app/search')) return 'Search'
   return 'Lore'
 }
 

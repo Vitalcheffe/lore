@@ -38,14 +38,14 @@ export function CookieConsent() {
           transition={{ type: 'spring', stiffness: 200, damping: 25 }}
           className="fixed bottom-0 left-0 right-0 z-[100] p-4"
         >
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl border border-[#E5E7EB] p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="max-w-4xl mx-auto bg-white dark:bg-[#0F0F12] rounded-2xl shadow-2xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex items-start gap-3 flex-1">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-[rgba(245,158,11,0.10)] flex items-center justify-center shrink-0">
                 <Cookie className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#18181B] mb-1">We respect your privacy</p>
-                <p className="text-xs text-[#71717A] leading-relaxed">
+                <p className="text-sm font-semibold text-[#18181B] dark:text-[#FAFAFA] mb-1">We respect your privacy</p>
+                <p className="text-xs text-[#71717A] dark:text-[#A1A1AA] leading-relaxed">
                   We use essential cookies to keep Lore running and optional cookies to improve your experience. 
                   No data is sold to third parties.{' '}
                   <a href="/privacy" className="text-emerald-600 hover:underline">Privacy Policy</a>
@@ -57,7 +57,7 @@ export function CookieConsent() {
                 variant="outline"
                 size="sm"
                 onClick={handleDecline}
-                className="text-xs border-[#E5E7EB] flex-1 sm:flex-none"
+                className="text-xs border-[#E5E7EB] dark:border-[rgba(255,255,255,0.08)] flex-1 sm:flex-none"
               >
                 Decline
               </Button>
