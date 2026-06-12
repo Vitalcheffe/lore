@@ -2,32 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { Playfair_Display, Cormorant_Garamond, Inter } from 'next/font/google'
-
 // ═══════════════════════════════════════════════════════════════
-// FONTS
+// FONTS — Defined in layout.tsx, accessed via CSS variables
 // ═══════════════════════════════════════════════════════════════
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  variable: '--font-playfair',
-  display: 'swap',
-})
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '600'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+const FONT_PLAYFAIR = 'var(--font-playfair), "Playfair Display", Georgia, serif'
+const FONT_CORMORANT = 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif'
+const FONT_INTER = 'var(--font-inter), "Inter", -apple-system, sans-serif'
 
 // ═══════════════════════════════════════════════════════════════
 // PALETTE
@@ -172,10 +153,10 @@ function ImpactProgress({ amount, total = 500000 }: { amount: number; total?: nu
   return (
     <div ref={ref} className="w-full">
       <div className="flex justify-between items-baseline mb-3">
-        <span style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }} className="text-xs tracking-widest uppercase">
+        <span style={{ color: COLORS.textSecondary, fontFamily: FONT_INTER }} className="text-xs tracking-widest uppercase">
           Objectif
         </span>
-        <span style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }} className="text-xs tracking-wide">
+        <span style={{ color: COLORS.textSecondary, fontFamily: FONT_INTER }} className="text-xs tracking-wide">
           {percentage.toFixed(1)}%
         </span>
       </div>
@@ -191,10 +172,10 @@ function ImpactProgress({ amount, total = 500000 }: { amount: number; total?: nu
         />
       </div>
       <div className="flex justify-between items-baseline mt-3">
-        <span style={{ color: COLORS.gold, fontFamily: playfair.style.fontFamily }} className="text-lg font-bold">
+        <span style={{ color: COLORS.gold, fontFamily: FONT_PLAYFAIR }} className="text-lg font-bold">
           <AnimatedCounter value={amount} prefix="" suffix=" MAD" />
         </span>
-        <span style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }} className="text-xs">
+        <span style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }} className="text-xs">
           sur {total.toLocaleString('fr-FR')} MAD
         </span>
       </div>
@@ -250,7 +231,7 @@ function ImpactCard({ tier, index, isActive, onClick }: {
                 className="text-3xl md:text-4xl font-bold tracking-tight"
                 style={{
                   color: tier.color,
-                  fontFamily: playfair.style.fontFamily,
+                  fontFamily: FONT_PLAYFAIR,
                 }}
               >
                 <AnimatedCounter value={tier.amount} suffix=" MAD" duration={2} />
@@ -259,7 +240,7 @@ function ImpactCard({ tier, index, isActive, onClick }: {
                 className="text-lg font-semibold mt-1"
                 style={{
                   color: COLORS.textPrimary,
-                  fontFamily: cormorant.style.fontFamily,
+                  fontFamily: FONT_CORMORANT,
                   letterSpacing: '0.04em',
                 }}
               >
@@ -293,7 +274,7 @@ function ImpactCard({ tier, index, isActive, onClick }: {
             className="text-sm mb-4"
             style={{
               color: COLORS.textSecondary,
-              fontFamily: cormorant.style.fontFamily,
+              fontFamily: FONT_CORMORANT,
               letterSpacing: '0.06em',
             }}
           >
@@ -315,7 +296,7 @@ function ImpactCard({ tier, index, isActive, onClick }: {
                     className="text-sm leading-relaxed mb-5"
                     style={{
                       color: COLORS.textSecondary,
-                      fontFamily: inter.style.fontFamily,
+                      fontFamily: FONT_INTER,
                       lineHeight: '1.8',
                     }}
                   >
@@ -338,7 +319,7 @@ function ImpactCard({ tier, index, isActive, onClick }: {
                           className="text-sm"
                           style={{
                             color: 'rgba(245, 237, 224, 0.7)',
-                            fontFamily: inter.style.fontFamily,
+                            fontFamily: FONT_INTER,
                           }}
                         >
                           {detail}
@@ -545,16 +526,16 @@ function ImpactSlider({ value, onChange }: { value: number; onChange: (v: number
 
       {/* Current value display */}
       <div className="flex justify-between items-center mt-4">
-        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}>
+        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }}>
           0 MAD
         </span>
         <div
           className="text-2xl font-bold"
-          style={{ color: activeColor, fontFamily: playfair.style.fontFamily }}
+          style={{ color: activeColor, fontFamily: FONT_PLAYFAIR }}
         >
           {value.toLocaleString('fr-FR')} MAD
         </div>
-        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}>
+        <span className="text-xs tracking-widest uppercase" style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }}>
           500 000 MAD
         </span>
       </div>
@@ -659,7 +640,7 @@ export default function CouleurDeLEspoirImpact() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${playfair.variable} ${cormorant.variable} ${inter.variable}`}
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: COLORS.bgDark, color: COLORS.textPrimary }}
     >
       <FloatingParticles />
@@ -674,14 +655,14 @@ export default function CouleurDeLEspoirImpact() {
             </svg>
             <span
               className="text-xs tracking-[0.3em] uppercase"
-              style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.textSecondary, fontFamily: FONT_INTER }}
             >
               Fondation TGCC
             </span>
           </div>
           <div
             className="text-xs tracking-[0.2em] uppercase"
-            style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+            style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }}
           >
             1er Juillet 2025
           </div>
@@ -699,13 +680,13 @@ export default function CouleurDeLEspoirImpact() {
           >
             <div
               className="text-xs tracking-[0.35em] uppercase mb-6"
-              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.gold, fontFamily: FONT_INTER }}
             >
               Calculateur d&apos;impact
             </div>
             <h1
               className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6"
-              style={{ fontFamily: playfair.style.fontFamily }}
+              style={{ fontFamily: FONT_PLAYFAIR }}
             >
               <span style={{ color: COLORS.cream }}>Votre geste,</span>
               <br />
@@ -720,7 +701,7 @@ export default function CouleurDeLEspoirImpact() {
             </h1>
             <p
               className="text-base md:text-lg max-w-2xl mx-auto leading-relaxed"
-              style={{ color: COLORS.textSecondary, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.03em' }}
+              style={{ color: COLORS.textSecondary, fontFamily: FONT_CORMORANT, letterSpacing: '0.03em' }}
             >
               Chaque contribution finance directement la construction d&apos;un pensionnat pour les jeunes filles de 12 a 20 ans a Casablanca. Decouvrez ce que votre generosite rend possible.
             </p>
@@ -741,7 +722,7 @@ export default function CouleurDeLEspoirImpact() {
           >
             <div
               className="text-xs tracking-[0.25em] uppercase mb-6"
-              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.gold, fontFamily: FONT_INTER }}
             >
               Etat des collectes
             </div>
@@ -760,7 +741,7 @@ export default function CouleurDeLEspoirImpact() {
           >
             <div
               className="text-xs tracking-[0.25em] uppercase mb-8 text-center"
-              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.gold, fontFamily: FONT_INTER }}
             >
               Simulez votre contribution
             </div>
@@ -780,13 +761,13 @@ export default function CouleurDeLEspoirImpact() {
                 >
                   <div
                     className="text-xl md:text-2xl font-semibold"
-                    style={{ color: currentSliderTier.color, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.04em' }}
+                    style={{ color: currentSliderTier.color, fontFamily: FONT_CORMORANT, letterSpacing: '0.04em' }}
                   >
                     {currentSliderTier.label}
                   </div>
                   <p
                     className="text-sm mt-2 max-w-lg mx-auto"
-                    style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily, lineHeight: '1.7' }}
+                    style={{ color: COLORS.textSecondary, fontFamily: FONT_INTER, lineHeight: '1.7' }}
                   >
                     {currentSliderTier.subtitle}
                   </p>
@@ -811,13 +792,13 @@ export default function CouleurDeLEspoirImpact() {
           >
             <div
               className="text-xs tracking-[0.25em] uppercase mb-4"
-              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.gold, fontFamily: FONT_INTER }}
             >
               Ce que chaque montant rend possible
             </div>
             <h2
               className="text-3xl md:text-4xl font-bold"
-              style={{ fontFamily: playfair.style.fontFamily, color: COLORS.cream }}
+              style={{ fontFamily: FONT_PLAYFAIR, color: COLORS.cream }}
             >
               L&apos;impact en detail
             </h2>
@@ -855,13 +836,13 @@ export default function CouleurDeLEspoirImpact() {
               >
                 <div
                   className="text-4xl md:text-5xl font-bold mb-2"
-                  style={{ color: stat.color, fontFamily: playfair.style.fontFamily }}
+                  style={{ color: stat.color, fontFamily: FONT_PLAYFAIR }}
                 >
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
                 <div
                   className="text-xs tracking-[0.2em] uppercase"
-                  style={{ color: COLORS.textSecondary, fontFamily: inter.style.fontFamily }}
+                  style={{ color: COLORS.textSecondary, fontFamily: FONT_INTER }}
                 >
                   {stat.label}
                 </div>
@@ -882,19 +863,19 @@ export default function CouleurDeLEspoirImpact() {
           >
             <div
               className="text-xs tracking-[0.25em] uppercase mb-6"
-              style={{ color: COLORS.gold, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.gold, fontFamily: FONT_INTER }}
             >
               A propos
             </div>
             <h2
               className="text-2xl md:text-3xl font-bold mb-8"
-              style={{ fontFamily: playfair.style.fontFamily, color: COLORS.cream }}
+              style={{ fontFamily: FONT_PLAYFAIR, color: COLORS.cream }}
             >
               Couleur de l&apos;Espoir
             </h2>
             <p
               className="text-base leading-[1.9] max-w-2xl mx-auto"
-              style={{ color: COLORS.textSecondary, fontFamily: cormorant.style.fontFamily, letterSpacing: '0.02em' }}
+              style={{ color: COLORS.textSecondary, fontFamily: FONT_CORMORANT, letterSpacing: '0.02em' }}
             >
               Le 1er juillet 2025, la Fondation TGCC organise a Casablanca une vente aux encheres caritative au profit de la construction d&apos;un pensionnat pour jeunes filles. Des artistes engagees offrent leurs oeuvres pour que chaque enchere devienne une pierre de cet edifice. Un lieu d&apos;accueil, d&apos;apprentissage et d&apos;emancipation pour celles qui n&apos;ont pas acces a l&apos;education qu&apos;elles meritent.
             </p>
@@ -914,14 +895,14 @@ export default function CouleurDeLEspoirImpact() {
             </svg>
             <span
               className="text-xs tracking-[0.2em]"
-              style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+              style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }}
             >
               Fondation TGCC — Couleur de l&apos;Espoir
             </span>
           </div>
           <span
             className="text-xs tracking-[0.15em]"
-            style={{ color: COLORS.textTertiary, fontFamily: inter.style.fontFamily }}
+            style={{ color: COLORS.textTertiary, fontFamily: FONT_INTER }}
           >
             fondationtgcc.com
           </span>

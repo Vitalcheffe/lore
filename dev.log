@@ -5,11 +5,13 @@
 
 ✓ Starting...
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 1308ms
- GET / 200 in 1468ms (compile: 1260ms, render: 208ms)
+✓ Ready in 1271ms
+ GET / 200 in 2.5s (compile: 2.2s, render: 268ms)
 [next-auth][warn][NEXTAUTH_URL] 
 https://next-auth.js.org/warnings#nextauth_url
 [next-auth][warn][NO_SECRET] 
 https://next-auth.js.org/warnings#no_secret
- GET /api/auth/session 200 in 895ms (compile: 786ms, proxy.ts: 85ms, render: 24ms)
- 786ms, proxy.ts: 85ms, render: 24ms)
+ GET /api/auth/session 200 in 836ms (compile: 725ms, proxy.ts: 86ms, render: 25ms)
+ GET / 200 in 41ms (compile: 5ms, render: 37ms)
+ GET / 200 in 256ms (compile: 4ms, render: 252ms)
+ GET /api/auth/session 200 in 160ms (compile: 115ms, proxy.ts: 38ms, render: 7ms)
