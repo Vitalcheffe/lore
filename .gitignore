@@ -53,3 +53,55 @@ Thumbs.db
 
 # Uploads (user files, not part of the app)
 upload/
+
+# AI Agent traces — NEVER push these
+agent-ctx/
+tool-results/
+worklog.md
+PROGRESS.md
+PROGRESS.MD
+TASKS.md
+RULES.md
+CHARTER.md
+OBJECTIVES.md
+recording.log
+dev.log
+
+# Internal skills system — NEVER push
+skills/
+
+# Build artifacts backup
+public/_next_backup/
+
+# Download directory (generated files)
+download/
+
+# Recording / search scripts
+record-video.mjs
+record-video.cjs
+record_video_v3.js
+record_video_v3b.js
+record_video_v4.js
+record_fast.js
+encode_final.py
+combine_audio.py
+generate_sfx.py
+generate_bg_music.py
+screenshot_clearpath.py
+render_clearpath_pdf.py
+generate_clearpath_pdf.py
+quick_test.py
+vlm_analyze.mjs
+capture-espoir.mjs
+capture-espoir2.mjs
+generate-audio.mjs
+
+# Search result JSONs
+search_*.json
+clearpath-search.json
+
+# Other project files
+APPLE_STYLE_VIDEO_PROMPT_v3.md
+APPLE_STYLE_VIDEO_MASTERCLASS.md
+APPLE_STYLE_VIDEO_MASTERCLASS_v2_backup.md
+LORE_VIDEO_PROMPT.md
