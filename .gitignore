@@ -54,7 +54,7 @@ Thumbs.db
 # Uploads (user files, not part of the app)
 upload/
 
-# AI Agent traces — NEVER push these
+# Internal traces — NEVER push these
 agent-ctx/
 tool-results/
 worklog.md
