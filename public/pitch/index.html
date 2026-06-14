@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>ClearPath AI — USAII Hackathon 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0A0A0B;--surface:#141416;--card:#1C1C1F;
+  --emerald:#059669;--emerald-light:#10B981;--emerald-glow:#34D399;
+  --red:#DC2626;--red-light:#EF4444;--red-bg:#1A0505;
+  --amber:#F59E0B;--amber-light:#FBBF24;
+  --blue:#3B82F6;--blue-light:#60A5FA;
+  --violet:#8B5CF6;
+  --text:#F4F4F5;--text2:#A1A1AA;--text3:#71717A;
+  --border:#2C2C2E;
+}
+
+body{
+  width:1920px;height:1080px;overflow:hidden;
+  background:var(--bg);color:var(--text);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== PARTICLE CANVAS ===== */
+#particleCanvas{position:fixed;top:0;left:0;width:1920px;height:1080px;z-index:0;pointer-events:none}
+
+/* ===== SCENE SYSTEM ===== */
+.scene{position:absolute;top:0;left:0;width:1920px;height:1080px;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;z-index:1;pointer-events:none;transition:opacity 0.6s ease}
+.scene.active{opacity:1;z-index:10}
+
+/* ===== SHARED ANIMATIONS ===== */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes pulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(5,150,105,0.3)}50%{box-shadow:0 0 40px rgba(5,150,105,0.6)}}
+@keyframes glowRed{0%,100%{box-shadow:0 0 20px rgba(220,38,38,0.3)}50%{box-shadow:0 0 50px rgba(220,38,38,0.7)}}
+@keyframes rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes dash{to{stroke-dashoffset:0}}
+@keyframes countUp{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes orbit{0%{transform:rotate(0deg) translateX(60px) rotate(0deg)}100%{transform:rotate(360deg) translateX(60px) rotate(-360deg)}}
+@keyframes ripple{0%{transform:scale(0.8);opacity:0.6}100%{transform:scale(2.5);opacity:0}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+@keyframes barGrow{from{width:0}to{width:var(--w)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+@keyframes scanline{0%{top:-10%}100%{top:110%}}
+
+.floating{animation:float 3s ease-in-out infinite}
+.pulsing{animation:pulse 2s ease-in-out infinite}
+.glowing{animation:glow 2s ease-in-out infinite}
+.glowingRed{animation:glowRed 1.5s ease-in-out infinite}
+
+/* ===== PROGRESS BAR ===== */
+#progressBar{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--emerald),var(--emerald-glow));z-index:100;transition:width 0.3s ease;box-shadow:0 0 10px var(--emerald)}
+
+/* ===== SCENE 0: HOOK ===== */
+.s0-search{width:860px;background:var(--card);border:1px solid var(--border);border-radius:28px;padding:20px 28px;display:flex;align-items:center;gap:16px}
+.s0-search-icon{width:22px;height:22px;border:2.5px solid var(--text3);border-radius:50%;position:relative;flex-shrink:0}
+.s0-search-icon::after{content:'';position:absolute;width:8px;height:2.5px;background:var(--text3);bottom:-3px;right:-5px;transform:rotate(45deg)}
+.s0-cursor{display:inline-block;width:2px;height:28px;background:var(--emerald);animation:blink 0.8s step-end infinite;margin-left:2px;vertical-align:middle}
+.s0-typing{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--text);white-space:nowrap;overflow:hidden}
+.s0-result{font-size:38px;font-weight:600;line-height:1.5;text-align:center}
+.s0-num{color:var(--emerald-glow);font-weight:800;font-size:44px}
+.s0-critical{color:var(--red-light);font-weight:700}
+.s0-million{font-size:120px;font-weight:900;letter-spacing:-4px;color:var(--emerald);text-shadow:0 0 60px rgba(5,150,105,0.4);animation:breathe 2s ease-in-out infinite}
+.s0-tag{display:inline-block;padding:8px 24px;border-radius:100px;font-size:18px;font-weight:600;letter-spacing:0.5px}
+
+/* ===== SCENE 1: PROBLEM ===== */
+.s1-stat{display:flex;flex-direction:column;align-items:center;padding:40px;border-radius:20px;background:var(--card);border:1px solid var(--border);position:relative;overflow:hidden;animation:float 4s ease-in-out infinite}
+.s1-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+.s1-stat-num{font-size:80px;font-weight:900;letter-spacing:-3px;line-height:1}
+.s1-stat-label{font-size:20px;color:var(--text2);margin-top:12px;line-height:1.4;text-align:center}
+.s1-quote{padding:28px 48px;border-left:4px solid var(--red);background:rgba(220,38,38,0.06);border-radius:0 16px 16px 0;font-size:34px;font-weight:600;font-style:italic;line-height:1.4}
+.s1-scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:scanline 3s linear infinite;opacity:0.3}
+
+/* ===== SCENE 2: SOLUTION ===== */
+.s2-app{width:880px;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.5)}
+.s2-header{height:48px;background:#F8F8FA;border-bottom:1px solid #E5E5EA;display:flex;align-items:center;padding:0 16px;gap:6px}
+.s2-dot{width:10px;height:10px;border-radius:50%}
+.s2-input{width:100%;background:#F2F2F7;border:1px solid #E5E5EA;border-radius:12px;padding:16px 20px;font-size:18px;color:#1C1C1E;font-family:'Inter',sans-serif}
+.s2-result-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#F2F2F7;border-radius:10px}
+.s2-bar-track{flex:1;height:10px;background:#E5E5EA;border-radius:5px;overflow:hidden}
+.s2-bar-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.s2-pct{font-size:16px;font-weight:700;width:50px;text-align:right}
+.s2-clarify{background:#FEF3C7;border:1px solid var(--amber);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px}
+.s2-clarify-icon{width:28px;height:28px;background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#1C1C1E;flex-shrink:0}
+.s2-jump{font-size:32px;font-weight:800;color:#059669;text-align:center}
+.s2-arrow{display:flex;align-items:center;justify-content:center;gap:12px;font-size:28px;font-weight:700;color:var(--emerald)}
+
+/* ===== SCENE 3: SAFETY ===== */
+.s3-crisis{width:960px;background:linear-gradient(135deg,#FEF2F2,#FEE2E2);border:2px solid var(--red);border-radius:20px;padding:40px;text-align:center;animation:glowRed 1.5s ease-in-out infinite}
+.s3-crisis-icon{width:52px;height:52px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.s3-num-grid{display:flex;justify-content:center;gap:40px;margin-top:24px}
+.s3-big-num{font-size:52px;font-weight:900;color:#DC2626;letter-spacing:-1px}
+.s3-num-label{font-size:16px;color:#991B1B;font-weight:500;margin-top:2px}
+.s3-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:var(--red);color:white;border-radius:100px;font-size:18px;font-weight:700;animation:pulse 1.5s ease-in-out infinite}
+.s3-statement{font-size:32px;font-weight:600;line-height:1.5;text-align:center;max-width:900px}
+.s3-emphasis{color:var(--red-light);font-weight:800}
+.s3-ripple{position:absolute;width:100px;height:100px;border:2px solid var(--red);border-radius:50%;animation:ripple 2s ease-out infinite}
+.s3-ripple:nth-child(2){animation-delay:0.7s}
+.s3-ripple:nth-child(3){animation-delay:1.4s}
+
+/* ===== SCENE 4: ARCHITECTURE ===== */
+.s4-layer{display:flex;align-items:center;gap:20px;width:960px;padding:14px 28px;border-radius:12px;background:var(--card);border:1px solid var(--border);position:relative}
+.s4-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.s4-label{font-size:20px;font-weight:600;flex:1}
+.s4-detail{font-size:16px;color:var(--text2)}
+.s4-arrow-down{width:2px;height:20px;background:var(--text3);margin:0 auto;position:relative}
+.s4-arrow-down::after{content:'';position:absolute;bottom:-3px;left:-5px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid var(--text3)}
+.s4-principle{padding:28px 44px;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);border-radius:16px;max-width:860px;text-align:center}
+.s4-principle-text{font-size:26px;font-weight:500;line-height:1.5}
+.s4-highlight{color:var(--emerald-glow);font-weight:700}
+
+/* ===== SCENE 5: CLOSE ===== */
+.s5-logo{width:72px;height:72px;border:3px solid var(--emerald);border-radius:18px;display:flex;align-items:center;justify-content:center;animation:glow 2s ease-in-out infinite}
+.s5-logo-text{font-size:32px;font-weight:900;color:var(--emerald)}
+.s5-name{font-size:44px;font-weight:800;letter-spacing:-2px}
+.s5-tagline{font-size:42px;font-weight:300;line-height:1.3;text-align:center;max-width:800px}
+.s5-tagline-bold{font-weight:700;background:linear-gradient(135deg,var(--emerald),var(--emerald-glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.s5-badge{padding:14px 36px;background:var(--card);border:1px solid var(--border);border-radius:100px;font-size:20px;font-weight:500;color:var(--text2)}
+.s5-credits{font-size:17px;color:var(--text3);line-height:1.7;text-align:center}
+.s5-orb{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(5,150,105,0.15),transparent 70%);animation:float 6s ease-in-out infinite}
+</style>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+<div id="progressBar" style="width:0%"></div>
+
+<!-- ===== SCENE 0: HOOK ===== -->
+<div class="scene active" id="s0">
+  <div class="s0-million" id="s0Million" style="opacity:0">4.2M</div>
+  <div style="height:24px"></div>
+  <div class="s0-search" id="s0Search" style="opacity:0">
+    <div class="s0-search-icon"></div>
+    <span class="s0-typing" id="s0Type"></span>
+    <span class="s0-cursor"></span>
+  </div>
+  <div style="height:32px"></div>
+  <div class="s0-result" id="s0Line1" style="opacity:0">The search engine returns <span class="s0-num">4.2 million</span> results.</div>
+  <div style="height:16px"></div>
+  <div class="s0-result" id="s0Line2" style="opacity:0"><span class="s0-critical">None of them</span> mention she has <span class="s0-critical">5 days</span> to respond.</div>
+  <div style="height:40px"></div>
+  <div class="s0-tag" id="s0Tag" style="opacity:0;background:rgba(220,38,38,0.12);color:var(--red-light)">A confident wrong answer is more dangerous than no answer</div>
+</div>
+
+<!-- ===== SCENE 1: PROBLEM ===== -->
+<div class="scene" id="s1">
+  <div class="s1-scanline"></div>
+  <div style="font-size:48px;font-weight:700;letter-spacing:-1px;margin-bottom:16px;text-align:center" id="s1Title">
+    <span style="color:var(--red)">73%</span> of searches lead to dead ends
+  </div>
+  <div style="font-size:24px;color:var(--text2);text-align:center;margin-bottom:48px;max-width:900px" id="s1Sub">
+    Not because resources don't exist — because the <span style="color:var(--red);font-weight:600">systems</span> connecting people to them are broken.
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;width:1200px" id="s1Stats">
+    <div class="s1-stat" style="animation-delay:0s">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);border-radius:20px 20px 0 0"></div>
+      <div class="s1-stat-num" style="color:var(--red)">73%</div>
+      <div class="s1-stat-label">Dead-end searches</div>
+    </div>
+    <div class="s1-stat" style="animation-delay:0.5s">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber);border-radius:20px 20px 0 0"></div>
+      <div class="s1-stat-num" style="color:var(--amber)">211</div>
+      <div class="s1-stat-label">Directories, no guidance</div>
+    </div>
+    <div class="s1-stat" style="animation-delay:1s">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text3);border-radius:20px 20px 0 0"></div>
+      <div class="s1-stat-num" style="color:var(--text2)">0%</div>
+      <div class="s1-stat-label">Ask what you need</div>
+    </div>
+  </div>
+  <div style="height:40px"></div>
+  <div class="s1-quote" id="s1Quote">
+    A confident wrong answer is more dangerous than no answer at all.
+  </div>
+</div>
+
+<!-- ===== SCENE 2: SOLUTION ===== -->
+<div class="scene" id="s2">
+  <div style="font-size:40px;font-weight:500;text-align:center;margin-bottom:8px">
+    Instead of giving you <span style="color:var(--red);font-weight:700">THE</span> answer,
+  </div>
+  <div style="font-size:40px;font-weight:500;text-align:center;margin-bottom:32px">
+    we give you an <span style="color:var(--emerald-glow);font-weight:700">HONEST</span> answer.
+  </div>
+  <div class="s2-app">
+    <div class="s2-header">
+      <div class="s2-dot" style="background:#FF5F57"></div>
+      <div class="s2-dot" style="background:#FEBC2E"></div>
+      <div class="s2-dot" style="background:#28C840"></div>
+      <div style="flex:1;text-align:center;font-size:13px;color:#8E8E93;font-weight:500">ClearPath AI</div>
+    </div>
+    <div style="padding:28px;display:flex;flex-direction:column;gap:14px;min-height:420px">
+      <div class="s2-input" id="s2Input">I can't pay my rent anymore</div>
+      <div id="s2Results" style="display:flex;flex-direction:column;gap:10px;opacity:0">
+        <div class="s2-result-row">
+          <span style="font-size:15px;font-weight:600;color:#F59E0B;width:130px">Legal Aid</span>
+          <div class="s2-bar-track"><div class="s2-bar-fill" id="bar1" style="background:#F59E0B;width:52%"></div></div>
+          <span class="s2-pct" style="color:#F59E0B" id="pct1">52%</span>
+        </div>
+        <div class="s2-result-row">
+          <span style="font-size:15px;font-weight:600;color:#EF4444;width:130px">Emergency</span>
+          <div class="s2-bar-track"><div class="s2-bar-fill" id="bar2" style="background:#EF4444;width:48%"></div></div>
+          <span class="s2-pct" style="color:#EF4444" id="pct2">48%</span>
+        </div>
+        <div class="s2-result-row">
+          <span style="font-size:15px;font-weight:600;color:#8E8E93;width:130px">Housing</span>
+          <div class="s2-bar-track"><div class="s2-bar-fill" id="bar3" style="background:#8E8E93;width:45%"></div></div>
+          <span class="s2-pct" style="color:#8E8E93" id="pct3">45%</span>
+        </div>
+      </div>
+      <div class="s2-clarify" id="s2Clarify" style="opacity:0">
+        <div class="s2-clarify-icon">?</div>
+        <span style="font-size:16px;color:#92400E;font-weight:500">Have you received an eviction notice?</span>
+        <span style="display:inline-flex;padding:6px 16px;border-radius:16px;font-size:14px;font-weight:600;background:#059669;color:white;margin-left:8px">Yes</span>
+        <span style="display:inline-flex;padding:6px 16px;border-radius:16px;font-size:14px;font-weight:600;background:#E5E5EA;color:#1C1C1E">No</span>
+      </div>
+      <div id="s2Jump" style="opacity:0;text-align:center;padding-top:8px">
+        <div class="s2-arrow">
+          <span style="color:#F59E0B">52%</span>
+          <span style="color:var(--emerald)">→</span>
+          <span style="color:#059669">94% Legal Aid</span>
+        </div>
+        <div style="font-size:16px;color:#8E8E93;margin-top:6px">One question. From "housing programs" to "you need a lawyer in 5 days."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCENE 3: SAFETY ===== -->
+<div class="scene" id="s3" style="background:linear-gradient(180deg,var(--bg) 0%,#1A0505 100%)">
+  <div class="s3-ripple" style="top:200px;left:800px"></div>
+  <div class="s3-ripple" style="top:400px;left:1100px"></div>
+  <div class="s3-ripple" style="top:300px;left:600px"></div>
+  <div class="s3-crisis" id="s3Crisis">
+    <div class="s3-crisis-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div style="font-size:32px;font-weight:800;color:#DC2626">Crisis Detected</div>
+    <div style="font-size:17px;color:#991B1B;margin-top:8px">Immediate help is available. You are not alone.</div>
+    <div class="s3-num-grid">
+      <div><div class="s3-big-num">988</div><div class="s3-num-label">Suicide & Crisis Lifeline</div></div>
+      <div><div class="s3-big-num" style="font-size:34px">Crisis Text Line</div><div class="s3-num-label">Text HOME to 741741</div></div>
+      <div><div class="s3-big-num">911</div><div class="s3-num-label">Emergency Services</div></div>
+    </div>
+    <div class="s3-badge" style="margin-top:24px">HARDCODED SAFETY — NOT AI-POWERED</div>
+  </div>
+  <div style="height:36px"></div>
+  <div class="s3-statement" id="s3Statement" style="opacity:0">
+    The AI <span class="s3-emphasis">cannot override it</span>. Cannot skip it.<br>
+    Cannot replace it with a "helpful" classification.<br>
+    <span class="s3-emphasis" style="font-size:36px">Some things are too important for AI to decide.</span>
+  </div>
+</div>
+
+<!-- ===== SCENE 4: ARCHITECTURE ===== -->
+<div class="scene" id="s4">
+  <div style="font-size:48px;font-weight:700;letter-spacing:-1px;margin-bottom:8px">Six Layers of Honesty</div>
+  <div style="font-size:24px;color:var(--text2);margin-bottom:32px">Each one makes the AI more honest, not more powerful.</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0" id="s4Arch">
+    <div class="s4-layer" id="a1"><div class="s4-num" style="background:var(--emerald);color:white">1</div><div class="s4-label">Free-text Input</div><div class="s4-detail">Describe your situation in your own words</div></div>
+    <div class="s4-arrow-down" id="aa1"></div>
+    <div class="s4-layer" id="a2"><div class="s4-num" style="background:var(--red);color:white">2</div><div class="s4-label" style="color:var(--red-light)">Crisis Detection</div><div class="s4-detail">Hardcoded, AI-proof safety layer</div></div>
+    <div class="s4-arrow-down" id="aa2"></div>
+    <div class="s4-layer" id="a3"><div class="s4-num" style="background:var(--amber);color:white">3</div><div class="s4-label">Multi-label Classification</div><div class="s4-detail">Confidence scores, not guesses</div></div>
+    <div class="s4-arrow-down" id="aa3"></div>
+    <div class="s4-layer" id="a4"><div class="s4-num" style="background:var(--blue);color:white">4</div><div class="s4-label">Clarification Questions</div><div class="s4-detail">If confidence &lt; 70%</div></div>
+    <div class="s4-arrow-down" id="aa4"></div>
+    <div class="s4-layer" id="a5"><div class="s4-num" style="background:var(--emerald-glow);color:#0A0A0B">5</div><div class="s4-label">Transparent Results</div><div class="s4-detail">Why + what else + how confident</div></div>
+    <div class="s4-arrow-down" id="aa5"></div>
+    <div class="s4-layer" id="a6"><div class="s4-num" style="background:var(--violet);color:white">6</div><div class="s4-label">Human Escalation</div><div class="s4-detail">211 navigator when AI can't help</div></div>
+  </div>
+  <div style="height:24px"></div>
+  <div class="s4-principle" id="s4Principle" style="opacity:0">
+    <div class="s4-principle-text">
+      We don't hide uncertainty — we <span class="s4-highlight">show it</span>.<br>
+      We don't guess when unsure — we <span class="s4-highlight">ask</span>.<br>
+      When we can't help, we connect you to a <span class="s4-highlight">real person</span>.
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCENE 5: CLOSE ===== -->
+<div class="scene" id="s5" style="background:linear-gradient(180deg,var(--bg) 0%,#0D1B2A 100%)">
+  <div class="s5-orb" style="width:400px;height:400px;top:100px;left:100px"></div>
+  <div class="s5-orb" style="width:300px;height:300px;bottom:50px;right:200px;animation-delay:2s"></div>
+  <div class="s5-logo" id="s5Logo" style="margin-bottom:20px;opacity:0">
+    <span class="s5-logo-text">CP</span>
+  </div>
+  <div class="s5-name" id="s5Name" style="text-align:center;opacity:0">ClearPath AI</div>
+  <div style="height:28px"></div>
+  <div class="s5-tagline" id="s5Tag" style="opacity:0">
+    When it matters most,<br>
+    <span class="s5-tagline-bold">honesty is the safest answer.</span>
+  </div>
+  <div style="height:28px"></div>
+  <div class="s5-badge" id="s5Badge" style="opacity:0">USAII Global AI Hackathon 2026 — Community Track</div>
+  <div style="height:20px"></div>
+  <div class="s5-credits" id="s5Credits" style="opacity:0">
+    Built by Amine Harch El Korane & Harshit Singh<br>
+    100% free & open source · Hugging Face · React · Node.js · Python
+  </div>
+</div>
+
+<script>
+// ===== PARTICLE SYSTEM =====
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 1920; canvas.height = 1080;
+
+const particles = [];
+const PARTICLE_COUNT = 60;
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * 1920;
+    this.y = Math.random() * 1080;
+    this.vx = (Math.random() - 0.5) * 0.5;
+    this.vy = (Math.random() - 0.5) * 0.5;
+    this.r = Math.random() * 2 + 0.5;
+    this.alpha = Math.random() * 0.3 + 0.05;
+    this.color = ['#059669','#10B981','#34D399','#3B82F6'][Math.floor(Math.random()*4)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > 1920 || this.y < 0 || this.y > 1080) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+function drawParticles() {
+  ctx.clearRect(0, 0, 1920, 1080);
+  particles.forEach(p => { p.update(); p.draw(); });
+  // Draw connections
+  ctx.globalAlpha = 0.04;
+  ctx.strokeStyle = '#059669';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      if (dx*dx + dy*dy < 40000) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ===== TIMELINE ENGINE =====
+const DURATION = 180; // 3 minutes
+let elapsed = 0;
+let playing = false;
+
+function show(id) { const e = document.getElementById(id); if(e) e.style.opacity = '1'; }
+function hide(id) { const e = document.getElementById(id); if(e) e.style.opacity = '0'; }
+function setScene(n) {
+  document.querySelectorAll('.scene').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+  });
+}
+
+// Scene timeline: [time_s, action]
+const timeline = [
+  // SCENE 0: HOOK (0-15s)
+  [0,    () => setScene(0)],
+  [0.5,  () => { show('s0Million'); document.getElementById('s0Million').style.animation='pop 0.6s ease forwards'; }],
+  [2,    () => show('s0Search')],
+  [2.5,  () => { const el=document.getElementById('s0Type'); let i=0; const txt="I can't pay my rent anymore"; const iv=setInterval(()=>{ if(i<txt.length){el.textContent+=txt[i];i++}else clearInterval(iv)},55); }],
+  [5.5,  () => { hide('s0Million'); show('s0Line1'); document.getElementById('s0Line1').style.animation='slideIn 0.5s ease forwards'; }],
+  [8,    () => { show('s0Line2'); document.getElementById('s0Line2').style.animation='slideIn 0.5s ease forwards'; }],
+  [11,   () => { show('s0Tag'); document.getElementById('s0Tag').style.animation='slideIn 0.5s ease forwards'; }],
+
+  // SCENE 1: PROBLEM (15-45s)
+  [15,   () => setScene(1)],
+  [15.5, () => { document.getElementById('s1Title').style.animation='slideIn 0.5s ease forwards'; }],
+  [17,   () => { document.getElementById('s1Sub').style.animation='slideIn 0.5s ease forwards'; }],
+  [19,   () => { document.querySelectorAll('.s1-stat').forEach((s,i)=>{s.style.animation=`slideIn 0.5s ease ${i*0.3}s forwards`;s.style.opacity='0';}); }],
+  [24,   () => { document.getElementById('s1Quote').style.animation='slideIn 0.6s ease forwards'; document.getElementById('s1Quote').style.opacity='0'; }],
+  
+  // SCENE 2: SOLUTION (45-75s)
+  [45,   () => setScene(2)],
+  [45.5, () => { /* subtitle already visible */ }],
+  [48,   () => { show('s2Results'); document.getElementById('s2Results').style.animation='slideIn 0.5s ease forwards'; }],
+  [54,   () => { show('s2Clarify'); document.getElementById('s2Clarify').style.animation='slideIn 0.5s ease forwards'; }],
+  [60,   () => {
+    // Animate confidence jump
+    document.getElementById('bar1').style.width = '94%';
+    document.getElementById('pct1').textContent = '94%';
+    document.getElementById('pct1').style.color = '#059669';
+    document.getElementById('bar2').style.opacity='0.3';
+    document.getElementById('bar3').style.opacity='0.3';
+    document.getElementById('pct2').style.opacity='0.3';
+    document.getElementById('pct3').style.opacity='0.3';
+    show('s2Jump');
+    document.getElementById('s2Jump').style.animation='pop 0.6s ease forwards';
+  }],
+  
+  // SCENE 3: SAFETY (75-105s)
+  [75,   () => setScene(3)],
+  [75.5, () => { document.getElementById('s3Crisis').style.animation='pop 0.8s ease forwards, glowRed 1.5s ease-in-out infinite'; }],
+  [82,   () => { show('s3Statement'); document.getElementById('s3Statement').style.animation='slideIn 0.6s ease forwards'; }],
+  
+  // SCENE 4: ARCHITECTURE (105-135s)
+  [105,  () => setScene(4)],
+  [106,  () => { const layers=['a1','aa1','a2','aa2','a3','aa3','a4','aa4','a5','aa5','a6']; layers.forEach((id,i)=>{ setTimeout(()=>{ const e=document.getElementById(id); if(e){e.style.animation='slideIn 0.4s ease forwards'; e.style.opacity='0';} },i*700); }); }],
+  [118,  () => { show('s4Principle'); document.getElementById('s4Principle').style.animation='slideIn 0.6s ease forwards'; }],
+  
+  // SCENE 5: CLOSE (135-180s)
+  [135,  () => setScene(5)],
+  [136,  () => { show('s5Logo'); document.getElementById('s5Logo').style.animation='pop 0.6s ease forwards'; }],
+  [138,  () => { show('s5Name'); document.getElementById('s5Name').style.animation='slideIn 0.5s ease forwards'; }],
+  [140,  () => { show('s5Tag'); document.getElementById('s5Tag').style.animation='slideIn 0.5s ease forwards'; }],
+  [145,  () => { show('s5Badge'); document.getElementById('s5Badge').style.animation='slideIn 0.5s ease forwards'; }],
+  [150,  () => { show('s5Credits'); document.getElementById('s5Credits').style.animation='slideIn 0.5s ease forwards'; }],
+];
+
+let timelineIndex = 0;
+
+function tick() {
+  if (!playing) return;
+  elapsed += 1/25;
+  if (elapsed >= DURATION) { playing = false; return; }
+  
+  document.getElementById('progressBar').style.width = (elapsed/DURATION*100) + '%';
+  
+  while (timelineIndex < timeline.length && elapsed >= timeline[timelineIndex][0]) {
+    timeline[timelineIndex][1]();
+    timelineIndex++;
+  }
+  
+  requestAnimationFrame(tick);
+}
+
+// Start after fonts load
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+    playing = true;
+    tick();
+  }, 500);
+});
+</script>
+</body>
+</html>
