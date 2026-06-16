@@ -14,7 +14,7 @@ export const RESOURCE_VERIFICATION_INTERVAL_DAYS = 90;
 export const MAX_INPUT_LENGTH = 1000;
 export const MIN_INPUT_LENGTH = 3;
 
-export const CRISIS_RESPONSE_MAX_MS = 200;
+export const CRISIS_RESPONSE_MAX_MS = 150;
 export const CLASSIFICATION_TIMEOUT_MS = 15000;
 
 export const RESOURCE_CATEGORIES = [
