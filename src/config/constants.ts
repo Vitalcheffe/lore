@@ -7,7 +7,7 @@ export const APP_DESCRIPTION = 'Community resource navigator with calibrated tra
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const MAX_FREE_CLASSIFICATIONS_PER_DAY = 5;
-export const CLASSIFICATION_RATE_LIMIT_PER_MINUTE = 15;
+export const CLASSIFICATION_RATE_LIMIT_PER_MINUTE = 20;
 export const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
 export const RESOURCE_VERIFICATION_INTERVAL_DAYS = 90;
 
