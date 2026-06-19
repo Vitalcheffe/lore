@@ -237,3 +237,4 @@ export const LABEL_KEYWORDS: Record<string, string[]> = {
     'nursing home', 'eldercare', 'mobility', 'fall prevention',
   ],
 };
+// Updated responsible AI configuration
