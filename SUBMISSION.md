@@ -37,3 +37,6 @@ ClearPath AI classifies needs across multiple categories with calibrated confide
 - Live app: [deployed on Vercel]
 - Pitch video: public/videos/pitch.mp4
 - Pitch animation: public/pitch/
+
+## Qualifier Code
+Pending approval
